@@ -344,7 +344,11 @@ namespace sarklib{
 			memcpy(m, mat3.m, sizeof(float)*9);
 		}
 
-		
+		// getting matrix as GL format pointer
+		const float* GetRawMatrix(){
+			return reinterpret_cast<const float*>(m);
+		}
+
 		// matrix plus operator
 		const Matrix3 operator+(const Matrix3& mat3) const{
 			return Matrix3(
@@ -494,6 +498,10 @@ namespace sarklib{
 			memcpy(m, mat4.m, sizeof(float)*16);
 		}
 
+		// getting matrix as GL format pointer
+		const float* GetRawMatrix(){
+			return reinterpret_cast<const float*>(m);
+		}
 
 		// matrix plus operator
 		const Matrix4 operator+(const Matrix4& mat4) const{
