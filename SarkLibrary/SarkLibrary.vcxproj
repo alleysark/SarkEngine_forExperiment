@@ -77,7 +77,7 @@
     <ClCompile Include="test_main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Exceptions.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
