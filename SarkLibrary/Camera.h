@@ -56,7 +56,33 @@ namespace sarklib{
 		void SetUp(const Vector3& up){
 			mUp = up;
 		}
+		
+		
+		// get view matrix at current time
+		Matrix4 GetViewMatrix(){
+			Vector3 vDir = mLookat - mEye; // direction of viewing camera
+			vDir.Normalize();
 
+			Vector3 vRight = vDir.Cross(mUp); // right vector of viewing camera
+			vRight.Normalize();
+
+			Vector3 vUp = vRight.Cross(vDir); // up vector of viewing camera
+			vUp.Normalize();
+
+			Matrix4 matOrientation(
+				vRight.x, vUp.x, vDir.x, 0.0f,
+				vRight.y, vUp.y, vDir.y, 0.0f,
+				vRight.z, vUp.z, vDir.z, 0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f );
+			
+			Matrix4 matTranslation(
+				1.0f, 0.0f, 0.0f, 0.0f,
+				0.0f, 1.0f, 0.0f, 0.0f,
+				0.0f, 0.0f, 1.0f, 0.0f,
+				-mEye.x, -mEye.y, -mEye.z, 1.0f );
+			
+			return matTranslation * matOrientation;
+		}
 	};
 
 }
