@@ -686,5 +686,127 @@ namespace sarklib{
 
 
 
+	/**
+		Type of quaternion
+	*/
+	class Quaternion{
+	public:
+		float s, x,y,z; // q = [s + xi+yj+zk], s is scalar and (x,y,z) is vector part
+
+		Quaternion() : s(0.0f), x(0.0f), y(0.0f), z(0.0f)
+		{ }
+		Quaternion(float _x, float _y, float _z) : s(0.0f), x(_x), y(_y), z(_z)
+		{ }
+		Quaternion(float _s, float _x, float _y, float _z) : s(_s), x(_x), y(_y), z(_z)
+		{ }
+		Quaternion(const Quaternion& q){
+			s = q.s; x=q.x; y=q.y; z=q.z;
+		}
+		void operator=(const Quaternion& q){
+			s = q.s; x=q.x; y=q.y; z=q.z;
+		}
+
+		explicit Quaternion(const Vector3& v){
+			s=0.0f;
+			x = v.x; y=v.y; z=v.z;
+		}
+		explicit Quaternion(const Vector2& v){
+			s=0.0f;
+			x = v.x; y=v.y; z=0.0f;
+		}
+
+
+		void Set(float _x, float _y, float _z){
+			s=0.0f;
+			x=_x; y=_y; z=_z;
+		}
+		void Set(float _s, float _x, float _y, float _z){
+			s=_s;
+			x=_x; y=_y; z=_z;
+		}
+		
+
+		bool IsPure() const{
+			return (s==0.0f);
+		}
+
+		void MakePure(){
+			s = 0.0f;
+		}
+
+		const Quaternion operator+(const Quaternion& q) const{
+			return Quaternion(s+q.s, x+q.x, y+q.y, z+q.z);
+		}
+		const Quaternion& operator+=(const Quaternion& q){
+			s += q.s;
+			x += q.x; y += q.y; z += q.z;
+			return *this;
+		}
+
+		const Quaternion operator-(const Quaternion& q) const{
+			return Quaternion(s-q.s, x-q.x, y-q.y, z-q.z);
+		}
+		const Quaternion& operator-=(const Quaternion& q){
+			s -= q.s;
+			x -= q.x; y -= q.y; z -= q.z;
+			return *this;
+		}
+
+		//Hamilton product: [s1, v1]*[s2, v2] = [s1*s2 - dot(v1,v2), s1*v2 + s2*v1 + cross(v1,v2)]
+		const Quaternion operator*(const Quaternion& q) const{
+			return Quaternion(
+				s*q.s - x*q.x - y*q.y - z*q.z,
+				s*q.x + x*q.s + y*q.z - z*q.y,
+				s*q.y - x*q.z + y*q.s + z*q.x,
+				s*q.z + x*q.y - y*q.x + z*q.s );
+		}
+
+		const Quaternion& operator*=(const Quaternion& q){
+			Set(s*q.s - x*q.x - y*q.y - z*q.z,
+				s*q.x + x*q.s + y*q.z - z*q.y,
+				s*q.y - x*q.z + y*q.s + z*q.x,
+				s*q.z + x*q.y - y*q.x + z*q.s );
+			return *this;
+		}
+
+		//get conjugation and conjugate this
+		const Quaternion Conjugation() const{
+			return Quaternion(s, -x, -y, -z);
+		}
+		const Quaternion& Conjugate(){
+			Set(s, -x, -y, -z);
+			return *this;
+		}
+
+		//magnitude which called 'norm' or 'the tensor of quaternion'
+		float Magnitude() const{
+			return sqrtf( sqre(s) + sqre(x) + sqre(y) + sqre(z) );
+		}
+		float MagnitudeSq() const{
+			return sqre(s) + sqre(x) + sqre(y) + sqre(z);
+		}
+
+		//get normal and normalize this
+		const Quaternion Normal() const{
+			float mag = Magnitude();
+			return Quaternion(s/mag, x/mag, y/mag, z/mag);
+		}
+		const Quaternion& Normalize(){
+			float mag = Magnitude();
+			s /= mag;
+			x /= mag;
+			y /= mag;
+			z /= mag;
+			return *this;
+		}
+
+		//inverse, q^{-1} = conj(q)/(norm(q)^2)
+		const Quaternion Inverse() const{
+			float factor = fabs(MagnitudeSq());
+			return Quaternion(s/factor, -x/factor, -y/factor, -z/factor);
+		}
+	};
+
+
 }
 #endif
