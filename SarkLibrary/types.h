@@ -12,6 +12,9 @@ namespace sarklib{
 
 	//=============== Vector Types =================
 
+	/**
+		Type of vector 2D
+	*/
 	class Vector2{
 	public:
 		float x,y;
@@ -30,6 +33,9 @@ namespace sarklib{
 			x=v.x; y=v.y;
 		}
 
+		void Set(float _x, float _y){
+			x = _x; y = _y;
+		}
 
 		// vector magnitude
 		float Magnitude() const{
@@ -150,7 +156,9 @@ namespace sarklib{
 
 
 
-
+	/**
+		Type of vector 3D
+	*/
 	class Vector3{
 	public:
 		float x,y,z;
@@ -167,6 +175,10 @@ namespace sarklib{
 		}
 		void operator=(const Vector3& v){
 			x=v.x; y=v.y; z=v.z;
+		}
+
+		void Set(float _x, float _y, float _z){
+			x=_x; y=_y; z=_z;
 		}
 
 		// explicitly type cast
@@ -317,8 +329,9 @@ namespace sarklib{
 			((a)*det3x3(f,g,h,j,k,l,n,o,p) - (b)*det3x3(e,g,h,i,k,l,m,o,p) + (c)*det3x3(e,f,h,i,j,l,m,n,p) - (d)*det3x3(e,f,g,i,j,k,m,n,o))
 
 
-	// 3x3 square matrix
-	// defined row X col
+	/**
+		Type of 3x3 square matrix defined as row X col order
+	*/
 	class Matrix3{
 	public:
 		float m[3][3]; //row x col
@@ -469,8 +482,9 @@ namespace sarklib{
 
 
 
-	// 4x4 square matrix
-	// defined row X col
+	/**
+		Type of 4x4 square matrix defined as row X col order
+	*/
 	class Matrix4{
 	public:
 		float m[4][4]; //row x col
@@ -669,6 +683,7 @@ namespace sarklib{
 				mat4.m[2][0]/fConstant, mat4.m[2][1]/fConstant, mat4.m[2][2]/fConstant, mat4.m[2][3]/fConstant, 
 				mat4.m[3][0]/fConstant, mat4.m[3][1]/fConstant, mat4.m[3][2]/fConstant, mat4.m[3][3]/fConstant );
 	}
+
 
 
 }
