@@ -39,7 +39,7 @@ namespace sarklib{
 
 		// vector magnitude
 		float Magnitude() const{
-			return sqrtf( MagnitudeSq() );
+			return sqrtf( sqre(x) + sqre(y) );
 		}
 
 		float MagnitudeSq() const{
@@ -133,11 +133,13 @@ namespace sarklib{
 		}
 
 
-		// normalization
+		// get normal and normalize this
+		const Vector2 Normal() const{
+			float mag = Magnitude();
+			return Vector2(x/mag, y/mag);
+		}
 		void Normalize(){
 			float mag = Magnitude();
-			if( mag == 0 )
-				return;
 			x /= mag;
 			y /= mag;
 		}
@@ -189,7 +191,7 @@ namespace sarklib{
 
 		// vector magnitude
 		float Magnitude() const{
-			return sqrtf( MagnitudeSq() );
+			return sqrtf( sqre(x) + sqre(y) + sqre(z) );
 		}
 
 		float MagnitudeSq() const{
@@ -287,11 +289,13 @@ namespace sarklib{
 			return Vector3(y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x);
 		}
 
-		// normalization
+		// get normal and normalize this
+		const Vector3 Normal() const{
+			float mag = Magnitude();
+			return Vector3(x/mag, y/mag, z/mag);
+		}
 		void Normalize(){
 			float mag = Magnitude();
-			if( mag == 0 )
-				return;
 			x /= mag;
 			y /= mag;
 			z /= mag;
