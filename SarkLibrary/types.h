@@ -37,7 +37,7 @@ namespace sarklib{
 
 		// vector magnitude
 		float Magnitude() const{
-			return math::sqrtf( math::sqre(x) + math::sqre(y) );
+			return math::sqrt( math::sqre(x) + math::sqre(y) );
 		}
 
 		float MagnitudeSq() const{
@@ -189,7 +189,7 @@ namespace sarklib{
 
 		// vector magnitude
 		float Magnitude() const{
-			return math::sqrtf( math::sqre(x) + math::sqre(y) + math::sqre(z) );
+			return math::sqrt( math::sqre(x) + math::sqre(y) + math::sqre(z) );
 		}
 
 		float MagnitudeSq() const{
@@ -782,7 +782,7 @@ namespace sarklib{
 
 		//magnitude which called 'norm' or 'the tensor of quaternion'
 		float Magnitude() const{
-			return math::sqrtf( math::sqre(s) + math::sqre(x) + math::sqre(y) + math::sqre(z) );
+			return math::sqrt( math::sqre(s) + math::sqre(x) + math::sqre(y) + math::sqre(z) );
 		}
 		float MagnitudeSq() const{
 			return math::sqre(s) + math::sqre(x) + math::sqre(y) + math::sqre(z);
