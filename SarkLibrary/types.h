@@ -3,10 +3,8 @@
 
 #include <stdlib.h>
 #include <memory.h>
-#include <math.h>
 
-#define sqre(x) (x*x)
-#define sign(x) (x>0?1:(x<0?-1:0))
+#include "Math.h"
 
 namespace sarklib{
 
@@ -39,11 +37,11 @@ namespace sarklib{
 
 		// vector magnitude
 		float Magnitude() const{
-			return sqrtf( sqre(x) + sqre(y) );
+			return math::sqrtf( math::sqre(x) + math::sqre(y) );
 		}
 
 		float MagnitudeSq() const{
-			return sqre(x) + sqre(y);
+			return math::sqre(x) + math::sqre(y);
 		}
 
 		// unary - operator
@@ -191,11 +189,11 @@ namespace sarklib{
 
 		// vector magnitude
 		float Magnitude() const{
-			return sqrtf( sqre(x) + sqre(y) + sqre(z) );
+			return math::sqrtf( math::sqre(x) + math::sqre(y) + math::sqre(z) );
 		}
 
 		float MagnitudeSq() const{
-			return sqre(x) + sqre(y) + sqre(z);
+			return math::sqre(x) + math::sqre(y) + math::sqre(z);
 		}
 
 		// unary - operator
@@ -784,10 +782,10 @@ namespace sarklib{
 
 		//magnitude which called 'norm' or 'the tensor of quaternion'
 		float Magnitude() const{
-			return sqrtf( sqre(s) + sqre(x) + sqre(y) + sqre(z) );
+			return math::sqrtf( math::sqre(s) + math::sqre(x) + math::sqre(y) + math::sqre(z) );
 		}
 		float MagnitudeSq() const{
-			return sqre(s) + sqre(x) + sqre(y) + sqre(z);
+			return math::sqre(s) + math::sqre(x) + math::sqre(y) + math::sqre(z);
 		}
 
 		//get normal and normalize this
