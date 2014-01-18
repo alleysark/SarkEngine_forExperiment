@@ -9,52 +9,78 @@ namespace sarklib{
 		and declare useful things additionally which are not in 'math.h'
 	*/
 	namespace math{
-		const float PI = 3.1415926535897932384626433832f;
+		const float PI = 3.141592f;
+		const double PI_d = 3.1415926535897932384626433832;
 
-		inline int sign(double d){
-			return ( d>0?1:(d<0?-1:0) );
+		inline int sign(double value){
+			return ( value > 0.0 ? 1 :  (value < 0.0 ? -1 : 0) );
 		}
-		inline int sign(float f){
-			return ( f>0?1:(f<0?-1:0) );
+		inline int sign(float value){
+			return ( value > 0.0f ? 1 :  (value < 0.0f ? -1 : 0) );
 		}
 
-		inline double sqre(double d){
-			return d*d;
+		inline double sqre(double value){
+			return value*value;
 		}
-		inline float sqre(float f){
-			return f*f;
+		inline float sqre(float value){
+			return value*value;
 		}
+
+		inline double clamp(double value, double min, double max){
+			return (value < min ? min :  (value > max ? max : value) );
+		}
+		inline float clamp(float value, float min, float max){
+			return (value < min ? min :  (value > max ? max : value) );
+		}
+
+		#ifdef max
+			#undef max
+		#endif
+		inline double max(double v1, double v2){
+			return (v1>v2 ? v1 : v2);
+		}
+		inline float max(float v1, float v2){
+			return (v1>v2 ? v1 : v2);
+		}
+
+		#ifdef min
+			#undef min
+		#endif
+		inline double min(double v1, double v2){
+			return (v1<v2 ? v1 : v2);
+		}
+		inline float min(float v1, float v2){
+			return (v1<v2 ? v1 : v2);
+		}
+
+		inline double round(double value){
+			return (value >= 0.0) ? (long)(value + 0.5) : (long)(value - 0.5);
+		}
+		inline float round(float value){
+			return (value >= 0.0f) ? (int)(value + 0.5f) : (int)(value - 0.5f);
+		}
+
 
 		#include<math.h>
-		// for specifying the methods within meth.h
-		using ::acosf;	using ::asinf;
-		using ::atanf;	using ::atan2f;	using ::ceilf;
-		using ::cosf;	using ::coshf;	using ::expf;
-		using ::fabsf;	using ::floorf;	using ::fmodf;
-		using ::frexpf;	using ::ldexpf;	using ::logf;
-		using ::log10f;	using ::modff;	using ::powf;
-		using ::sinf;	using ::sinhf;	using ::sqrtf;
-		using ::tanf;	using ::tanhf;
-
-		using ::acosl;	using ::asinl;
-		using ::atanl;	using ::atan2l;	using ::ceill;
-		using ::cosl;	using ::coshl;	using ::expl;
-		using ::fabsl;	using ::floorl;	using ::fmodl;
-		using ::frexpl;	using ::ldexpl;	using ::logl;
-		using ::log10l;	using ::modfl;	using ::powl;
-		using ::sinl;	using ::sinhl;	using ::sqrtl;
-		using ::tanl;	using ::tanhl;
-
+		// for specifying the methods within math.h
 		using ::abs;
+		using ::ceil;	using ::floor;
 
-		using ::acos;	using ::asin;
-		using ::atan;	using ::atan2;	using ::ceil;
-		using ::cos;	using ::cosh;	using ::exp;
-		using ::fabs;	using ::floor;	using ::fmod;
-		using ::frexp;	using ::ldexp;	using ::log;
-		using ::log10;	using ::modf;	using ::pow;
-		using ::sin;	using ::sinh;	using ::sqrt;
-		using ::tan;	using ::tanh;
+		using ::cos;	using ::cosh;	using ::acos;
+		using ::sin;	using ::sinh;	using ::asin;
+		using ::tan;	using ::tanh;	using ::atan;	using ::atan2;
+		
+		using ::exp;
+		using ::pow;
+		using ::sqrt;
+
+		using ::frexp;	using ::ldexp;
+		using ::log;	using ::log10;
+		
+		using ::modf; //modulo
+		using ::fmod; //remainder
+		
+		
 	}
 }
 #endif
