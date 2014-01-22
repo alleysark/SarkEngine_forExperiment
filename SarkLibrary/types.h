@@ -155,6 +155,7 @@ namespace sarklib{
 	};
 	typedef Vector2 Vertex2;
 	typedef Vector2 Position2;
+	typedef Vector2 Point2;
 
 	// Vector2 friend operators
 	const Vector2 operator+(float fConstant, const Vector2& v){
@@ -324,6 +325,7 @@ namespace sarklib{
 	};
 	typedef Vector3 Vertex3;
 	typedef Vector3 Position3;
+	typedef Vector3 Point3;
 
 	// Vector3 friend operators
 	const Vector3 operator+(float fConstant, const Vector3& v){
