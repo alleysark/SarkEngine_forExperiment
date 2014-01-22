@@ -141,6 +141,17 @@ namespace sarklib{
 			x /= mag;
 			y /= mag;
 		}
+
+		
+		// calculate Euclidean distance of given two vectors
+		static float Distance(const Vector2& v1, const Vector2& v2){
+			return math::sqrt( math::sqre(v1.x - v2.x) + math::sqre(v1.y - v2.y) );
+		}
+
+		// calculate radians of given two vectors
+		static float Angle(const Vector2& v1, const Vector2& v2){
+			return math::acos( v1.Normal().Dot( v2.Normal() ) );
+		}
 	};
 	typedef Vector2 Vertex2;
 	typedef Vector2 Position2;
@@ -287,6 +298,7 @@ namespace sarklib{
 			return Vector3(y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x);
 		}
 
+
 		// get normal and normalize this
 		const Vector3 Normal() const{
 			float mag = Magnitude();
@@ -297,6 +309,17 @@ namespace sarklib{
 			x /= mag;
 			y /= mag;
 			z /= mag;
+		}
+
+
+		// calculate Euclidean distance of given two vectors
+		static float Distance(const Vector3& v1, const Vector3& v2){
+			return math::sqrt( math::sqre(v1.x - v2.x) + math::sqre(v1.y - v2.y) + math::sqre(v1.z - v2.z) );
+		}
+
+		// calculate radians of given two vectors
+		static float Angle(const Vector3& v1, const Vector3& v2){
+			return math::acos( v1.Normal().Dot( v2.Normal() ) );
 		}
 	};
 	typedef Vector3 Vertex3;
