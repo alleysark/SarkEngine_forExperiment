@@ -731,8 +731,8 @@ namespace sarklib{
 			s = q.s; x=q.x; y=q.y; z=q.z;
 		}
 
-		explicit Quaternion(const Vector3& v){
-			s=0.0f;
+		explicit Quaternion(const Vector3& v, float _s=0.0f){
+			s=_s;
 			x = v.x; y=v.y; z=v.z;
 		}
 		explicit Quaternion(const Vector2& v){
@@ -829,6 +829,35 @@ namespace sarklib{
 		const Quaternion Inverse() const{
 			float factor = fabs(MagnitudeSq());
 			return Quaternion(s/factor, -x/factor, -y/factor, -z/factor);
+		}
+
+
+		// rotate given vector by arbitrary axis as theta
+		static void Rotate(Vector3& v, const Vector3& axis, float theta){
+			Quaternion P(v);
+			Quaternion q(math::sin(theta/2.0f)*axis, math::cos(theta/2.0f)); //rotation quaternion
+			
+			P = (q * P) * q.Inverse();
+			v.Set(P.x, P.y, P.z);
+		}
+
+		static void Rotate(Vector3& v, float roll, float pitch, float yaw){
+			Quaternion P(v);
+			
+			float cos_yaw = math::cos(yaw/2.0f);
+			float sin_yaw = math::sin(yaw/2.0f);
+			float cos_pitch = math::cos(pitch/2.0f);
+			float sin_pitch = math::sin(pitch/2.0f);
+			float cos_roll = math::cos(roll/2.0f);
+			float sin_roll = math::sin(roll/2.0f);
+			Quaternion q(
+				cos_yaw*sin_pitch*cos_roll + sin_yaw*cos_pitch*sin_roll,
+				sin_yaw*cos_pitch*cos_roll - cos_yaw*sin_pitch*sin_roll,
+				cos_yaw*cos_pitch*sin_roll - sin_yaw*sin_pitch*cos_roll,
+				cos_yaw*cos_pitch*cos_roll + sin_yaw*sin_pitch*sin_roll);
+
+			P = (q * P) * q.Inverse();
+			v.Set(P.x, P.y, P.z);
 		}
 	};
 
