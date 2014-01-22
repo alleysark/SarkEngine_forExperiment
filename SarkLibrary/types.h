@@ -722,9 +722,7 @@ namespace sarklib{
 
 		Quaternion() : s(0.0f), x(0.0f), y(0.0f), z(0.0f)
 		{ }
-		Quaternion(float _x, float _y, float _z) : s(0.0f), x(_x), y(_y), z(_z)
-		{ }
-		Quaternion(float _s, float _x, float _y, float _z) : s(_s), x(_x), y(_y), z(_z)
+		Quaternion(float _x, float _y, float _z, float _s=0.0f) : s(_s), x(_x), y(_y), z(_z)
 		{ }
 		Quaternion(const Quaternion& q){
 			s = q.s; x=q.x; y=q.y; z=q.z;
