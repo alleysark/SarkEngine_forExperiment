@@ -80,7 +80,10 @@ namespace sarklib{
 		using ::modf; //modulo
 		using ::fmod; //remainder
 		
-		
+		// interpolations
+		float lerp(float q0, float q1, float t){
+			return t*(q1 - q0) + q0;
+		}
 	}
 }
 #endif
