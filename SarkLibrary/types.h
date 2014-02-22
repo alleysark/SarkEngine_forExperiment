@@ -337,6 +337,167 @@ namespace sarklib{
 	}
 
 
+	/**
+	Type of vector 4D
+	*/
+	class Vector4{
+	public:
+		float x, y, z, w;
+
+		Vector4() :x(0.0f), y(0.0f), z(0.0f), w(0.0f)
+		{ }
+		Vector4(float val) :x(val), y(val), z(val), w(val)
+		{ }
+		Vector4(float _x, float _y, float _z, float _w)
+			: x(_x), y(_y), z(_z), w(_w)
+		{ }
+		Vector4(const Vector4& v){
+			x = v.x; y = v.y; z = v.z; w = v.w;
+		}
+		void operator=(const Vector4& v){
+			x = v.x; y = v.y; z = v.z; w = v.w;
+		}
+
+		void Set(float _x, float _y, float _z, float _w){
+			x = _x; y = _y; z = _z; w = _w;
+		}
+
+		// explicitly type cast
+		explicit Vector4(const Vector2& v){
+			x = v.x; y = v.y; z = 0.0f; w = 0.0f;
+		}
+		explicit Vector4(const Vector3& v){
+			x = v.x; y = v.y; z = v.z; w = 0.0f;
+		}
+
+
+		// vector magnitude
+		float Magnitude() const{
+			return math::sqrt(math::sqre(x) + math::sqre(y) + math::sqre(z) + math::sqre(w));
+		}
+
+		float MagnitudeSq() const{
+			return math::sqre(x) + math::sqre(y) + math::sqre(z) + math::sqre(w);
+		}
+
+		// unary - operator
+		const Vector4 operator-() const{
+			return Vector4(-x, -y, -z, -w);
+		}
+
+
+		// vector plus operator
+		const Vector4 operator+(const Vector4& v) const{
+			return Vector4(x + v.x, y + v.y, z + v.z, w + v.w);
+		}
+
+		const Vector4 operator+(float fConstant) const{
+			return Vector4(x + fConstant, y + fConstant, z + fConstant, w + fConstant);
+		}
+
+		friend const Vector4 operator+(float fConstant, const Vector4& v);
+
+		const Vector4& operator+=(const Vector4& v){
+			x += v.x; y += v.y; z += v.z; w += v.w;
+			return *this;
+		}
+
+		const Vector4& operator+=(float fConstant){
+			x += fConstant; y += fConstant; z += fConstant; w += fConstant;
+			return *this;
+		}
+
+
+		// vector minus operator
+		const Vector4 operator-(const Vector4& v) const{
+			return Vector4(x - v.x, y - v.y, z - v.z, w - v.w);
+		}
+
+		const Vector4 operator-(float fConstant) const{
+			return Vector4(x - fConstant, y - fConstant, z - fConstant, w - fConstant);
+		}
+
+		const Vector4& operator-=(const Vector4& v){
+			x -= v.x; y -= v.y; z -= v.z; w -= v.w;
+			return *this;
+		}
+
+		const Vector4& operator-=(float fConstant){
+			x -= fConstant; y -= fConstant; z -= fConstant; w -= fConstant;
+			return *this;
+		}
+
+
+		// vector constant multiplication operator (it is not cross operation)
+		const Vector4 operator*(float fConstant) const{
+			return Vector4(x*fConstant, y*fConstant, z*fConstant, w*fConstant);
+		}
+
+		friend const Vector4 operator*(float fConstant, const Vector4& v);
+
+		const Vector4& operator*=(float fConstant){
+			x *= fConstant; y *= fConstant; z *= fConstant; w *= fConstant;
+			return *this;
+		}
+
+
+		// vector constnat division operator
+		const Vector4 operator/(float fConstant) const{
+			return Vector4(x / fConstant, y / fConstant, z / fConstant, w / fConstant);
+		}
+
+		const Vector4& operator/=(float fConstant){
+			x /= fConstant; y /= fConstant; z /= fConstant; w /= fConstant;
+			return *this;
+		}
+
+		// boolean operators
+		bool operator==(const Vector4& v) const{
+			return (x == v.x && y == v.y && z == v.z && w == v.w);
+		}
+
+		bool operator!=(const Vector4& v) const{
+			return (x != v.x || y != v.y || z != v.z || w != v.w);
+		}
+
+
+		// dot product
+		float Dot(const Vector4& v) const{
+			return x*v.x + y*v.y + z*v.z + w*v.w;
+		}
+
+		// get normal and normalize this
+		const Vector4 Normal() const{
+			float mag = Magnitude();
+			return Vector4(x / mag, y / mag, z / mag, w / mag);
+		}
+		void Normalize(){
+			float mag = Magnitude();
+			x /= mag;
+			y /= mag;
+			z /= mag;
+			w /= mag;
+		}
+
+
+		// calculate Euclidean distance of given two vectors
+		static float Distance(const Vector4& v1, const Vector4& v2){
+			return math::sqrt(math::sqre(v1.x - v2.x) + math::sqre(v1.y - v2.y) + math::sqre(v1.z - v2.z) + math::sqre(v1.w - v2.w));
+		}
+	};
+	typedef Vector4 Vertex4;
+	typedef Vector4 Position4;
+	typedef Vector4 Point4;
+	typedef Vector4 Color;
+
+	// Vector4 friend operators
+	const Vector4 operator+(float fConstant, const Vector4& v){
+		return Vector4(fConstant + v.x, fConstant + v.y, fConstant + v.z, fConstant + v.w);
+	}
+
+	const Vector4 operator*(float fConstant, const Vector4& v){
+		return Vector4(fConstant * v.x, fConstant * v.y, fConstant * v.z, fConstant * v.w);
+	}
 
 
 	//=============== Matrix Types =================
@@ -827,7 +988,7 @@ namespace sarklib{
 
 		//inverse, q^{-1} = conj(q)/(norm(q)^2)
 		const Quaternion Inverse() const{
-			float factor = fabs(MagnitudeSq());
+			float factor = math::abs(MagnitudeSq());
 			return Quaternion(s/factor, -x/factor, -y/factor, -z/factor);
 		}
 
