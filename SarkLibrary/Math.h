@@ -5,8 +5,8 @@ namespace sarklib{
 
 	/**
 		Mathematic methods and constants, 
-		this namespace redeclare whole methods in 'math.h' as namespace sarklib::math
-		and declare useful things additionally which are not in 'math.h'
+		this namespace redeclare whole methods in 'math.h' as namespace sarklib::math for adjective library use
+		and declare useful functions additionally which are not included in 'math.h'
 	*/
 	namespace math{
 		const float PI = 3.141592f;
