@@ -80,7 +80,8 @@
     <ClCompile Include="core.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="resources.cpp" />
-    <ClCompile Include="Scenes.cpp" />
+    <ClCompile Include="scenes.cpp" />
+    <ClCompile Include="shapes.cpp" />
     <ClCompile Include="test_main.cpp" />
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
@@ -89,7 +90,8 @@
     <ClInclude Include="core.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="resources.h" />
-    <ClInclude Include="Scenes.h" />
+    <ClInclude Include="scenes.h" />
+    <ClInclude Include="shapes.h" />
     <ClInclude Include="Transform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

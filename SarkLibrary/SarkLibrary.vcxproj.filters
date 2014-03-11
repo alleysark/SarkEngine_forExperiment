@@ -42,8 +42,11 @@
     <ClCompile Include="Transform.cpp">
       <Filter>Header Files\physics</Filter>
     </ClCompile>
-    <ClCompile Include="Scenes.cpp">
+    <ClCompile Include="scenes.cpp">
       <Filter>Header Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="shapes.cpp">
+      <Filter>Header Files\physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -62,8 +65,11 @@
     <ClInclude Include="Transform.h">
       <Filter>Header Files\physics</Filter>
     </ClInclude>
-    <ClInclude Include="Scenes.h">
+    <ClInclude Include="scenes.h">
       <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="shapes.h">
+      <Filter>Header Files\physics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
