@@ -81,12 +81,14 @@
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="resources.cpp" />
     <ClCompile Include="test_main.cpp" />
+    <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BMPResource.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="resources.h" />
+    <ClInclude Include="Transform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

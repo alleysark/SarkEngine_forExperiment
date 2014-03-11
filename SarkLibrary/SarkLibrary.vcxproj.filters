@@ -13,36 +13,51 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\core">
+      <UniqueIdentifier>{62c7536c-76c9-487c-b20e-b34e65fe4bad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{329ea97f-2bc6-4288-ba7b-59ced0cefed7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\physics">
+      <UniqueIdentifier>{73f6f98a-668e-4b9c-bc51-086bc31adcd2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="core.cpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\core</Filter>
     </ClCompile>
     <ClCompile Include="Engine.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="resources.cpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\core</Filter>
     </ClCompile>
     <ClCompile Include="BMPResource.cpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="resources.cpp">
+      <Filter>Header Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Header Files\physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="Engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resources.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="BMPResource.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="resources.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Header Files\physics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
