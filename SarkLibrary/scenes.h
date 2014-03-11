@@ -3,16 +3,25 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include "core.h"
 #include "Transform.h"
 
 namespace sarklib{
 
-	// pure abstract scene component class
-	// *the transformation of scene component is always done as T.R.(S) order
-	// *transform x vertices = world coord vertices
+	// pure abstract scene component class.
+	// all scene components have unique component id
 	class ASceneComponent{
+	public:
+		typedef uint32 ComponentID;
+
 	private:
+		static ComponentID _nextComponentID;
+		static ComponentID _getUniqueComponentID();
+
+	protected:
+		ComponentID mComponentId;
+
 		Transform mTransform;
 		bool mbVisible;
 
@@ -23,6 +32,9 @@ namespace sarklib{
 
 		// render interface
 		virtual void Render() = 0;
+
+
+		const ComponentID& GetComponentID() const;
 
 		Transform& GetTransform();
 
@@ -47,23 +59,28 @@ namespace sarklib{
 			Layer(bool needSorted = false);
 
 			void Sort(Vector3 pivotPosition);
+
+			ASceneComponent* FindSceneComponent(const ASceneComponent::ComponentID& componentId);
 		};
 
 	protected:
 		std::string mstrName;
 		
-		Layer mGUILayer;
-		Layer mObjectLayer;
-		Layer mBackLayer;
+		typedef std::map<std::string, Layer*> LayerContainer;
+		LayerContainer mLayers;
 
 	public:
 		AScene(std::string name);
 
 		virtual ~AScene();
 
+		// render interface
+		virtual void Render() = 0;
+
+
 		const std::string& GetName() const;
 
-		virtual void Render() = 0;
+		ASceneComponent* GetSceneComponent(const ASceneComponent::ComponentID& componentId, std::string layerName);
 	};
 
 }
