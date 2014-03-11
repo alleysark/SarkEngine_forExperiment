@@ -65,6 +65,9 @@
     <ClInclude Include="Transform.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
+    <ClInclude Include="Input.hpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClInclude>
     <ClInclude Include="scenes.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
