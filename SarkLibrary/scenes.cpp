@@ -44,19 +44,30 @@ namespace sarklib{
 		mbNeedSorted = needSorted;
 	}
 
+	AScene::Layer::~Layer(){
+		ComponentContainer::iterator itr = sceneComponents.begin();
+		ComponentContainer::iterator end = sceneComponents.end();
+		for (; itr != end; itr++){
+			delete (*itr);
+		}
+	}
+
 	void AScene::Layer::Sort(Vector3 pivotPosition){
 		real* distanceArr = new real[sceneComponents.size()];
 
 		for (ComponentContainer::iterator itr = sceneComponents.begin();
 			itr != sceneComponents.end(); itr++){
-
 		}
+	}
+
+	void AScene::Layer::AddSceneComponent(ASceneComponent* sceneComponent){
+		sceneComponents.push_back(sceneComponent);
 	}
 
 	ASceneComponent* AScene::Layer::FindSceneComponent(const ASceneComponent::ComponentID& componentId){
 		ComponentContainer::iterator itr = sceneComponents.begin();
-		ComponentContainer::iterator itrEnd = sceneComponents.end();
-		for (; itr != itrEnd; itr++){
+		ComponentContainer::iterator end = sceneComponents.end();
+		for (; itr != end; itr++){
 			if ((*itr)->GetComponentID() == componentId){
 				return (*itr);
 			}
@@ -74,15 +85,39 @@ namespace sarklib{
 		mstrName = name;
 	}
 
-	AScene::~AScene(){}
+	AScene::~AScene(){
+		LayerContainer::iterator itr = mLayers.begin();
+		LayerContainer::iterator end = mLayers.end();
+		for (; itr != end; itr++){
+			delete itr->second;
+		}
+	}
 
 	const std::string& AScene::GetName() const{
 		return mstrName;
 	}
 
-	ASceneComponent* AScene::GetSceneComponent(const ASceneComponent::ComponentID& componentId, std::string layerName){
+	bool AScene::AddLayer(std::string layerName, bool needSorted){
 		LayerContainer::iterator findedLayer = mLayers.find(layerName);
 		if (findedLayer != mLayers.end())
+			return false;
+
+		mLayers[layerName] = new Layer(needSorted);
+		return true;
+	}
+
+	bool AScene::AddSceneComponent(ASceneComponent* sceneComponent, std::string layerName){
+		LayerContainer::iterator findedLayer = mLayers.find(layerName);
+		if (findedLayer == mLayers.end())
+			return false;
+
+		findedLayer->second->AddSceneComponent(sceneComponent);
+		return true;
+	}
+
+	ASceneComponent* AScene::GetSceneComponent(const ASceneComponent::ComponentID& componentId, std::string layerName){
+		LayerContainer::iterator findedLayer = mLayers.find(layerName);
+		if (findedLayer == mLayers.end())
 			return NULL;
 
 		return findedLayer->second->FindSceneComponent(componentId);

@@ -57,8 +57,11 @@ namespace sarklib{
 
 		public:
 			Layer(bool needSorted = false);
+			~Layer();
 
 			void Sort(Vector3 pivotPosition);
+
+			void AddSceneComponent(ASceneComponent* sceneComponent);
 
 			ASceneComponent* FindSceneComponent(const ASceneComponent::ComponentID& componentId);
 		};
@@ -79,6 +82,10 @@ namespace sarklib{
 
 
 		const std::string& GetName() const;
+
+		bool AddLayer(std::string layerName, bool needSorted = false);
+
+		bool AddSceneComponent(ASceneComponent* sceneComponent, std::string layerName);
 
 		ASceneComponent* GetSceneComponent(const ASceneComponent::ComponentID& componentId, std::string layerName);
 	};
