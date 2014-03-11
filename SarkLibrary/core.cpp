@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <memory.h>
 
-#include "Math.h"
+#include "core.h"
 
 
 namespace sarklib{
