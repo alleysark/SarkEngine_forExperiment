@@ -45,6 +45,9 @@
     <ClCompile Include="scenes.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -65,10 +68,10 @@
     <ClInclude Include="Transform.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
-    <ClInclude Include="Input.hpp">
+    <ClInclude Include="scenes.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
-    <ClInclude Include="scenes.h">
+    <ClInclude Include="Input.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
   </ItemGroup>

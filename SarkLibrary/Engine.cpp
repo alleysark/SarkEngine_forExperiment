@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include "Input.h"
 
 namespace sarklib{
 
@@ -59,15 +60,10 @@ namespace sarklib{
 		unsigned long curTime;
 
 		while (mbRunning){
-			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)){
-				// handle or dispatch messages
-				if (msg.message == WM_QUIT){
-					mbRunning = false;
-				}
-				else{
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
-				}
+			if (PeekMessage(&msg, mhWnd, 0, 0, PM_REMOVE)){
+				// translate and dispatch messages
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
 			}
 			else{
 				curTime = timeGetTime();
@@ -186,9 +182,23 @@ namespace sarklib{
 			Engine::instance->mbRunning = false;
 			return 0;
 
+		case WM_CLOSE:
+			// TODO: if there are file processing or network connection,
+			// app can't be ternimated. just return 0;
+			// or else, just break to make handle message into DefWindowProc
+			break;
+
+			// input handling
+		case WM_KEYDOWN:
+			Input::keyboard.Down(wParam);
+			break;
+		case WM_KEYUP:
+			Input::keyboard.Up(wParam);
+			break;
+
 		case WM_SIZE:
 			Engine::instance->Resize(LOWORD(lParam), HIWORD(lParam));
-			return 0;
+			break;
 		};
 		return DefWindowProc(hWnd, iMessage, wParam, lParam);
 	}

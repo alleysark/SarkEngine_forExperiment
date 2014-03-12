@@ -79,6 +79,7 @@
     <ClCompile Include="BMPResource.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="resources.cpp" />
     <ClCompile Include="scenes.cpp" />
     <ClCompile Include="shapes.cpp" />
@@ -89,7 +90,7 @@
     <ClInclude Include="BMPResource.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="Engine.h" />
-    <ClInclude Include="Input.hpp" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="resources.h" />
     <ClInclude Include="scenes.h" />
     <ClInclude Include="shapes.h" />
