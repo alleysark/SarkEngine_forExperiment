@@ -30,14 +30,16 @@ namespace sarklib{
 #ifdef SARKLIB_USING_DOUBLE
 	typedef double		real;
 	typedef double		real_d; //is there any 128-bit floating point system??
-#define REAL_MAX	DBL_MAX
+
+	const real REAL_MAX = DBL_MAX;
 
 	typedef uint64		uinteger;
 	typedef int64		integer;
 #else
 	typedef float		real;
 	typedef double		real_d;
-#define REAL_MAX	FLT_MAX
+
+	const real REAL_MAX = FLT_MAX;
 
 	typedef uint32		uinteger;
 	typedef int32		integer;
@@ -79,16 +81,16 @@ namespace sarklib{
 			return (value < min ? min : (value > max ? max : value));
 		}
 
-#ifdef max
-#undef max
-#endif
+		#ifdef max
+			#undef max
+		#endif
 		inline real max(real v1, real v2){
 			return (v1 > v2 ? v1 : v2);
 		}
 
-#ifdef min
-#undef min
-#endif
+		#ifdef min
+			#undef min
+		#endif
 		inline real min(real v1, real v2){
 			return (v1 < v2 ? v1 : v2);
 		}
@@ -144,7 +146,14 @@ namespace sarklib{
 	*/
 	class Vector2{
 	public:
-		real x, y;
+		union{
+			struct{
+				real x, y;
+			};
+			struct{
+				real v[2];
+			};
+		};
 
 		Vector2();
 		Vector2(real val);
@@ -232,7 +241,14 @@ namespace sarklib{
 	*/
 	class Vector3{
 	public:
-		real x, y, z;
+		union{
+			struct{
+				real x, y, z;
+			};
+			struct{
+				real v[3];
+			};
+		};
 
 		Vector3();
 		Vector3(real val);
@@ -329,11 +345,14 @@ namespace sarklib{
 	public:
 		union{
 			struct{
-				Vector3 xyz;
-				real w;
+				real x, y, z, w;
 			};
 			struct{
-				real x, y, z, w;
+				real v[4];
+			};
+			struct{
+				Vector3 xyz;
+				real w;
 			};
 			struct{
 				real r, g, b, a;
@@ -429,18 +448,18 @@ namespace sarklib{
 	//inline type det2x2(type e00, type e01, type e10, type e11){
 	//	return (e00*e11 - e01*e10);
 	//}
-#define det2x2(a,b,c,d) ((a)*(d) - (b)*(c))
+	#define det2x2(a,b,c,d) ((a)*(d) - (b)*(c))
 
-#define det3x3(	a, b, c, \
-	d, e, f, \
-	g, h, i) \
-	((a)*det2x2(e, f, h, i) - (b)*det2x2(d, f, g, i) + (c)*det2x2(d, e, g, h))
+	#define det3x3(	a, b, c, \
+		d, e, f, \
+		g, h, i) \
+		((a)*det2x2(e, f, h, i) - (b)*det2x2(d, f, g, i) + (c)*det2x2(d, e, g, h))
 
-#define det4x4(	a, b, c, d, \
-	e, f, g, h, \
-	i, j, k, l, \
-	m, n, o, p) \
-	((a)*det3x3(f, g, h, j, k, l, n, o, p) - (b)*det3x3(e, g, h, i, k, l, m, o, p) + (c)*det3x3(e, f, h, i, j, l, m, n, p) - (d)*det3x3(e, f, g, i, j, k, m, n, o))
+	#define det4x4(	a, b, c, d, \
+		e, f, g, h, \
+		i, j, k, l, \
+		m, n, o, p) \
+		((a)*det3x3(f, g, h, j, k, l, n, o, p) - (b)*det3x3(e, g, h, i, k, l, m, o, p) + (c)*det3x3(e, f, h, i, j, l, m, n, p) - (d)*det3x3(e, f, g, i, j, k, m, n, o))
 
 
 	/**
