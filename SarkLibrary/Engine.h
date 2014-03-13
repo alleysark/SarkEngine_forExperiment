@@ -2,12 +2,17 @@
 #define __ENGINE_H__
 
 #include <Windows.h>
-#include <string>
 
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#pragma comment(lib, "winmm")
+#pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "glu32.lib")
+#pragma comment(lib, "glew32.lib")
+
+#include <string>
 #include <map>
 #include "core.h"
 #include "scenes.h"
@@ -40,7 +45,7 @@ namespace sarklib{
 		bool mbRunning;
 
 		// window size
-		unsigned int mnWndWidth, mnWndHeight;
+		uinteger mnWndWidth, mnWndHeight;
 
 		// color buffer clear color
 		Color mClearColor;
@@ -68,7 +73,7 @@ namespace sarklib{
 		static Engine* GetInstance();
 
 		// initialize application
-		bool InitializeApp(HINSTANCE hInstance, int nCmdShow, std::wstring strClassName, std::wstring strAppName);
+		bool InitializeApp(HINSTANCE hInstance, integer nCmdShow, std::wstring strClassName, std::wstring strAppName);
 
 		// run engine loop
 		void Run();
@@ -103,9 +108,14 @@ namespace sarklib{
 		bool SetCurrentScene(const std::string& sceneName);
 
 		void SetClearColor(const Color& color);
+
 		void SetViewMode(bool as2D);
 
-		void Resize(unsigned int width, unsigned int height);
+		void ResizeWindow(uinteger width, uinteger height);
+
+		void SetViewport(uinteger width, uinteger height);
+
+		void SetProjectionMatrix(uinteger width, uinteger height);
 
 	public:
 		static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);

@@ -31,7 +31,7 @@ namespace sarklib{
 
 
 	// initialize application
-	bool Engine::InitializeApp(HINSTANCE hInstance, int nCmdShow, std::wstring strClassName, std::wstring strAppName){
+	bool Engine::InitializeApp(HINSTANCE hInstance, integer nCmdShow, std::wstring strClassName, std::wstring strAppName){
 		mhInst = hInstance;
 
 		WNDCLASSEX wc;
@@ -44,8 +44,6 @@ namespace sarklib{
 		if (!RegisterClassEx(&wc))
 			return false;
 
-		mnWndWidth = 640;
-		mnWndHeight = 480;
 		mhWnd = CreateWindow(strClassName.c_str(), strAppName.c_str(), WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT, CW_USEDEFAULT, mnWndWidth, mnWndHeight,
 			NULL, (HMENU)NULL, hInstance, NULL);
@@ -68,9 +66,6 @@ namespace sarklib{
 		mbRunning = true;
 		MSG msg;
 
-		unsigned long passTime = timeGetTime();
-		unsigned long curTime;
-
 		while (mbRunning){
 			if (PeekMessage(&msg, mhWnd, 0, 0, PM_REMOVE)){
 				// translate and dispatch messages
@@ -78,10 +73,6 @@ namespace sarklib{
 				DispatchMessage(&msg);
 			}
 			else{
-				curTime = timeGetTime();
-				real deltaTime = (real)(curTime - passTime) / 1000.0f;
-				passTime = curTime;
-
 				Update();
 				Render();
 			}
@@ -134,18 +125,28 @@ namespace sarklib{
 		glFrontFace(GL_CCW);
 
 		glPolygonMode(GL_FRONT_FACE, GL_FILL);
+
+		glMatrixMode(GL_MODELVIEW);
 	}
 
 
 
 	// update current scene and other frame depentent components
 	void Engine::Update(){
+		static uint64 passTime = timeGetTime();
+		static uint64 curTime;
+
+		curTime = timeGetTime();
+		real deltaTime = (real)(curTime - passTime) / 1000.0f;
+		passTime = curTime;
+
 		mCurrentScene->Update();
 	}
 
 	// render current scene
 	void Engine::Render(){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glLoadIdentity();
 
 		mCurrentScene->Render();
 
@@ -180,34 +181,41 @@ namespace sarklib{
 		mbIs2D = as2D;
 	}
 
-	void Engine::Resize(unsigned int width, unsigned int height){
+	void Engine::ResizeWindow(uinteger width, uinteger height){
 		mnWndWidth = width;
 		mnWndHeight = height;
 
-		glViewport(0, 0, mnWndWidth, mnWndHeight);
+		SetWindowPos(mhWnd, NULL, 0, 0, mnWndWidth, mnWndHeight, SWP_NOMOVE | SWP_NOZORDER);
+
+		SetViewport(mnWndWidth, mnWndHeight);
+		SetProjectionMatrix(mnWndWidth, mnWndHeight);
+	}
+
+	void Engine::SetViewport(uinteger width, uinteger height){
+		glViewport(0, 0, width, height);
+	}
+
+	void Engine::SetProjectionMatrix(uinteger width, uinteger height){
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 
 		if (mbIs2D){
 			// orthogonal view
-			if (mnWndHeight >= mnWndWidth){
-				real ratio = (real)mnWndWidth / (real)mnWndHeight;
+			if (height >= width){
+				real ratio = (real)width / (real)height;
 				glOrtho(-500.0f*ratio, 500.0f*ratio, -500.0f, 500.0f, 0.0f, 1000.0f);
 			}
 			else{
-				real ratio = (real)mnWndHeight / (real)mnWndWidth;
+				real ratio = (real)height / (real)width;
 				glOrtho(-500.0f, 500.0f, -500.0f, 500.0f, 0.0f, 1000.0f);
 			}
 		}
 		else{
-			gluPerspective(60, (real)mnWndWidth / (real)mnWndHeight, 0.1f, 1000.0f);
+			gluPerspective(60, (real)width / (real)height, 0.1f, 1000.0f);
 		}
 
 		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
 	}
-	
-
 
 	LRESULT CALLBACK Engine::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam){
 		switch (iMessage){
@@ -230,7 +238,10 @@ namespace sarklib{
 			break;
 
 		case WM_SIZE:
-			Engine::instance->Resize(LOWORD(lParam), HIWORD(lParam));
+			Engine::instance->mnWndWidth = LOWORD(lParam);
+			Engine::instance->mnWndHeight = HIWORD(lParam);
+			Engine::instance->SetViewport(Engine::instance->mnWndWidth, Engine::instance->mnWndHeight);
+			Engine::instance->SetProjectionMatrix(Engine::instance->mnWndWidth, Engine::instance->mnWndHeight);
 			break;
 		};
 		return DefWindowProc(hWnd, iMessage, wParam, lParam);
