@@ -906,12 +906,7 @@ namespace sarklib{
 		x = v.x; y = v.y; z = 0.0f;
 	}
 
-
-	void Quaternion::Set(real _x, real _y, real _z){
-		s = 0.0f;
-		x = _x; y = _y; z = _z;
-	}
-	void Quaternion::Set(real _s, real _x, real _y, real _z){
+	void Quaternion::Set(real _x, real _y, real _z, real _s){
 		s = _s;
 		x = _x; y = _y; z = _z;
 	}
@@ -929,7 +924,7 @@ namespace sarklib{
 
 	// quaternion plus operation
 	const Quaternion Quaternion::operator+(const Quaternion& q) const{
-		return Quaternion(s + q.s, x + q.x, y + q.y, z + q.z);
+		return Quaternion(x + q.x, y + q.y, z + q.z, s + q.s);
 	}
 	const Quaternion& Quaternion::operator+=(const Quaternion& q){
 		s += q.s;
@@ -939,7 +934,7 @@ namespace sarklib{
 
 	// quaternion minus operation
 	const Quaternion Quaternion::operator-(const Quaternion& q) const{
-		return Quaternion(s - q.s, x - q.x, y - q.y, z - q.z);
+		return Quaternion(x - q.x, y - q.y, z - q.z, s - q.s);
 	}
 	const Quaternion& Quaternion::operator-=(const Quaternion& q){
 		s -= q.s;
@@ -950,25 +945,25 @@ namespace sarklib{
 	//Hamilton product: [s1, v1]*[s2, v2] = [s1*s2 - dot(v1,v2), s1*v2 + s2*v1 + cross(v1,v2)]
 	const Quaternion Quaternion::operator*(const Quaternion& q) const{
 		return Quaternion(
-			s*q.s - x*q.x - y*q.y - z*q.z,
 			s*q.x + x*q.s + y*q.z - z*q.y,
 			s*q.y - x*q.z + y*q.s + z*q.x,
-			s*q.z + x*q.y - y*q.x + z*q.s);
+			s*q.z + x*q.y - y*q.x + z*q.s,
+			s*q.s - x*q.x - y*q.y - z*q.z);
 	}
 	const Quaternion& Quaternion::operator*=(const Quaternion& q){
-		Set(s*q.s - x*q.x - y*q.y - z*q.z,
-			s*q.x + x*q.s + y*q.z - z*q.y,
+		Set(s*q.x + x*q.s + y*q.z - z*q.y,
 			s*q.y - x*q.z + y*q.s + z*q.x,
-			s*q.z + x*q.y - y*q.x + z*q.s);
+			s*q.z + x*q.y - y*q.x + z*q.s,
+			s*q.s - x*q.x - y*q.y - z*q.z);
 		return *this;
 	}
 
 	//get conjugation and conjugate this
 	const Quaternion Quaternion::Conjugation() const{
-		return Quaternion(s, -x, -y, -z);
+		return Quaternion(-x, -y, -z, s);
 	}
 	const Quaternion& Quaternion::Conjugate(){
-		Set(s, -x, -y, -z);
+		Set(-x, -y, -z, s);
 		return *this;
 	}
 
@@ -983,7 +978,7 @@ namespace sarklib{
 	//get normal and normalize this
 	const Quaternion Quaternion::Normal() const{
 		real mag = Magnitude();
-		return Quaternion(s / mag, x / mag, y / mag, z / mag);
+		return Quaternion(x / mag, y / mag, z / mag, s / mag);
 	}
 	const Quaternion& Quaternion::Normalize(){
 		real mag = Magnitude();
@@ -997,7 +992,7 @@ namespace sarklib{
 	//inverse, q^{-1} = conj(q)/(norm(q)^2)
 	const Quaternion Quaternion::Inverse() const{
 		real factor = math::abs(MagnitudeSq());
-		return Quaternion(s / factor, -x / factor, -y / factor, -z / factor);
+		return Quaternion(-x / factor, -y / factor, -z / factor, s / factor);
 	}
 
 	// make this as the rotating quaternion from given axis vector and theta

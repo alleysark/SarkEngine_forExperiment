@@ -624,12 +624,12 @@ namespace sarklib{
 	public:
 		union{
 			struct{ // q = [s + xi+yj+zk], s is scalar and (x,y,z) is vector part
-				real s;
 				real x, y, z;
+				real s;
 			};
 			struct{
-				real s;
 				Vector3 v;
+				real s;
 			};
 		};
 
@@ -642,8 +642,7 @@ namespace sarklib{
 		explicit Quaternion(const Vector2& v);
 
 
-		void Set(real _x, real _y, real _z);
-		void Set(real _s, real _x, real _y, real _z);
+		void Set(real _x, real _y, real _z, real _s = 0.0f);
 
 
 		// is scalar factor zero?
