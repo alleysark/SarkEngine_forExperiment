@@ -3,6 +3,16 @@
 
 namespace sarklib{
 
+	// singleton instance
+	Engine* Engine::instance = NULL;
+	// get instance of this engine
+	Engine* Engine::GetInstance(){
+		if (instance == NULL)
+			instance = new Engine();
+		return instance;
+	}
+
+
 	Engine::Engine(){
 		mhInst = NULL;
 		mhWnd = NULL;
@@ -13,15 +23,14 @@ namespace sarklib{
 		mnWndWidth = mnWndHeight = 100;
 		mClearColor.Set(0.0f, 0.0f, 0.0f, 1.0f);
 		mbIs2D = false;
-	}
 
-	Engine* Engine::instance = NULL;
-	Engine* Engine::GetInstance(){
-		if (instance == NULL)
-			instance = new Engine();
-		return instance;
+		mCurrentScene = NULL;
 	}
+	Engine::Engine(const Engine&){}
+	const Engine& Engine::operator=(const Engine&){ return *this; }
 
+
+	// initialize application
 	bool Engine::InitializeApp(HINSTANCE hInstance, int nCmdShow, std::wstring strClassName, std::wstring strAppName){
 		mhInst = hInstance;
 
@@ -52,6 +61,7 @@ namespace sarklib{
 		return true;
 	}
 
+	// run engine loop
 	void Engine::Run(){
 		mbRunning = true;
 		MSG msg;
@@ -67,38 +77,105 @@ namespace sarklib{
 			}
 			else{
 				curTime = timeGetTime();
-				Update((real)(curTime - passTime) / 1000.0f);
+				real deltaTime = (real)(curTime - passTime) / 1000.0f;
 				passTime = curTime;
 
+				Update();
 				Render();
 			}
 		}
 	}
 
-	void Engine::Update(real fDeltTime){
+	// pause engine loop
+	void Engine::Pause(){}
 
-	}
-
-	void Engine::Render(){
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		static real theta = 0;
-
-		glPushMatrix();
-		glRotatef(theta, 0.0f, 0.0f, 1.0f);
-		glBegin(GL_TRIANGLES);
-		glColor3f(1.0f, 0.0f, 0.0f); glVertex2f(0.0f, 1.0f);
-		glColor3f(0.0f, 1.0f, 0.0f); glVertex2f(0.87f, -0.5f);
-		glColor3f(0.0f, 0.0f, 1.0f); glVertex2f(-0.87f, -0.5f);
-		glEnd();
-		glPopMatrix();
-
-		SwapBuffers(mhDC);
-
-		theta += 1.0f;
-	}
-
+	// release application
 	void Engine::ReleaseApp(){
 		DisableGLContext();
+	}
+
+	// enable opengl device and rendering context
+	bool Engine::EnableGLContext(){
+		PIXELFORMATDESCRIPTOR pfd;
+		int nPixelFormat;
+
+		mhDC = GetDC(mhWnd);
+		memset(&pfd, 0, sizeof(pfd));
+
+		pfd.nSize = sizeof(pfd);
+		pfd.nVersion = 1;
+		pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+		pfd.iPixelType = PFD_TYPE_RGBA;
+		pfd.cColorBits = 32;
+		pfd.cDepthBits = 16;
+		pfd.iLayerType = PFD_MAIN_PLANE;
+		nPixelFormat = ChoosePixelFormat(mhDC, &pfd);
+		SetPixelFormat(mhDC, nPixelFormat, &pfd);
+
+		mhRC = wglCreateContext(mhDC);
+		return (bool)wglMakeCurrent(mhDC, mhRC);
+	}
+
+	// disable opengl device and rendering context
+	void Engine::DisableGLContext(){
+		wglMakeCurrent(NULL, NULL);
+		wglDeleteContext(mhRC);
+		ReleaseDC(mhWnd, mhDC);
+	}
+
+	// setup opengl state
+	void Engine::SetupGL(){
+		glClearColor(mClearColor.r, mClearColor.g, mClearColor.b, mClearColor.a);
+		glEnable(GL_DEPTH_TEST);
+
+		glEnable(GL_CULL_FACE);
+		glFrontFace(GL_CCW);
+
+		glPolygonMode(GL_FRONT_FACE, GL_FILL);
+	}
+
+
+
+	// update current scene and other frame depentent components
+	void Engine::Update(){
+		mCurrentScene->Update();
+	}
+
+	// render current scene
+	void Engine::Render(){
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		mCurrentScene->Render();
+
+		SwapBuffers(mhDC);
+	}
+
+	
+
+	// ---------- configuration methods ------------
+
+	bool Engine::AddScene(const std::string& sceneName, AScene* scene){
+		SceneContainer::const_iterator find = mScenes.find(sceneName);
+		if (find != mScenes.cend())
+			return false;
+		mScenes[sceneName] = scene;
+		return true;
+	}
+	bool Engine::SetCurrentScene(const std::string& sceneName){
+		SceneContainer::const_iterator find = mScenes.find(sceneName);
+		if (find == mScenes.cend())
+			return false;
+		mCurrentScene = find->second;
+		return true;
+	}
+
+	void Engine::SetClearColor(const Color& color){
+		mClearColor = color;
+		glClearColor(mClearColor.r, mClearColor.g, mClearColor.b, mClearColor.a);
+	}
+
+	void Engine::SetViewMode(bool as2D){
+		mbIs2D = as2D;
 	}
 
 	void Engine::Resize(unsigned int width, unsigned int height){
@@ -127,53 +204,7 @@ namespace sarklib{
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 	}
-
-	void Engine::SetClearColor(const Color& color){
-		mClearColor = color;
-		glClearColor(mClearColor.r, mClearColor.g, mClearColor.b, mClearColor.a);
-	}
-
-	void Engine::SetViewMode(bool as2D){
-		mbIs2D = as2D;
-	}
-
-
-	bool Engine::EnableGLContext(){
-		PIXELFORMATDESCRIPTOR pfd;
-		int nPixelFormat;
-
-		mhDC = GetDC(mhWnd);
-		memset(&pfd, 0, sizeof(pfd));
-
-		pfd.nSize = sizeof(pfd);
-		pfd.nVersion = 1;
-		pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-		pfd.iPixelType = PFD_TYPE_RGBA;
-		pfd.cColorBits = 32;
-		pfd.cDepthBits = 16;
-		pfd.iLayerType = PFD_MAIN_PLANE;
-		nPixelFormat = ChoosePixelFormat(mhDC, &pfd);
-		SetPixelFormat(mhDC, nPixelFormat, &pfd);
-
-		mhRC = wglCreateContext(mhDC);
-		return (bool)wglMakeCurrent(mhDC, mhRC);
-	}
-
-	void Engine::DisableGLContext(){
-		wglMakeCurrent(NULL, NULL);
-		wglDeleteContext(mhRC);
-		ReleaseDC(mhWnd, mhDC);
-	}
-
-	void Engine::SetupGL(){
-		glClearColor(mClearColor.r, mClearColor.g, mClearColor.b, mClearColor.a);
-		glEnable(GL_DEPTH_TEST);
-
-		glEnable(GL_CULL_FACE);
-		glFrontFace(GL_CCW);
-
-		glPolygonMode(GL_FRONT_FACE, GL_FILL);
-	}
+	
 
 
 	LRESULT CALLBACK Engine::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam){
