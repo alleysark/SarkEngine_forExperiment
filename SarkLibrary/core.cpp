@@ -508,7 +508,7 @@ namespace sarklib{
 	}
 
 	// getting matrix as GL format pointer
-	const real* Matrix3::GetRawMatrix(){
+	const real* Matrix3::GetRawMatrix() const{
 		return reinterpret_cast<const real*>(m);
 	}
 
@@ -688,7 +688,7 @@ namespace sarklib{
 	}
 
 	// getting matrix as GL format pointer
-	const real* Matrix4::GetRawMatrix(){
+	const real* Matrix4::GetRawMatrix() const{
 		return reinterpret_cast<const real*>(m);
 	}
 

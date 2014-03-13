@@ -485,7 +485,7 @@ namespace sarklib{
 		void operator=(const Matrix3& mat3);
 
 		// getting matrix as GL format pointer
-		const real* GetRawMatrix();
+		const real* GetRawMatrix() const;
 
 		// matrix plus operator
 		const Matrix3 operator+(const Matrix3& mat3) const;
@@ -564,7 +564,7 @@ namespace sarklib{
 		explicit Matrix4(const Matrix3& mat3);
 
 		// getting matrix as GL format pointer
-		const real* GetRawMatrix();
+		const real* GetRawMatrix() const;
 
 		// matrix plus operator
 		const Matrix4 operator+(const Matrix4& mat4) const;
