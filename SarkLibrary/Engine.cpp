@@ -57,6 +57,8 @@ namespace sarklib{
 		if (!EnableGLContext())
 			return false;
 
+		glewInit();
+
 		SetupGL();
 		return true;
 	}
