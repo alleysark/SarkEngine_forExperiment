@@ -1,7 +1,6 @@
 #ifndef __SCENES_H__
 #define __SCENES_H__
 
-#include <string>
 #include <vector>
 #include <map>
 #include "core.h"
