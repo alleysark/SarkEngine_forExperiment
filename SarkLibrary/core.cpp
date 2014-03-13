@@ -327,13 +327,15 @@ namespace sarklib{
 	Type of vector 4D
 	*/
 
-	Vector4::Vector4() :x(0.0f), y(0.0f), z(0.0f), w(0.0f)
-	{ }
-	Vector4::Vector4(real val) : x(val), y(val), z(val), w(val)
-	{ }
-	Vector4::Vector4(real _x, real _y, real _z, real _w)
-		: x(_x), y(_y), z(_z), w(_w)
-	{ }
+	Vector4::Vector4(){
+		x = 0.0f; y = 0.0f; z = 0.0f; w = 0.0f;
+	}
+	Vector4::Vector4(real val){
+		x = y = z = w = val;
+	}
+	Vector4::Vector4(real _x, real _y, real _z, real _w){
+		x = _x; y = _y; z = _z; w = _w;
+	}
 	Vector4::Vector4(const Vector4& v){
 		x = v.x; y = v.y; z = v.z; w = v.w;
 	}
