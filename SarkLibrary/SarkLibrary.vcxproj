@@ -77,6 +77,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BMPResource.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Input.cpp" />
@@ -88,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BMPResource.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Input.h" />

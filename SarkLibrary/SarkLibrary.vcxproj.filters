@@ -48,6 +48,9 @@
     <ClCompile Include="Input.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -72,6 +75,9 @@
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
     <ClInclude Include="Input.h">
+      <Filter>Header Files\core-system</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
   </ItemGroup>
