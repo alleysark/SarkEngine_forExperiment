@@ -28,6 +28,11 @@ namespace sarklib{
 
 		Vector3& n = mmatView.row[2].xyz;
 		n = u.Cross(v);
+
+		mmatView.m[0][3] = -mEye.Dot(u);
+		mmatView.m[1][3] = -mEye.Dot(v);
+		mmatView.m[2][3] = -mEye.Dot(n);
+		mmatView.m[3][3] = 1.f;
 	}
 
 	// get view transformation matrix
