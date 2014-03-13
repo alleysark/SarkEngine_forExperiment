@@ -13,8 +13,8 @@ and declare useful functions additionally which are not included in 'math.h'
 
 namespace sarklib{
 
-	typedef uint8_t		ubyte;
-	typedef int8_t		byte;
+	typedef uint8_t		uint8;
+	typedef int8_t		int8;
 
 	typedef uint16_t	uint16;
 	typedef int16_t		int16;
@@ -69,7 +69,7 @@ namespace sarklib{
 			return deg * PI / 180.0f;
 		}
 
-		inline byte sign(real value){
+		inline int8 sign(real value){
 			return (value > 0.0 ? 1 : (value < 0.0 ? -1 : 0));
 		}
 
@@ -96,7 +96,7 @@ namespace sarklib{
 		}
 
 		// approximately equal
-		inline bool apprx_equal(real v1, real v2, byte precision = 3){
+		inline bool apprx_equal(real v1, real v2, int8 precision = 3){
 			while (precision){
 				v1 *= 10.0f;
 				v2 *= 10.0f;

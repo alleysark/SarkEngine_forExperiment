@@ -17,7 +17,7 @@ namespace sarklib{
 		// --------------------------------------------
 		class Keyboard{
 		public:
-			typedef ubyte KeyCode;
+			typedef uint8 KeyCode;
 
 			// virtual keys of windows(it can be assigned by other system codes)
 			static const KeyCode CODE_NONE = 0;
@@ -142,7 +142,7 @@ namespace sarklib{
 		// ------------	mouse properties	------------------
 		class Mouse{
 		public:
-			typedef ubyte mouse_state_t;
+			typedef uint8 mouse_state_t;
 			const mouse_state_t STATE_MOVEMENT = 0;
 
 			const mouse_state_t STATE_LBUTTON_DOWN = 0;

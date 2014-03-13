@@ -31,16 +31,16 @@ namespace sarklib{
 	struct IBMPPIXELFORMAT{};
 
 	struct BMPPIXELFORMAT24 : public IBMPPIXELFORMAT{ // B-G-R order
-		ubyte b;
-		ubyte g;
-		ubyte r;
+		uint8 b;
+		uint8 g;
+		uint8 r;
 	};
 
 	struct BMPPIXELFORMAT32 : public IBMPPIXELFORMAT{
-		ubyte r;
-		ubyte g;
-		ubyte b;
-		ubyte a;
+		uint8 r;
+		uint8 g;
+		uint8 b;
+		uint8 a;
 	};
 
 	// BMP format resource
