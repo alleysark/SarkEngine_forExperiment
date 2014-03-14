@@ -16,18 +16,17 @@ namespace sarklib{
 
 	// make view matrix from camera properties(eye,at,up)
 	void Camera::MakeMatrix(){
-		Vector3 direction = mEye - mLookat;
+		Vector3& n = mmatView.row[2].xyz;
+		n = mEye - mLookat;
+		n.Normalize();
 
 		Vector3& u = mmatView.row[0].xyz;
-		u = mUp.Cross(direction);
+		u = mUp.Cross(n);
 		u.Normalize();
 
 		Vector3& v = mmatView.row[1].xyz;
-		v = direction.Cross(u);
+		v = n.Cross(u);
 		v.Normalize();
-
-		Vector3& n = mmatView.row[2].xyz;
-		n = u.Cross(v);
 
 		mmatView.m[0][3] = -mEye.Dot(u);
 		mmatView.m[1][3] = -mEye.Dot(v);
@@ -121,6 +120,7 @@ namespace sarklib{
 	void Camera::Pitch(real rad){
 		Vector3 lookDirection = mLookat - mEye;
 		Quaternion::Rotate(lookDirection, mmatView.row[0].xyz, rad);
+		Quaternion::Rotate(mUp, mmatView.row[0].xyz, rad);
 		mLookat = mEye + lookDirection;
 
 		MakeMatrix();
@@ -139,8 +139,8 @@ namespace sarklib{
 	// turn camera on an axis of n (likes z)
 	// it tilt its sight (positive radian makes it to see left-tilting)
 	void Camera::Roll(real rad){
-		Quaternion::Rotate(mmatView.row[0].xyz, mmatView.row[2].xyz, rad);
-		Quaternion::Rotate(mmatView.row[1].xyz, mmatView.row[2].xyz, rad);
+		Quaternion::Rotate(mUp, mmatView.row[2].xyz, rad);
+		MakeMatrix();
 	}
 
 }
