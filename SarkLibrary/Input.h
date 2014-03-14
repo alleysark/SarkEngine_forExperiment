@@ -5,6 +5,7 @@
 #include <Windows.h>
 #include <map>
 #include <list>
+#include <functional>
 
 namespace sarklib{
 
@@ -119,7 +120,7 @@ namespace sarklib{
 			static const KeyCode CODE_DECIMAL = VK_DECIMAL;
 
 			typedef uint32 KeyComb;
-			typedef void(*KeyCombHandler)(void);
+			typedef std::function<void(void)> KeyCombHandler;
 			typedef std::list<KeyCode> KeyCodeContainer;
 			typedef std::map<KeyComb, KeyCombHandler> KeyCombHandlerContainer;
 
