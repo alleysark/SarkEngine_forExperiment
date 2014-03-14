@@ -85,6 +85,7 @@
     <ClCompile Include="scenes.cpp" />
     <ClCompile Include="shapes.cpp" />
     <ClCompile Include="test_main.cpp" />
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -96,6 +97,7 @@
     <ClInclude Include="resources.h" />
     <ClInclude Include="scenes.h" />
     <ClInclude Include="shapes.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="Transform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

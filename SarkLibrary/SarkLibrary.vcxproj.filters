@@ -51,6 +51,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -78,6 +81,9 @@
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
+      <Filter>Header Files\core-system</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
   </ItemGroup>
