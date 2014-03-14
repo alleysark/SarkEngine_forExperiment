@@ -16,6 +16,7 @@
 #include <map>
 #include "core.h"
 #include "scenes.h"
+#include "Timer.h"
 
 namespace sarklib{
 
@@ -40,6 +41,9 @@ namespace sarklib{
 		HGLRC mhRC;
 
 		// ----------- engine properties -------------
+
+		// engine timer
+		Timer mTimer;
 
 		// the running state of engine
 		bool mbRunning;
@@ -78,8 +82,14 @@ namespace sarklib{
 		// run engine loop
 		void Run();
 
-		// pause engine loop
-		void Pause();
+		// pause engine loop. message loop is not paused
+		bool Pause();
+
+		// resume engine loop
+		bool Resume();
+
+		// call a halt to running engine
+		void Halt();
 
 		// release application
 		void ReleaseApp();

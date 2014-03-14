@@ -13,19 +13,12 @@ namespace sarklib{
 	}
 
 
-	Engine::Engine(){
-		mhInst = NULL;
-		mhWnd = NULL;
-		mhDC = NULL;
-		mhRC = NULL;
+	Engine::Engine() :
+		mhInst(NULL), mhWnd(NULL), mhDC(NULL), mhRC(NULL),
+		mTimer(false), mbRunning(false), mnWndWidth(0), mnWndHeight(0), mClearColor(0), mbIs2D(false),
+		mCurrentScene(NULL)
+	{ }
 
-		mbRunning = false;
-		mnWndWidth = mnWndHeight = 100;
-		mClearColor.Set(0.0f, 0.0f, 0.0f, 1.0f);
-		mbIs2D = false;
-
-		mCurrentScene = NULL;
-	}
 	Engine::Engine(const Engine&){}
 	const Engine& Engine::operator=(const Engine&){ return *this; }
 
@@ -66,6 +59,7 @@ namespace sarklib{
 		mbRunning = true;
 		MSG msg;
 
+		mTimer.Resume();
 		while (mbRunning){
 			if (PeekMessage(&msg, mhWnd, 0, 0, PM_REMOVE)){
 				// translate and dispatch messages
@@ -73,14 +67,29 @@ namespace sarklib{
 				DispatchMessage(&msg);
 			}
 			else{
-				Update();
-				Render();
+				if (mTimer.Update()){
+					Update();
+					Render();
+				}
 			}
 		}
 	}
 
-	// pause engine loop
-	void Engine::Pause(){}
+	// pause engine loop. message loop is not paused
+	bool Engine::Pause(){
+		return mTimer.Pause();
+	}
+
+	// resume engine loop
+	bool Engine::Resume(){
+		return mTimer.Resume();
+	}
+
+	// call a halt to running engine
+	void Engine::Halt(){
+		mTimer.Pause();
+		mbRunning = false;
+	}
 
 	// release application
 	void Engine::ReleaseApp(){
