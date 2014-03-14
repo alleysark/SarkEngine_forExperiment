@@ -19,6 +19,9 @@
     <Filter Include="Header Files\core-system">
       <UniqueIdentifier>{62c7536c-76c9-487c-b20e-b34e65fe4bad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\core-util\scene components">
+      <UniqueIdentifier>{8f984233-3096-4005-b83b-ac8490020791}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_main.cpp">
