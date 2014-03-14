@@ -142,13 +142,6 @@ namespace sarklib{
 
 	// update current scene and other frame depentent components
 	void Engine::Update(){
-		static uint64 passTime = timeGetTime();
-		static uint64 curTime;
-
-		curTime = timeGetTime();
-		real deltaTime = (real)(curTime - passTime) / 1000.0f;
-		passTime = curTime;
-
 		mCurrentScene->Update();
 	}
 
