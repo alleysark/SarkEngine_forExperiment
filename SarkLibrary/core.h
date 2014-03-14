@@ -481,8 +481,16 @@ namespace sarklib{
 			real _10, real _11, real _12,
 			real _20, real _21, real _22);
 		Matrix3(real** mat3);
+		Matrix3(const Vector3& row0, const Vector3& row1, const Vector3& row2);
 		Matrix3(const Matrix3& mat3);
 		void operator=(const Matrix3& mat3);
+
+		// set matrix elements
+		void Set(real _00, real _01, real _02,
+			real _10, real _11, real _12,
+			real _20, real _21, real _22);
+		// set matrix elements
+		void Set(const Vector3& row0, const Vector3& row1, const Vector3& row2);
 
 		// getting matrix as GL format pointer
 		const real* GetRawMatrix() const;
@@ -558,10 +566,25 @@ namespace sarklib{
 			real _20, real _21, real _22, real _23,
 			real _30, real _31, real _32, real _33);
 		Matrix4(real** mat4);
+		Matrix4(const Vector4& row0, 
+			const Vector4& row1, 
+			const Vector4& row2, 
+			const Vector4& row3);
 		Matrix4(const Matrix4& mat4);
 		void operator=(const Matrix4& mat4);
 
 		explicit Matrix4(const Matrix3& mat3);
+
+		// set matrix elements
+		void Set(real _00, real _01, real _02, real _03,
+			real _10, real _11, real _12, real _13,
+			real _20, real _21, real _22, real _23,
+			real _30, real _31, real _32, real _33);
+		// set matrix elements
+		void Set(const Vector4& row0,
+			const Vector4& row1,
+			const Vector4& row2,
+			const Vector4& row3);
 
 		// getting matrix as GL format pointer
 		const real* GetRawMatrix() const;

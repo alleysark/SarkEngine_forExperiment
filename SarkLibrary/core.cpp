@@ -500,11 +500,28 @@ namespace sarklib{
 	Matrix3::Matrix3(real** mat3){
 		memcpy(m, mat3, sizeof(real)* 9);
 	}
+	Matrix3::Matrix3(const Vector3& row0, const Vector3& row1, const Vector3& row2){
+		row[0] = row0; row[1] = row1; row[2] = row2;
+	}
 	Matrix3::Matrix3(const Matrix3& mat3){
 		memcpy(m, mat3.m, sizeof(real)* 9);
 	}
 	void Matrix3::operator = (const Matrix3& mat3){
 		memcpy(m, mat3.m, sizeof(real)* 9);
+	}
+
+	// set matrix elements
+	void Matrix3::Set(real _00, real _01, real _02,
+		real _10, real _11, real _12,
+		real _20, real _21, real _22)
+	{
+		m[0][0] = _00; m[0][1] = _01; m[0][2] = _02;
+		m[1][0] = _10; m[1][1] = _11; m[1][2] = _12;
+		m[2][0] = _20; m[2][1] = _21; m[2][2] = _22;
+	}
+	// set matrix elements
+	void Matrix3::Set(const Vector3& row0, const Vector3& row1, const Vector3& row2){
+		row[0] = row0; row[1] = row1; row[2] = row2;
 	}
 
 	// getting matrix as GL format pointer
@@ -673,6 +690,13 @@ namespace sarklib{
 	Matrix4::Matrix4(real** mat4){
 		memcpy(m, mat4, sizeof(real)* 16);
 	}
+	Matrix4::Matrix4(const Vector4& row0,
+		const Vector4& row1,
+		const Vector4& row2,
+		const Vector4& row3)
+	{
+		row[0] = row0; row[1] = row1; row[2] = row2; row[3] = row3;
+	}
 	Matrix4::Matrix4(const Matrix4& mat4){
 		memcpy(m, mat4.m, sizeof(real)* 16);
 	}
@@ -685,6 +709,26 @@ namespace sarklib{
 		m[1][0] = mat3.m[1][0]; m[1][1] = mat3.m[1][1]; m[1][2] = mat3.m[1][2]; m[1][3] = 0.0f;
 		m[2][0] = mat3.m[2][0]; m[2][1] = mat3.m[2][1]; m[2][2] = mat3.m[2][2]; m[2][3] = 0.0f;
 		m[3][0] = mat3.m[3][0]; m[3][1] = mat3.m[3][1]; m[3][2] = mat3.m[3][2]; m[3][3] = 0.0f;
+	}
+
+	// set matrix elements
+	void Matrix4::Set(real _00, real _01, real _02, real _03,
+		real _10, real _11, real _12, real _13,
+		real _20, real _21, real _22, real _23,
+		real _30, real _31, real _32, real _33)
+	{
+		m[0][0] = _00; m[0][1] = _01; m[0][2] = _02; m[0][3] = _03;
+		m[1][0] = _10; m[1][1] = _11; m[1][2] = _12; m[1][3] = _13;
+		m[2][0] = _20; m[2][1] = _21; m[2][2] = _22; m[2][3] = _23;
+		m[3][0] = _30; m[3][1] = _31; m[3][2] = _32; m[3][3] = _33;
+	}
+	// set matrix elements
+	void Matrix4::Set(const Vector4& row0,
+		const Vector4& row1,
+		const Vector4& row2,
+		const Vector4& row3)
+	{
+		row[0] = row0; row[1] = row1; row[2] = row2; row[3] = row3;
 	}
 
 	// getting matrix as GL format pointer
