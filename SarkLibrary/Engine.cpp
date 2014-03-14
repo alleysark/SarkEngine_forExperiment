@@ -75,6 +75,11 @@ namespace sarklib{
 		}
 	}
 
+	// get engine timer
+	const Timer& Engine::GetTimer() const{
+		return mTimer;
+	}
+
 	// pause engine loop. message loop is not paused
 	bool Engine::Pause(){
 		return mTimer.Pause();

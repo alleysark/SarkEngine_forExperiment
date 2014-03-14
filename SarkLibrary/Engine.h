@@ -16,6 +16,7 @@
 #include "core.h"
 #include "scenes.h"
 #include "Timer.h"
+#include "Input.h"
 
 namespace sarklib{
 
@@ -80,6 +81,9 @@ namespace sarklib{
 
 		// run engine loop
 		void Run();
+
+		// get engine timer
+		const Timer& GetTimer() const;
 
 		// pause engine loop. message loop is not paused
 		bool Pause();
