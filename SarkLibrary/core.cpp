@@ -932,10 +932,14 @@ namespace sarklib{
 	Type of quaternion
 	*/
 
-	Quaternion::Quaternion() : s(0.0f), x(0.0f), y(0.0f), z(0.0f)
-	{ }
-	Quaternion::Quaternion(real _x, real _y, real _z, real _s) : s(_s), x(_x), y(_y), z(_z)
-	{ }
+	Quaternion::Quaternion(){
+		s = 0.0f;
+		x = y = z = 0.0f;
+	}
+	Quaternion::Quaternion(real _x, real _y, real _z, real _s){
+		s = _s;
+		x = _x; y = _y; z = _z;
+	}
 	Quaternion::Quaternion(const Quaternion& q){
 		s = q.s; x = q.x; y = q.y; z = q.z;
 	}
@@ -1037,7 +1041,7 @@ namespace sarklib{
 
 	//inverse, q^{-1} = conj(q)/(norm(q)^2)
 	const Quaternion Quaternion::Inverse() const{
-		real factor = math::abs(MagnitudeSq());
+		real factor = MagnitudeSq();
 		return Quaternion(-x / factor, -y / factor, -z / factor, s / factor);
 	}
 
