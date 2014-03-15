@@ -12,27 +12,101 @@ namespace sark{
 		return _nextComponentID++;
 	}
 
-	ASceneComponent::ASceneComponent(){
+	// component id is automatically generated when constructor is called
+	ASceneComponent::ASceneComponent(ASceneComponent* parent)
+		: mParent(parent), mActivated(true)
+	{
 		mComponentId = _getUniqueComponentID();
-		mbEnable = true;
+		mComponentName = std::to_string(mComponentId);
+	}
+	
+	// component id is automatically generated when constructor is called.
+	ASceneComponent::ASceneComponent(const std::string& name, ASceneComponent* parent)
+		: mParent(parent), mActivated(true)
+	{
+		mComponentId = _getUniqueComponentID();
+		mComponentName = name;
 	}
 
+	// every derived class have to ensure release of your resources.
 	ASceneComponent::~ASceneComponent(){}
 
+	// get scene component ID
 	const ASceneComponent::ComponentID& ASceneComponent::GetComponentID() const{
 		return mComponentId;
 	}
+	// set scene component name
+	void ASceneComponent::SetComponentName(const std::string& name){
+		mComponentName = name;
+	}
 
+	// get scene component name
+	const std::string& ASceneComponent::GetComponentName() const{
+		return mComponentName;
+	}
+
+
+	// get parent component pointer
+	ASceneComponent* ASceneComponent::GetParent() const{
+		return mParent;
+	}
+	// set new parent. parent can be NULL to make this global component.
+	void ASceneComponent::SetParent(ASceneComponent* newParent){
+		mParent = newParent;
+	}
+
+
+	// get a child of id
+	ASceneComponent* ASceneComponent::GetChild(const ComponentID& id){
+		ChildComponentContainer::iterator itr = mChildren.begin();
+		ChildComponentContainer::iterator end = mChildren.end();
+		for (; itr != end; itr++){
+			if ((*itr)->GetComponentID() == id)
+				return (*itr);
+		}
+		return NULL;
+	}
+	// get a child who is firstly matched with queried name
+	ASceneComponent* ASceneComponent::GetChild(const std::string& name){
+		ChildComponentContainer::iterator itr = mChildren.begin();
+		ChildComponentContainer::iterator end = mChildren.end();
+		for (; itr != end; itr++){
+			if ((*itr)->GetComponentName() == name)
+				return (*itr);
+		}
+		return NULL;
+	}
+	// get all the children who are matched with queried name
+	std::list<ASceneComponent*> ASceneComponent::GetChildren(const std::string& name){
+		std::list<ASceneComponent*> results;
+
+		ChildComponentContainer::iterator itr = mChildren.begin();
+		ChildComponentContainer::iterator end = mChildren.end();
+		for (; itr != end; itr++){
+			if ((*itr)->GetComponentName() == name)
+				results.push_back((*itr));
+		}
+		return results;
+	}
+
+	// get the children container
+	const ASceneComponent::ChildComponentContainer& ASceneComponent::GetChildren() const{
+		return mChildren;
+	}
+
+
+	// get transform object of this component. it is local transform object.
 	Transform& ASceneComponent::GetTransform(){
 		return mTransform;
 	}
 
-	bool ASceneComponent::IsEnable() const{
-		return mbEnable;
+	// is this component activated?
+	bool ASceneComponent::IsActive() const{
+		return mActivated;
 	}
-
-	void ASceneComponent::Enable(bool enable){
-		mbEnable = enable;
+	// set component activation property
+	void ASceneComponent::Activate(bool act){
+		mActivated = act;
 	}
 
 
@@ -147,7 +221,7 @@ namespace sark{
 		ComponentReplicaArray::iterator itr = componentReplicas.begin();
 		ComponentReplicaArray::iterator end = componentReplicas.end();
 		for (; itr != end; itr++){
-			if (!(*itr)->IsEnable())
+			if (!(*itr)->IsActive())
 				continue;
 			(*itr)->Update();
 		}
@@ -158,7 +232,7 @@ namespace sark{
 		ComponentReplicaArray::iterator itr = componentReplicas.begin();
 		ComponentReplicaArray::iterator end = componentReplicas.end();
 		for (; itr != end; itr++){
-			if (!(*itr)->IsEnable())
+			if (!(*itr)->IsActive())
 				continue;
 			(*itr)->Render();
 		}

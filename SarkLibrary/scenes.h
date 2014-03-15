@@ -1,7 +1,9 @@
 #ifndef __SCENES_H__
 #define __SCENES_H__
 
+#include <string>
 #include <vector>
+#include <list>
 #include <map>
 #include "core.h"
 #include "Transform.h"
@@ -14,6 +16,7 @@ namespace sark{
 	class ASceneComponent{
 	public:
 		typedef uint32 ComponentID;
+		typedef std::list<ASceneComponent*> ChildComponentContainer;
 
 	private:
 		static ComponentID _nextComponentID;
@@ -23,10 +26,22 @@ namespace sark{
 		// unique component id
 		ComponentID mComponentId;
 
-		// transformation helper property
+		// name of scene component. it is duplicatable name
+		std::string mComponentName;
+
+		// parent scene component of this component.
+		// scene component can be composed as hierarchical structure
+		ASceneComponent* mParent;
+
+		// child scene components of this component.
+		// scene component can be composed as hierarchical structure
+		ChildComponentContainer mChildren;
+
+		// local scene component transform object
 		Transform mTransform;
-		// component availability indicator
-		bool mbEnable;
+
+		// component activation indicator
+		bool mActivated;
 
 	public:
 		// relative distance of this and camera.
@@ -34,22 +49,55 @@ namespace sark{
 		real rel_distance;
 
 	public:
-		ASceneComponent();
+		// component id is automatically generated when constructor is called.
+		ASceneComponent(ASceneComponent* parent = NULL);
+
+		// component id is automatically generated when constructor is called.
+		ASceneComponent(const std::string& name, ASceneComponent* parent = NULL);
 
 		// every derived class have to ensure release of your resources.
 		virtual ~ASceneComponent();
 
-		// interface
+		// update interface
 		virtual void Update() = 0;
+
+		// render interface
 		virtual void Render() = 0;
 
 
+		// get scene component ID
 		const ComponentID& GetComponentID() const;
 
+		// get scene component name
+		const std::string& GetComponentName() const;
+		// set scene component name
+		void SetComponentName(const std::string& name);
+
+
+		// get parent component pointer
+		ASceneComponent* GetParent() const;
+		// set new parent. parent can be NULL to make this global component.
+		void SetParent(ASceneComponent* newParent);
+
+
+		// get a child of id
+		ASceneComponent* GetChild(const ComponentID& id);
+		// get a child who is firstly matched with queried name
+		ASceneComponent* GetChild(const std::string& name);
+		// get all the children who are matched with queried name
+		std::list<ASceneComponent*> GetChildren(const std::string& name);
+
+		// get the children container
+		const ChildComponentContainer& GetChildren() const;
+
+
+		// get transform object of this component. it is local transform object.
 		Transform& GetTransform();
 
-		bool IsEnable() const;
-		void Enable(bool enable);
+		// is this component activated?
+		bool IsActive() const;
+		// set component activation property
+		void Activate(bool act);
 	};
 
 
