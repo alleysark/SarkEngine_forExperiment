@@ -1,7 +1,7 @@
 #include "shapes.h"
 #include <algorithm>
 
-namespace sarklib{
+namespace sark{
 
 	IShape::IShape(Type type){
 		mType = type;

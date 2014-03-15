@@ -5,7 +5,7 @@
 #include <string>
 #include <map>
 
-namespace sarklib{
+namespace sark{
 
 	class IResource;
 	template<class ImpResourceLoaderType> class IResourceLoader;

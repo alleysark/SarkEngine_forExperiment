@@ -1,7 +1,7 @@
 #include "scenes.h"
 #include <algorithm>
 
-namespace sarklib{
+namespace sark{
 
 	//=============================================
 	//		ASceneComponent class implementation

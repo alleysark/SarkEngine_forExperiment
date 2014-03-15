@@ -1,6 +1,6 @@
 #include "BMPResource.h"
 
-namespace sarklib{
+namespace sark{
 
 	BMPResource::BMPResource(int32 width, int32 height, uint16 bitCount, IBMPPIXELFORMAT* pPixels){
 		mWidth = width;

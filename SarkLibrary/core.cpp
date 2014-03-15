@@ -4,7 +4,7 @@
 #include "core.h"
 
 
-namespace sarklib{
+namespace sark{
 	//=============== Vector Types =================
 
 	/**

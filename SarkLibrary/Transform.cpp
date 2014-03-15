@@ -1,6 +1,6 @@
 #include "Transform.h"
 
-namespace sarklib{
+namespace sark{
 
 	Transform::Transform(){
 		mmatWorld.MakeIdentity();

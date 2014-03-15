@@ -4,7 +4,7 @@
 #include "core.h"
 #include <chrono>
 
-namespace sarklib{
+namespace sark{
 
 	// timer's time unit is 'second' type as real_d
 	// timer can be the real-time timer or fixed-flow timer

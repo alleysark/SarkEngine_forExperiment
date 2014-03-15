@@ -4,7 +4,7 @@
 #include "core.h"
 #include "resources.h"
 
-namespace sarklib{
+namespace sark{
 
 	struct BITMAPFILEHEADER {	// 14 = 2+4+2+2+4 (byte)
 		uint16 bfType;			// "BM"

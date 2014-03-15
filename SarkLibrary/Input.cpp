@@ -1,7 +1,7 @@
 #include "Input.h"
 #include <algorithm>
 
-namespace sarklib{
+namespace sark{
 
 	Input::Keyboard::Keyboard(){}
 

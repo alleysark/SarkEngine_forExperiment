@@ -1,6 +1,6 @@
 #include "resources.h"
 
-namespace sarklib{
+namespace sark{
 
 	ResourceManager::ResourceManager(){
 		mstrBasePath = "./";

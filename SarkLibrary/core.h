@@ -2,7 +2,7 @@
 #define __CORE_H__
 
 /**
-sarklib redeclare whole methods in 'math.h' as namespace sarklib::math for adjective library use
+sark redeclare whole methods in 'math.h' as namespace sark::math for adjective library use
 and declare useful functions additionally which are not included in 'math.h'
 */
 #include <math.h>
@@ -11,7 +11,7 @@ and declare useful functions additionally which are not included in 'math.h'
 #include <stdint.h>
 #include <stdlib.h>
 
-namespace sarklib{
+namespace sark{
 
 	typedef uint8_t		uint8;
 	typedef int8_t		int8;

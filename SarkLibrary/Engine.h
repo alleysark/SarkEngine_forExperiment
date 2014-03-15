@@ -18,7 +18,7 @@
 #include "Timer.h"
 #include "Input.h"
 
-namespace sarklib{
+namespace sark{
 
 	// engine is the core single-tone class to make application.
 	// it creates window and initializes graphics library(especially OpenGL).

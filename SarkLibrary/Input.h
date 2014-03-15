@@ -7,7 +7,7 @@
 #include <list>
 #include <functional>
 
-namespace sarklib{
+namespace sark{
 
 	// input static class management input system as general
 	// *note: when you are trying to debugging this class, 

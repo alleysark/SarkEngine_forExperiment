@@ -3,7 +3,7 @@
 
 #include "core.h"
 
-namespace sarklib{
+namespace sark{
 
 	// camera defines the most basic functionality and properties
 	// it can be extended by inheritance

@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-namespace sarklib{
+namespace sark{
 
 	Camera::Camera() :mEye(0), mLookat(0.f, 0.f, 1.f), mUp(0.f, 1.f, 0.f){
 		MakeMatrix();

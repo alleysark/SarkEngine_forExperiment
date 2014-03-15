@@ -3,7 +3,7 @@
 
 #include "core.h"
 
-namespace sarklib{
+namespace sark{
 
 	class Transform{
 	private:

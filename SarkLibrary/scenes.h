@@ -7,7 +7,7 @@
 #include "Transform.h"
 #include "Camera.h"
 
-namespace sarklib{
+namespace sark{
 
 	// pure abstract scene components class.
 	// all scene components have unique component id

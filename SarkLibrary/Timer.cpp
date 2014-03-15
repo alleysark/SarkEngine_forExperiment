@@ -1,7 +1,7 @@
 #include "Timer.h"
 
 
-namespace sarklib{
+namespace sark{
 
 	Timer::Timer(bool createWorking){
 		_start = Clock::now();

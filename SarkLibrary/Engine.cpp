@@ -1,7 +1,7 @@
 #include "Engine.h"
 #include "Input.h"
 
-namespace sarklib{
+namespace sark{
 
 	// singleton instance
 	Engine* Engine::instance = NULL;
