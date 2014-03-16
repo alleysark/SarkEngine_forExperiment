@@ -158,24 +158,22 @@ namespace sark{
 
 	// get combined transformation matrix of all ancestors
 	const Matrix4& ASceneComponent::GetAbsoluteMatrix(){
-		if (mAbsoluteTransformMat.m[3][3] != 0){
-			return mAbsoluteTransformMat;
-		}
-
-		// recalculate absolute transform matrix only when
-		// its or ancestors's transformation has been changed
-		if (mParent == NULL){
-			mAbsoluteTransformMat = mTransform.GetMatrix();
-		}
-		else{
-			mAbsoluteTransformMat = mTransform.GetMatrix() * mParent->GetAbsoluteMatrix();
+		if (IS_STAINED(mAbsoluteTransformMat)){
+			// recalculate absolute transform matrix only when
+			// its or ancestor's transformation has been changed
+			if (mParent == NULL){
+				mAbsoluteTransformMat = mTransform.GetMatrix();
+			}
+			else{
+				mAbsoluteTransformMat = mTransform.GetMatrix() * mParent->GetAbsoluteMatrix();
+			}
 		}
 		return mAbsoluteTransformMat;
 	}
 
 	// it makes its absolute transform matrix stained and also children's
 	void ASceneComponent::TransformStained(){
-		mAbsoluteTransformMat.m[3][3] = 0;
+		STAIN_TRANSMATRIX(mAbsoluteTransformMat);
 
 		ChildComponentContainer::iterator itr = mChildren.begin();
 		ChildComponentContainer::iterator end = mChildren.end();

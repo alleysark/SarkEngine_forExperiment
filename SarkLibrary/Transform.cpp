@@ -12,15 +12,14 @@ namespace sark{
 
 	// get transformation matrix
 	const Matrix4& Transform::GetMatrix(){
-		if (mTransformMat.m[3][3] != 0)
-			return mTransformMat;
-
-		// recalculate transform matrix only when
-		// its transformation has been changed
-		mTransformMat = mRotator.ToMatrix4(true);
-		mTransformMat.m[0][3] = mPosition.x;
-		mTransformMat.m[1][3] = mPosition.y;
-		mTransformMat.m[2][3] = mPosition.z;
+		if (IS_STAINED(mTransformMat)){
+			// recalculate transform matrix only when
+			// its transformation has been changed
+			mTransformMat = mRotator.ToMatrix4(true);
+			mTransformMat.m[0][3] = mPosition.x;
+			mTransformMat.m[1][3] = mPosition.y;
+			mTransformMat.m[2][3] = mPosition.z;
+		}
 		return mTransformMat;
 	}
 
@@ -68,7 +67,7 @@ namespace sark{
 	// if there is reference scene component, it sets the changed flag of absolute 
 	// transform of reference scene component.
 	void Transform::TransformStained(){
-		mTransformMat.m[3][3] = 0;
+		STAIN_TRANSMATRIX(mTransformMat);
 		if (mReference != NULL){
 			mReference->TransformStained();
 		}
