@@ -24,8 +24,8 @@ namespace sark{
 			return false;
 
 		_cur = Clock::now();
-		mElapsedTime = real_d((_cur - _start).count()) * Clock::period::num / Clock::period::den;
-		mDeltaTime = real_d((_cur - _prev).count()) * Clock::period::num / Clock::period::den;
+		mElapsedTime = static_cast<real>(real_d((_cur - _start).count()) * Clock::period::num / Clock::period::den);
+		mDeltaTime = static_cast<real>(real_d((_cur - _prev).count()) * Clock::period::num / Clock::period::den);
 		_prev = _cur;
 		
 		return true;
@@ -63,12 +63,12 @@ namespace sark{
 	}
 
 	// get currently elapsed time of engine running
-	const real_d& Timer::GetElapsedTime() const{
+	const real& Timer::GetElapsedTime() const{
 		return mElapsedTime;
 	}
 
 	// get delta time
-	const real_d& Timer::GetDeltaTime() const{
+	const real& Timer::GetDeltaTime() const{
 		return mDeltaTime;
 	}
 

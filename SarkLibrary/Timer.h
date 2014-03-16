@@ -16,8 +16,8 @@ namespace sark{
 		
 		Time _start, _prev, _cur, _pause;
 
-		real_d mElapsedTime;
-		real_d mDeltaTime;
+		real mElapsedTime;
+		real mDeltaTime;
 
 		bool mWorking;
 
@@ -38,10 +38,10 @@ namespace sark{
 		bool IsWorking() const;
 
 		// get currently elapsed time of engine running
-		const real_d& GetElapsedTime() const;
+		const real& GetElapsedTime() const;
 
 		// get delta time
-		const real_d& GetDeltaTime() const;
+		const real& GetDeltaTime() const;
 	};
 
 }
