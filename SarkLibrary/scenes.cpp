@@ -14,7 +14,7 @@ namespace sark{
 
 	// component id is automatically generated when constructor is called
 	ASceneComponent::ASceneComponent(ASceneComponent* parent)
-		: mParent(parent), mActivated(true)
+		: mParent(parent), mTransform(this), mActivated(true)
 	{
 		mComponentId = _getUniqueComponentID();
 		mComponentName = std::to_string(mComponentId);
@@ -22,7 +22,7 @@ namespace sark{
 	
 	// component id is automatically generated when constructor is called.
 	ASceneComponent::ASceneComponent(const std::string& name, ASceneComponent* parent)
-		: mParent(parent), mActivated(true)
+		: mParent(parent), mTransform(this), mActivated(true)
 	{
 		mComponentId = _getUniqueComponentID();
 		mComponentName = name;
@@ -52,12 +52,22 @@ namespace sark{
 	}
 	// set new parent. parent can be NULL to make this global component.
 	void ASceneComponent::SetParent(ASceneComponent* newParent){
+		if (mParent != NULL){
+			mParent->PullChild(mComponentId);
+		}
+
 		mParent = newParent;
+		if (newParent != NULL){
+			newParent->PushChild(this);
+		}
 	}
 
 
 	// get a child of id
 	ASceneComponent* ASceneComponent::GetChild(const ComponentID& id){
+		if (mChildren.size() == 0)
+			return NULL;
+
 		ChildComponentContainer::iterator itr = mChildren.begin();
 		ChildComponentContainer::iterator end = mChildren.end();
 		for (; itr != end; itr++){
@@ -68,6 +78,9 @@ namespace sark{
 	}
 	// get a child who is firstly matched with queried name
 	ASceneComponent* ASceneComponent::GetChild(const std::string& name){
+		if (mChildren.size() == 0)
+			return NULL;
+
 		ChildComponentContainer::iterator itr = mChildren.begin();
 		ChildComponentContainer::iterator end = mChildren.end();
 		for (; itr != end; itr++){
@@ -76,9 +89,37 @@ namespace sark{
 		}
 		return NULL;
 	}
+
+	// push a child into its children container as uniquely
+	bool ASceneComponent::PushChild(ASceneComponent* child){
+		if (GetChild(child->GetComponentID()) != NULL)
+			return false;
+		mChildren.push_back(child);
+		return true;
+	}
+
+	// pull a child from its children container. it doesn't delete pulled child from memory
+	ASceneComponent* ASceneComponent::PullChild(const ComponentID& id){
+		if (mChildren.size() == 0)
+			return NULL;
+
+		ASceneComponent* pulled = NULL;
+		ChildComponentContainer::iterator itr = mChildren.begin();
+		ChildComponentContainer::iterator end = mChildren.end();
+		for (; itr != end; itr++){
+			if ((*itr)->GetComponentID() == id){
+				pulled = (*itr);
+				mChildren.erase(itr);
+				break;
+			}
+		}
+		return pulled;
+	}
+
+
 	// get all the children who are matched with queried name
-	std::list<ASceneComponent*> ASceneComponent::GetChildren(const std::string& name){
-		std::list<ASceneComponent*> results;
+	const ASceneComponent::ChildComponentContainer ASceneComponent::GetChildren(const std::string& name){
+		ChildComponentContainer results;
 
 		ChildComponentContainer::iterator itr = mChildren.begin();
 		ChildComponentContainer::iterator end = mChildren.end();
@@ -88,6 +129,21 @@ namespace sark{
 		}
 		return results;
 	}
+	// save all the children who are matched with queried name 
+	// into given list reference. it returns the size of result.
+	uint32 ASceneComponent::GetChildren(const std::string& name, ChildComponentContainer& refContainer){
+		if (mChildren.size() == 0)
+			return 0;
+
+		ChildComponentContainer::iterator itr = mChildren.begin();
+		ChildComponentContainer::iterator end = mChildren.end();
+		for (; itr != end; itr++){
+			if ((*itr)->GetComponentName() == name)
+				refContainer.push_back((*itr));
+		}
+		return refContainer.size();
+	}
+
 
 	// get the children container
 	const ASceneComponent::ChildComponentContainer& ASceneComponent::GetChildren() const{
@@ -99,6 +155,35 @@ namespace sark{
 	Transform& ASceneComponent::GetTransform(){
 		return mTransform;
 	}
+
+	// get combined transformation matrix of all ancestors
+	const Matrix4& ASceneComponent::GetAbsoluteMatrix(){
+		if (mAbsoluteTransformMat.m[3][3] != 0){
+			return mAbsoluteTransformMat;
+		}
+
+		// recalculate absolute transform matrix only when
+		// its or ancestors's transformation has been changed
+		if (mParent == NULL){
+			mAbsoluteTransformMat = mTransform.GetMatrix();
+		}
+		else{
+			mAbsoluteTransformMat = mTransform.GetMatrix() * mParent->GetAbsoluteMatrix();
+		}
+		return mAbsoluteTransformMat;
+	}
+
+	// it makes its absolute transform matrix stained and also children's
+	void ASceneComponent::TransformStained(){
+		mAbsoluteTransformMat.m[3][3] = 0;
+
+		ChildComponentContainer::iterator itr = mChildren.begin();
+		ChildComponentContainer::iterator end = mChildren.end();
+		for (; itr != end; itr++){
+			(*itr)->TransformStained();
+		}
+	}
+
 
 	// is this component activated?
 	bool ASceneComponent::IsActive() const{

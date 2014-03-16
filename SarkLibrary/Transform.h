@@ -5,15 +5,22 @@
 
 namespace sark{
 
+	class ASceneComponent;
+
 	class Transform{
 	private:
 		Position3 mPosition;
 		Quaternion mRotator;
 		
-		Matrix4 mmatWorld;
+		// complete transform matrix. m[3][3] is a stain-check flag
+		Matrix4 mTransformMat;
 
+		// if this is the transform of scene component,
+		// it can access the scene component object by this property
+		// (ASceneComponent regard this as friend)
+		ASceneComponent* mReference;
 	public:
-		Transform();
+		Transform(ASceneComponent* reference = NULL);
 		~Transform();
 
 		// get transformation matrix
@@ -36,6 +43,13 @@ namespace sark{
 		void Rotate(const Vector3& axis, real theta);
 		// rotate it from given rotating factor roll(z-axis), pitch(x-axis) and yaw(y-axis)
 		void Rotate(real roll, real pitch, real yaw);
+
+	private:
+		// all the methods of Transform class have to call this function
+		// when the properties (translation and rotator quaternion) are changed.
+		// if there is reference scene component, it sets the stained flag of absolute 
+		// transform of reference scene component.
+		void TransformStained();
 	};
 
 }

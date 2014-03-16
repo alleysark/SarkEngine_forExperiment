@@ -1,23 +1,27 @@
 #include "Transform.h"
+#include "scenes.h"
 
 namespace sark{
 
-	Transform::Transform(){
-		mmatWorld.MakeIdentity();
+	Transform::Transform(ASceneComponent* reference)
+		: mReference(reference)
+	{
+		mTransformMat.MakeIdentity();
 	}
 	Transform::~Transform(){}
 
 	// get transformation matrix
 	const Matrix4& Transform::GetMatrix(){
-		if (mmatWorld.m[3][3] != 0)
-			return mmatWorld;
+		if (mTransformMat.m[3][3] != 0)
+			return mTransformMat;
 
-		mmatWorld = mRotator.ToMatrix4(true);
-		mmatWorld.m[0][3] = mPosition.x;
-		mmatWorld.m[1][3] = mPosition.y;
-		mmatWorld.m[2][3] = mPosition.z;
-		mmatWorld.m[3][3] = 1.0f;
-		return mmatWorld;
+		// recalculate transform matrix only when
+		// its transformation has been changed
+		mTransformMat = mRotator.ToMatrix4(true);
+		mTransformMat.m[0][3] = mPosition.x;
+		mTransformMat.m[1][3] = mPosition.y;
+		mTransformMat.m[2][3] = mPosition.z;
+		return mTransformMat;
 	}
 
 	// get position vector
@@ -28,34 +32,45 @@ namespace sark{
 	// translate into the other position from given vector
 	void Transform::Translate(const Position3& position){
 		mPosition = position;
-		mmatWorld.m[3][3] = 0.0f;
+		TransformStained();
 	}
 	// translate into the other position from given vector
 	void Transform::Translate(real x, real y, real z){
 		mPosition.Set(x, y, z);
-		mmatWorld.m[3][3] = 0.0f;
+		TransformStained();
 	}
 
 	// translate this position additionally
 	void Transform::TranslateMore(const Position3& add){
 		mPosition += add;
-		mmatWorld.m[3][3] = 0.0f;
+		TransformStained();
 	}
 	// translate this position additionally
 	void Transform::TranslateMore(real add_x, real add_y, real add_z){
 		mPosition += Position3(add_x, add_y, add_z);
-		mmatWorld.m[3][3] = 0.0f;
+		TransformStained();
 	}
 
 	// rotate it from given axis and theta
 	void Transform::Rotate(const Vector3& axis, real theta){
 		mRotator.MakeRotatingQuat(axis, theta);
-		mmatWorld.m[3][3] = 0.0f;
+		TransformStained();
 	}
 	// rotate it from given rotating factor roll(z-axis), pitch(x-axis) and yaw(y-axis)
 	void Transform::Rotate(real roll, real pitch, real yaw){
 		mRotator.MakeRotatingQuat(roll, pitch, yaw);
-		mmatWorld.m[3][3] = 0.0f;
+		TransformStained();
 	}
 
+
+	// all the methods of Transform class have to call this function
+	// when the properties (translation and rotator quaternion) are changed.
+	// if there is reference scene component, it sets the changed flag of absolute 
+	// transform of reference scene component.
+	void Transform::TransformStained(){
+		mTransformMat.m[3][3] = 0;
+		if (mReference != NULL){
+			mReference->TransformStained();
+		}
+	}
 }

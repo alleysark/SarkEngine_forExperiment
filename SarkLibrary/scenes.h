@@ -30,15 +30,20 @@ namespace sark{
 		std::string mComponentName;
 
 		// parent scene component of this component.
-		// scene component can be composed as hierarchical structure
+		// scene component can be composed as hierarchical structure.
+		// please do not make the circle in the family-tree.
 		ASceneComponent* mParent;
 
 		// child scene components of this component.
-		// scene component can be composed as hierarchical structure
+		// scene component can be composed as hierarchical structure.
+		// please do not make the circle in the family-tree.
 		ChildComponentContainer mChildren;
 
 		// local scene component transform object
 		Transform mTransform;
+
+		// combined transform matrix of all ancestors
+		Matrix4 mAbsoluteTransformMat;
 
 		// component activation indicator
 		bool mActivated;
@@ -84,8 +89,19 @@ namespace sark{
 		ASceneComponent* GetChild(const ComponentID& id);
 		// get a child who is firstly matched with queried name
 		ASceneComponent* GetChild(const std::string& name);
+
+		// push a child into its children container as uniquely
+		bool PushChild(ASceneComponent* child);
+
+		// pull a child from its children container. it doesn't delete pulled child from memory
+		ASceneComponent* PullChild(const ComponentID& id);
+		
+
 		// get all the children who are matched with queried name
-		std::list<ASceneComponent*> GetChildren(const std::string& name);
+		const ChildComponentContainer GetChildren(const std::string& name);
+		// save all the children who are matched with queried name 
+		// into given list reference. it returns the size of result.
+		uint32 GetChildren(const std::string& name, ChildComponentContainer& refContainer);
 
 		// get the children container
 		const ChildComponentContainer& GetChildren() const;
@@ -94,6 +110,18 @@ namespace sark{
 		// get transform object of this component. it is local transform object.
 		Transform& GetTransform();
 
+		// get combined transformation matrix of all ancestors
+		const Matrix4& GetAbsoluteMatrix();
+
+	private:
+		// it considers the Transform class as its friend 
+		// to allow the access of 'TransformChanged()' method
+		friend Transform;
+
+		// it makes its absolute transform matrix stained and also children's
+		void TransformStained();
+		
+	public:
 		// is this component activated?
 		bool IsActive() const;
 		// set component activation property
