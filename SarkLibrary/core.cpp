@@ -254,6 +254,23 @@ namespace sark{
 	}
 
 
+	// vector x matrix
+	const Vector3 Vector3::operator*(const Matrix3& mat3) const{
+		return Vector3(
+			x*mat3.m[0][0] + y*mat3.m[1][0] + z*mat3.m[2][0],
+			x*mat3.m[0][1] + y*mat3.m[1][1] + z*mat3.m[2][1],
+			x*mat3.m[0][2] + y*mat3.m[1][2] + z*mat3.m[2][2]);
+	}
+
+	// vector x matrix for this
+	const Vector3& Vector3::operator*=(const Matrix3& mat3){
+		Set(x*mat3.m[0][0] + y*mat3.m[1][0] + z*mat3.m[2][0],
+			x*mat3.m[0][1] + y*mat3.m[1][1] + z*mat3.m[2][1],
+			x*mat3.m[0][2] + y*mat3.m[1][2] + z*mat3.m[2][2]);
+		return *this;
+	}
+
+
 	// vector constnat division operator
 	const Vector3 Vector3::operator/(real fConstant) const{
 		return Vector3(x / fConstant, y / fConstant, z / fConstant);
@@ -422,6 +439,25 @@ namespace sark{
 	}
 
 
+	// vector x matrix
+	const Vector4 Vector4::operator*(const Matrix4& mat4) const{
+		return Vector4(
+			x*mat4.m[0][0] + y*mat4.m[1][0] + z*mat4.m[2][0] + w*mat4.m[3][0],
+			x*mat4.m[0][1] + y*mat4.m[1][1] + z*mat4.m[2][1] + w*mat4.m[3][1],
+			x*mat4.m[0][2] + y*mat4.m[1][2] + z*mat4.m[2][2] + w*mat4.m[3][2],
+			x*mat4.m[0][3] + y*mat4.m[1][3] + z*mat4.m[2][3] + w*mat4.m[3][3]);
+	}
+
+	// vector x matrix for this
+	const Vector4& Vector4::operator*=(const Matrix4& mat4){
+		Set(x*mat4.m[0][0] + y*mat4.m[1][0] + z*mat4.m[2][0] + w*mat4.m[3][0],
+			x*mat4.m[0][1] + y*mat4.m[1][1] + z*mat4.m[2][1] + w*mat4.m[3][1],
+			x*mat4.m[0][2] + y*mat4.m[1][2] + z*mat4.m[2][2] + w*mat4.m[3][2],
+			x*mat4.m[0][3] + y*mat4.m[1][3] + z*mat4.m[2][3] + w*mat4.m[3][3]);
+		return *this;
+	}
+
+
 	// vector constnat division operator
 	const Vector4 Vector4::operator/(real fConstant) const{
 		return Vector4(x / fConstant, y / fConstant, z / fConstant, w / fConstant);
@@ -575,6 +611,22 @@ namespace sark{
 			m[2][0] * mat3.m[0][0] + m[2][1] * mat3.m[1][0] + m[2][2] * mat3.m[2][0],
 			m[2][0] * mat3.m[0][1] + m[2][1] * mat3.m[1][1] + m[2][2] * mat3.m[2][1],
 			m[2][0] * mat3.m[0][2] + m[2][1] * mat3.m[1][2] + m[2][2] * mat3.m[2][2]);
+	}
+
+	// matrix multiply operator of this
+	const Matrix3& Matrix3::operator*=(const Matrix3& mat3){
+		Set(m[0][0] * mat3.m[0][0] + m[0][1] * mat3.m[1][0] + m[0][2] * mat3.m[2][0],
+			m[0][0] * mat3.m[0][1] + m[0][1] * mat3.m[1][1] + m[0][2] * mat3.m[2][1],
+			m[0][0] * mat3.m[0][2] + m[0][1] * mat3.m[1][2] + m[0][2] * mat3.m[2][2],
+
+			m[1][0] * mat3.m[0][0] + m[1][1] * mat3.m[1][0] + m[1][2] * mat3.m[2][0],
+			m[1][0] * mat3.m[0][1] + m[1][1] * mat3.m[1][1] + m[1][2] * mat3.m[2][1],
+			m[1][0] * mat3.m[0][2] + m[1][1] * mat3.m[1][2] + m[1][2] * mat3.m[2][2],
+
+			m[2][0] * mat3.m[0][0] + m[2][1] * mat3.m[1][0] + m[2][2] * mat3.m[2][0],
+			m[2][0] * mat3.m[0][1] + m[2][1] * mat3.m[1][1] + m[2][2] * mat3.m[2][1],
+			m[2][0] * mat3.m[0][2] + m[2][1] * mat3.m[1][2] + m[2][2] * mat3.m[2][2]);
+		return *this;
 	}
 
 	// matrix multiply to vector operator
@@ -794,6 +846,30 @@ namespace sark{
 			m[3][0] * mat4.m[0][1] + m[3][1] * mat4.m[1][1] + m[3][2] * mat4.m[2][1] + m[3][3] * mat4.m[3][1],
 			m[3][0] * mat4.m[0][2] + m[3][1] * mat4.m[1][2] + m[3][2] * mat4.m[2][2] + m[3][3] * mat4.m[3][2],
 			m[3][0] * mat4.m[0][3] + m[3][1] * mat4.m[1][3] + m[3][2] * mat4.m[2][3] + m[3][3] * mat4.m[3][3]);
+	}
+
+	// matrix multiply operator of this
+	const Matrix4& Matrix4::operator*=(const Matrix4& mat4){
+		Set(m[0][0] * mat4.m[0][0] + m[0][1] * mat4.m[1][0] + m[0][2] * mat4.m[2][0] + m[0][3] * mat4.m[3][0],
+			m[0][0] * mat4.m[0][1] + m[0][1] * mat4.m[1][1] + m[0][2] * mat4.m[2][1] + m[0][3] * mat4.m[3][1],
+			m[0][0] * mat4.m[0][2] + m[0][1] * mat4.m[1][2] + m[0][2] * mat4.m[2][2] + m[0][3] * mat4.m[3][2],
+			m[0][0] * mat4.m[0][3] + m[0][1] * mat4.m[1][3] + m[0][2] * mat4.m[2][3] + m[0][3] * mat4.m[3][3],
+
+			m[1][0] * mat4.m[0][0] + m[1][1] * mat4.m[1][0] + m[1][2] * mat4.m[2][0] + m[1][3] * mat4.m[3][0],
+			m[1][0] * mat4.m[0][1] + m[1][1] * mat4.m[1][1] + m[1][2] * mat4.m[2][1] + m[1][3] * mat4.m[3][1],
+			m[1][0] * mat4.m[0][2] + m[1][1] * mat4.m[1][2] + m[1][2] * mat4.m[2][2] + m[1][3] * mat4.m[3][2],
+			m[1][0] * mat4.m[0][3] + m[1][1] * mat4.m[1][3] + m[1][2] * mat4.m[2][3] + m[1][3] * mat4.m[3][3],
+
+			m[2][0] * mat4.m[0][0] + m[2][1] * mat4.m[1][0] + m[2][2] * mat4.m[2][0] + m[2][3] * mat4.m[3][0],
+			m[2][0] * mat4.m[0][1] + m[2][1] * mat4.m[1][1] + m[2][2] * mat4.m[2][1] + m[2][3] * mat4.m[3][1],
+			m[2][0] * mat4.m[0][2] + m[2][1] * mat4.m[1][2] + m[2][2] * mat4.m[2][2] + m[2][3] * mat4.m[3][2],
+			m[2][0] * mat4.m[0][3] + m[2][1] * mat4.m[1][3] + m[2][2] * mat4.m[2][3] + m[2][3] * mat4.m[3][3],
+
+			m[3][0] * mat4.m[0][0] + m[3][1] * mat4.m[1][0] + m[3][2] * mat4.m[2][0] + m[3][3] * mat4.m[3][0],
+			m[3][0] * mat4.m[0][1] + m[3][1] * mat4.m[1][1] + m[3][2] * mat4.m[2][1] + m[3][3] * mat4.m[3][1],
+			m[3][0] * mat4.m[0][2] + m[3][1] * mat4.m[1][2] + m[3][2] * mat4.m[2][2] + m[3][3] * mat4.m[3][2],
+			m[3][0] * mat4.m[0][3] + m[3][1] * mat4.m[1][3] + m[3][2] * mat4.m[2][3] + m[3][3] * mat4.m[3][3]);
+		return *this;
 	}
 
 	// matrix multiply to vector operator

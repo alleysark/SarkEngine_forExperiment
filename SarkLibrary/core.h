@@ -139,6 +139,12 @@ namespace sark{
 	//			mathematic type definitions
 	//==============================================
 
+	class Vector2;
+	class Vector3;
+	class Vector4;
+	class Matrix3;
+	class Matrix4;
+	class Quaternion;
 
 	//=============== Vector Types =================
 	/**
@@ -301,6 +307,13 @@ namespace sark{
 		const Vector3& operator*=(real fConstant);
 
 
+		// vector x matrix
+		const Vector3 operator*(const Matrix3& mat3) const;
+
+		// vector x matrix for this
+		const Vector3& operator*=(const Matrix3& mat3);
+
+
 		// vector constnat division operator
 		const Vector3 operator/(real fConstant) const;
 
@@ -411,6 +424,13 @@ namespace sark{
 		const Vector4& operator*=(real fConstant);
 
 
+		// vector x matrix
+		const Vector4 operator*(const Matrix4& mat4) const;
+
+		// vector x matrix for this
+		const Vector4& operator*=(const Matrix4& mat4);
+
+
 		// vector constnat division operator
 		const Vector4 operator/(real fConstant) const;
 
@@ -514,6 +534,9 @@ namespace sark{
 		// matrix multiply operator
 		const Matrix3 operator*(const Matrix3& mat3) const;
 
+		// matrix multiply operator of this
+		const Matrix3& operator*=(const Matrix3& mat3);
+
 		// matrix multiply to vector operator
 		const Vector3 operator*(const Vector3& vec3) const;
 
@@ -607,6 +630,9 @@ namespace sark{
 
 		// matrix multiply operator
 		const Matrix4 operator*(const Matrix4& mat4) const;
+
+		// matrix multiply operator of this
+		const Matrix4& operator*=(const Matrix4& mat4);
 
 		// matrix multiply to vector operator
 		const Vector4 operator*(const Vector4& vec4) const;
