@@ -243,6 +243,7 @@ namespace sark{
 	typedef Vector2 Vertex2;
 	typedef Vector2 Position2;
 	typedef Vector2 Point2;
+	typedef Vector2 Texcoord;
 
 
 	/**
@@ -352,6 +353,7 @@ namespace sark{
 	typedef Vector3 Vertex3;
 	typedef Vector3 Position3;
 	typedef Vector3 Point3;
+	typedef Vector3 Normal;
 
 
 	/**
