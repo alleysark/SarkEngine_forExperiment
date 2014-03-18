@@ -8,7 +8,7 @@ namespace sark{
 	class ASceneComponent;
 
 	// make given transformation matrix stained
-	#define STAIN_TRANSMATRIX(mat4) ((mat4).m[3][3] = 1)
+	#define STAIN_TRANSMATRIX(mat4) ((mat4).m[3][3] = 0)
 
 	// macro function for checking if matrix is stained
 	#define IS_STAINED(mat4) ((mat4).m[3][3] == 0)
