@@ -63,6 +63,9 @@
     <ClCompile Include="Mesh.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
+    <ClCompile Include="RigidCube.cpp">
+      <Filter>Header Files\core-util\scene components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -100,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="Mesh.h">
       <Filter>Header Files\core-system</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidCube.h">
+      <Filter>Header Files\core-util\scene components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
