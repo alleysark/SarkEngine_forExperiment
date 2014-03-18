@@ -101,6 +101,19 @@ namespace sark{
 		// unbind mesh buffer from graphic system.
 		// it must have been unbinded after binding
 		void Unbind();
+
+
+		// get position data
+		const std::vector<Position3>& GetPositions() const;
+
+		// get normal data
+		const std::vector<Normal>& GetNormals() const;
+
+		// get texcoord data
+		const std::vector<Texcoord>& GetTexcoords() const;
+
+		// get face data
+		const std::vector<Face>& GetFaces() const;
 	};
 
 }

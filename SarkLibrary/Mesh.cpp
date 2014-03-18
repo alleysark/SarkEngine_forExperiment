@@ -138,4 +138,25 @@ namespace sark{
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 	}
 
+
+	// get position data
+	const std::vector<Position3>& Mesh::GetPositions() const{
+		return mPositions;
+	}
+
+	// get normal data
+	const std::vector<Normal>& Mesh::GetNormals() const{
+		return mNormals;
+	}
+
+	// get texcoord data
+	const std::vector<Texcoord>& Mesh::GetTexcoords() const{
+		return mTexcoords;
+	}
+
+	// get face data
+	const std::vector<Mesh::Face>& Mesh::GetFaces() const{
+		return mFaces;
+	}
+
 }
