@@ -45,9 +45,6 @@
     <ClCompile Include="Transform.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
-    <ClCompile Include="scenes.cpp">
-      <Filter>Header Files\core-system</Filter>
-    </ClCompile>
     <ClCompile Include="Input.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
@@ -55,6 +52,12 @@
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClCompile>
+    <ClCompile Include="ASceneComponent.cpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClCompile>
+    <ClCompile Include="AScene.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,9 +80,6 @@
     <ClInclude Include="Transform.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
-    <ClInclude Include="scenes.h">
-      <Filter>Header Files\core-system</Filter>
-    </ClInclude>
     <ClInclude Include="Input.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
@@ -87,6 +87,12 @@
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
+      <Filter>Header Files\core-system</Filter>
+    </ClInclude>
+    <ClInclude Include="ASceneComponent.h">
+      <Filter>Header Files\core-system</Filter>
+    </ClInclude>
+    <ClInclude Include="AScene.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
   </ItemGroup>

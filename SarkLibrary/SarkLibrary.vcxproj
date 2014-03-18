@@ -76,26 +76,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ASceneComponent.cpp" />
     <ClCompile Include="BMPResource.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="resources.cpp" />
-    <ClCompile Include="scenes.cpp" />
+    <ClCompile Include="AScene.cpp" />
     <ClCompile Include="shapes.cpp" />
     <ClCompile Include="test_main.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ASceneComponent.h" />
     <ClInclude Include="BMPResource.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="resources.h" />
-    <ClInclude Include="scenes.h" />
+    <ClInclude Include="AScene.h" />
     <ClInclude Include="shapes.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Transform.h" />

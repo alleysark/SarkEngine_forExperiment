@@ -14,7 +14,7 @@
 #include <string>
 #include <map>
 #include "core.h"
-#include "scenes.h"
+#include "AScene.h"
 #include "Timer.h"
 #include "Input.h"
 
