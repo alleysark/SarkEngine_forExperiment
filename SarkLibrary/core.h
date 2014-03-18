@@ -25,6 +25,9 @@ namespace sark{
 	typedef uint64_t	uint64;
 	typedef int64_t		int64;
 
+	typedef float		float32;
+	typedef double		float64;
+
 
 	//#define SARKLIB_USING_DOUBLE
 #ifdef SARKLIB_USING_DOUBLE
