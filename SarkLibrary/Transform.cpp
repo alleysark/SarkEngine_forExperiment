@@ -56,7 +56,14 @@ namespace sark{
 
 	// get world space position
 	const Position3 Transform::GetPosition(){
-		return (GetMatrix() * Vector4(mTranslation, 1.f)).xyz;
+		const Matrix4& myAbsMat = GetMatrix();
+
+		if (myAbsMat.IsIdentity()){
+			return mTranslation;
+		}
+		else{
+			return (myAbsMat * Vector4(mTranslation, 1.f)).xyz;
+		}
 	}
 
 	// get local position (translation) 
