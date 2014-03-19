@@ -15,7 +15,7 @@ namespace sark{
 		Position3 mLookat;	//focusing target
 		Vector3 mUp;	//camera's standing axis
 
-		Matrix4 mmatView;
+		Matrix4 mViewMatrix;
 
 	public:
 		Camera();
@@ -28,7 +28,7 @@ namespace sark{
 
 	public:
 		// get view transformation matrix
-		const Matrix4& GetMatrix();
+		const Matrix4& GetViewMatrix();
 
 		// get u-axis basis of view space (it'll be the x-axis). u is the right-direction
 		const Vector3& GetBasisU();

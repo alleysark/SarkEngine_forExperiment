@@ -16,40 +16,40 @@ namespace sark{
 
 	// make view matrix from camera properties(eye,at,up)
 	void Camera::MakeMatrix(){
-		Vector3& n = mmatView.row[2].xyz;
+		Vector3& n = mViewMatrix.row[2].xyz;
 		n = mEye - mLookat;
 		n.Normalize();
 
-		Vector3& u = mmatView.row[0].xyz;
+		Vector3& u = mViewMatrix.row[0].xyz;
 		u = mUp.Cross(n);
 		u.Normalize();
 
-		Vector3& v = mmatView.row[1].xyz;
+		Vector3& v = mViewMatrix.row[1].xyz;
 		v = n.Cross(u);
 		v.Normalize();
 
-		mmatView.m[0][3] = -mEye.Dot(u);
-		mmatView.m[1][3] = -mEye.Dot(v);
-		mmatView.m[2][3] = -mEye.Dot(n);
-		mmatView.m[3][3] = 1.f;
+		mViewMatrix.m[0][3] = -mEye.Dot(u);
+		mViewMatrix.m[1][3] = -mEye.Dot(v);
+		mViewMatrix.m[2][3] = -mEye.Dot(n);
+		mViewMatrix.m[3][3] = 1.f;
 	}
 
 	// get view transformation matrix
-	const Matrix4& Camera::GetMatrix(){
-		return mmatView;
+	const Matrix4& Camera::GetViewMatrix(){
+		return mViewMatrix;
 	}
 
 	// get u-axis basis of view space (it'll be the x-axis). u is the right-direction
 	const Vector3& Camera::GetBasisU(){
-		return mmatView.row[0].xyz;
+		return mViewMatrix.row[0].xyz;
 	}
 	// get v-axis basis of view space (it'll be the y-axis). v is the up-direction
 	const Vector3& Camera::GetBasisV(){
-		return mmatView.row[1].xyz;
+		return mViewMatrix.row[1].xyz;
 	}
 	// get n-axis basis of view space (it'll be the z-axis). n is the opposite view-direction
 	const Vector3& Camera::GetBasisN(){
-		return mmatView.row[2].xyz;
+		return mViewMatrix.row[2].xyz;
 	}
 
 	// get eye position
@@ -93,24 +93,24 @@ namespace sark{
 
 	// move camera into forward direction (positive distance goes to forward)
 	void Camera::MoveForward(real distance){
-		mEye = mEye - distance*mmatView.row[2].xyz;
-		mLookat = mLookat - distance*mmatView.row[2].xyz;
+		mEye = mEye - distance*mViewMatrix.row[2].xyz;
+		mLookat = mLookat - distance*mViewMatrix.row[2].xyz;
 
 		MakeMatrix();
 	}
 
 	// move camera into sideward direction (positive distance goes to right)
 	void Camera::MoveSideward(real distance){
-		mEye = mEye + distance*mmatView.row[0].xyz;
-		mLookat = mLookat + distance*mmatView.row[0].xyz;
+		mEye = mEye + distance*mViewMatrix.row[0].xyz;
+		mLookat = mLookat + distance*mViewMatrix.row[0].xyz;
 
 		MakeMatrix();
 	}
 
 	// move camera into upward direction (positive distance goes to up)
 	void Camera::MoveUpward(real distance){
-		mEye = mEye + distance*mmatView.row[1].xyz;
-		mLookat = mLookat + distance*mmatView.row[1].xyz;
+		mEye = mEye + distance*mViewMatrix.row[1].xyz;
+		mLookat = mLookat + distance*mViewMatrix.row[1].xyz;
 
 		MakeMatrix();
 	}
@@ -119,8 +119,8 @@ namespace sark{
 	// it nod its sight (positive radian makes it to see up)
 	void Camera::Pitch(real rad){
 		Vector3 lookDirection = mLookat - mEye;
-		Quaternion::Rotate(lookDirection, mmatView.row[0].xyz, rad);
-		Quaternion::Rotate(mUp, mmatView.row[0].xyz, rad);
+		Quaternion::Rotate(lookDirection, mViewMatrix.row[0].xyz, rad);
+		Quaternion::Rotate(mUp, mViewMatrix.row[0].xyz, rad);
 		mLookat = mEye + lookDirection;
 
 		MakeMatrix();
@@ -130,7 +130,7 @@ namespace sark{
 	// it shakes its sight (positive radian makes it to see left)
 	void Camera::Yaw(real rad){
 		Vector3 lookDirection = mLookat - mEye;
-		Quaternion::Rotate(lookDirection, mmatView.row[1].xyz, rad);
+		Quaternion::Rotate(lookDirection, mViewMatrix.row[1].xyz, rad);
 		mLookat = mEye + lookDirection;
 
 		MakeMatrix();
@@ -139,7 +139,7 @@ namespace sark{
 	// turn camera on an axis of n (likes z)
 	// it tilt its sight (positive radian makes it to see left-tilting)
 	void Camera::Roll(real rad){
-		Quaternion::Rotate(mUp, mmatView.row[2].xyz, rad);
+		Quaternion::Rotate(mUp, mViewMatrix.row[2].xyz, rad);
 		MakeMatrix();
 	}
 
