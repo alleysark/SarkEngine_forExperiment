@@ -2,12 +2,14 @@
 
 namespace sark{
 
-	Camera::Camera() :mEye(0), mLookat(0.f, 0.f, 1.f), mUp(0.f, 1.f, 0.f){
-		MakeMatrix();
+	Camera::Camera() :mEye(0.f), mLookat(0.f, 0.f, -1.f), mUp(0.f, 1.f, 0.f)
+	{
+		mViewMatrix.MakeIdentity();
 	}
 
 	Camera::Camera(const Vector3& eye, const Vector3& lookat, const Vector3& up)
-		: mEye(eye), mLookat(lookat), mUp(up){
+		: mEye(eye), mLookat(lookat), mUp(up)
+	{
 		MakeMatrix();
 	}
 
