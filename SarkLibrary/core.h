@@ -380,6 +380,7 @@ namespace sark{
 		Vector4();
 		Vector4(real val);
 		Vector4(real _x, real _y, real _z, real _w);
+		Vector4(const Vector3& vec3, real _w);
 		Vector4(const Vector4& v);
 		void operator=(const Vector4& v);
 
@@ -501,7 +502,7 @@ namespace sark{
 			};
 		};
 
-		Matrix3();
+		Matrix3(bool identity = false);
 		Matrix3(real _00, real _01, real _02,
 			real _10, real _11, real _12,
 			real _20, real _21, real _22);
@@ -588,7 +589,7 @@ namespace sark{
 			};
 		};
 
-		Matrix4();
+		Matrix4(bool identity = false);
 		Matrix4(real _00, real _01, real _02, real _03,
 			real _10, real _11, real _12, real _13,
 			real _20, real _21, real _22, real _23,

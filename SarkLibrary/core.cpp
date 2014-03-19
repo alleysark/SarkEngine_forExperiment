@@ -353,6 +353,9 @@ namespace sark{
 	Vector4::Vector4(real _x, real _y, real _z, real _w){
 		x = _x; y = _y; z = _z; w = _w;
 	}
+	Vector4::Vector4(const Vector3& vec3, real _w){
+		xyz = vec3; w = _w;
+	}
 	Vector4::Vector4(const Vector4& v){
 		x = v.x; y = v.y; z = v.z; w = v.w;
 	}
@@ -522,8 +525,11 @@ namespace sark{
 	Type of 3x3 square matrix defined as row X col order
 	*/
 
-	Matrix3::Matrix3(){
+	Matrix3::Matrix3(bool identity){
 		memset(m, 0, sizeof(real)* 9);
+		if (identity){
+			m[0][0] = m[1][1] = m[2][2] = 1.f;
+		}
 	}
 	Matrix3::Matrix3(real _00, real _01, real _02,
 		real _10, real _11, real _12,
@@ -726,8 +732,11 @@ namespace sark{
 	Type of 4x4 square matrix defined as row X col order
 	*/
 
-	Matrix4::Matrix4(){
+	Matrix4::Matrix4(bool identity){
 		memset(m, 0, sizeof(real)* 16);
+		if (identity){
+			m[0][0] = m[1][1] = m[2][2] = m[3][3] = 1.f;
+		}
 	}
 	Matrix4::Matrix4(real _00, real _01, real _02, real _03,
 		real _10, real _11, real _12, real _13,

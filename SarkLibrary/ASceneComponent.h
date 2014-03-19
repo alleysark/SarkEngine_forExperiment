@@ -41,9 +41,6 @@ namespace sark{
 		// local scene component transform object
 		Transform mTransform;
 
-		// combined transform matrix of all ancestors
-		Matrix4 mAbsoluteTransformMat;
-
 		// component activation indicator
 		bool mActivated;
 
@@ -103,22 +100,15 @@ namespace sark{
 		uint32 GetChildren(const std::string& name, ChildComponentContainer& refContainer);
 
 		// get the children container
-		const ChildComponentContainer& GetChildren() const;
+		ChildComponentContainer& GetChildren();
 
 
-		// get transform object of this component. it is local transform object.
-		Transform& GetTransform();
-
-		// get combined transformation matrix of all ancestors
-		const Matrix4& GetAbsoluteMatrix();
-
-	private:
 		// it considers the Transform class as its friend 
 		// to allow the access of 'TransformChanged()' method
 		friend Transform;
 
-		// it makes its absolute transform matrix stained and also children's
-		void TransformStained();
+		// get transform object of this component. it is local transform object.
+		Transform& GetTransform();
 
 	public:
 		// is this component activated?

@@ -14,27 +14,52 @@ namespace sark{
 	#define IS_STAINED(mat4) ((mat4).m[3][3] == 0)
 
 
+	// transformation managemenet class
+	// it can be organized the hierarchical struct
 	class Transform{
 	private:
-		Position3 mPosition;
+		// local translation factor.
+		Position3 mTranslation;
+
+		// local rotation factor
 		Quaternion mRotator;
 		
-		// complete transform matrix. m[3][3] is a stain-check flag
-		Matrix4 mTransformMat;
+		// local scaling factor
+		Vector3 mScale;
 
-		// if this is the transform of scene component,
+		// local transform matrix. m[3][3] is a stain-check flag
+		Matrix4 mLocalTM;
+
+		// combined transform matrix of all ancestors
+		Matrix4 mAbsoluteTM;
+
 		// it can access the scene component object by this property
 		// (ASceneComponent regard this as friend)
 		ASceneComponent* mReference;
+
 	public:
 		Transform(ASceneComponent* reference = NULL);
 		~Transform();
 
-		// get transformation matrix
+		// get absolute transformation matrix
 		const Matrix4& GetMatrix();
 
-		// get position vector
-		const Position3& GetPosition() const;
+		// get local transformation matrix
+		const Matrix4& GetLocalMatrix();
+
+
+		// get world space position
+		const Position3 GetPosition();
+
+		// get local position (translation) 
+		const Position3& GetLocalPosition() const;
+
+		// get local rotator
+		const Quaternion& GetLocalRotation() const;
+
+		// get local scale
+		const Vector3& GetLocalScale() const;
+
 
 		// translate into the other position from given vector
 		void Translate(const Position3& position);
@@ -51,12 +76,17 @@ namespace sark{
 		// rotate it from given rotating factor roll(z-axis), pitch(x-axis) and yaw(y-axis)
 		void Rotate(real roll, real pitch, real yaw);
 
+		// scale it by given scaling factor
+		void Scale(const Vector3& scaleAs);
+		// scale it by given scaling factor
+		void Scale(real sx, real sy, real sz);
+
 	private:
 		// all the methods of Transform class have to call this function
 		// when the properties (translation and rotator quaternion) are changed.
 		// if there is reference scene component, it sets the stained flag of absolute 
 		// transform of reference scene component.
-		void TransformStained();
+		void TransformStained(bool callOnLocal = true);
 	};
 
 }
