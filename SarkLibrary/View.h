@@ -30,51 +30,26 @@ namespace sark{
 
 
 
-	// interface of view.
 	// it defines the features of view, shape of view-volume,
 	// viewport and projection matrix.
-	// there is two viewing style; <OrthogonalView> and <PerspectiveView>.
-	class IView{
-	public:
-		struct OrthogonalProperty{
-			// width of cube volume.
-			// range will be [-width/2, width/2]
-			real mWidth;
+	// there is two viewing style; 'Orthographic view' and 'Perspective view'.
+	class View{
+	private:
+		// it is true when if it is orthographic view
+		bool mOrtho;
 
-			// height of cube volume.
-			// range will be [-height/2, height/2]
-			real mHeight;
+		// half factor of height. it defines the range as [-mH, mH]
+		real mH;
 
-			// depth of cube volume.
-			// range will be [0, depth]
-			real mDepth;
+		// half factor of width. it defines the range as [-mW, mW]
+		real mW;
 
-			OrthogonalProperty(real width, real height, real depth){
-				mWidth = width;
-				mHeight = height;
-				mDepth = depth;
-			}
-		};
+		// positive value of z-distance from cop to nearest plane.
+		real mzNear;
 
-		struct PerspectiveProperty{
-			// field of view about vertical (y property)
-			real mFovy;
-			// aspect ratio (width / height)
-			real mAspect;
-			// near plane of view frustum
-			real mNear;
-			// far plane of view frustum
-			real mFar;
+		// positive value of z-distance from cop to farthest plane.
+		real mzFar;
 
-			PerspectiveProperty(real fovy, real aspect, real z_near, real z_far){
-				mFovy = fovy;
-				mAspect = aspect;
-				mNear = z_near;
-				mFar = z_far;
-			}
-		};
-
-	protected:
 		// projection matrix
 		Matrix4 mProjMatrix;
 
@@ -82,24 +57,30 @@ namespace sark{
 		Viewport mViewport;
 
 	public:
-		IView();
+		View();
 
-		virtual ~IView();
+		~View();
 
-		// set property for orthogonal view
-		virtual void Set(const OrthogonalProperty& orthoProperty) = 0;
+		// make orthographic view. it defines cube-like view volume
+		// which range of [-width/2, width/2] for x, [-height/2, height/2] for y
+		// and [0, depth] for z.
+		void Orthographic(real width, real height, real depth);
 
-		// set property for perspective view
-		virtual void Set(const PerspectiveProperty& persProperty) = 0;
+		// make perspective view
+		// it defines truncated quadrangular pyramid volume called 'frustum'.
+		// 
+		// fovy is Field Of View as degree,
+		// aspect is the ratio of width of height (width/height),
+		// znear is positive distance from cop to nearest plane,
+		// zfar is positive distance from cop to farthest plane.
+		void Perspective(real fovy, real aspect, real znear, real zfar);
+
+
+		// is this view orthographic view?
+		bool IsOrthoView() const;
 
 		// get projection matrix
 		const Matrix4& GetProjMatrix() const;
-
-	protected:
-		// update projection matrix
-		virtual void UpdateProjMatrix() = 0;
-
-	public:
 
 		// get viewport
 		const Viewport& GetViewport() const;
@@ -114,52 +95,5 @@ namespace sark{
 		// virtual bool IsCulled(const Sphere& sphere) const = 0;
 	};
 
-
-
-	// orthogonal view which is one of the viewing style.
-	// it defines cube-like view volume.
-	class OrthogonalView : public IView{
-	private:
-		OrthogonalProperty mProperty;
-
-	public:
-		// default properties are 20,20,10
-		OrthogonalView();
-		OrthogonalView(real width, real height, real depth);
-
-		// set view properties
-		void Set(const OrthogonalProperty& orthoProperty);
-
-	private:
-		// update projection matrix
-		void UpdateProjMatrix();
-
-		// not used
-		void Set(const PerspectiveProperty&){}
-	};
-
-
-
-	// perspective view which is one of the viewing style.
-	// it defines truncated quadrangular pyramid volume called 'frustum'.
-	class PerspectiveView : public IView{
-	private:
-		PerspectiveProperty mProperty;
-
-	public:
-		// default properties are 90, 1, 0.01, 10
-		PerspectiveView();
-		PerspectiveView(real fovy, real aspect, real z_near, real z_far);
-		
-		// set view properties
-		void Set(const PerspectiveProperty& persProperty);
-
-	private:
-		// update projection matrix
-		void UpdateProjMatrix();
-
-		// not used
-		void Set(const OrthogonalProperty&){}
-	};
 }
 #endif
