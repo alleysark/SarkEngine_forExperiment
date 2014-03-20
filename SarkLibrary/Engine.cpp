@@ -15,7 +15,7 @@ namespace sark{
 
 	Engine::Engine() :
 		mhInst(NULL), mhWnd(NULL), mhDC(NULL), mhRC(NULL),
-		mTimer(false), mbRunning(false), mnWndWidth(0), mnWndHeight(0), mClearColor(0), mbIs2D(false),
+		mTimer(false), mbRunning(false), mnWndWidth(0), mnWndHeight(0), mClearColor(0),
 		mCurrentScene(NULL)
 	{ }
 
@@ -140,7 +140,11 @@ namespace sark{
 
 		glPolygonMode(GL_FRONT_FACE, GL_FILL);
 
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+
 		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
 	}
 
 
@@ -164,11 +168,14 @@ namespace sark{
 
 	// ---------- configuration methods ------------
 
-	bool Engine::AddScene(const std::string& sceneName, AScene* scene){
+	bool Engine::AddScene(const std::string& sceneName, AScene* scene, bool asCurrent){
 		SceneContainer::const_iterator find = mScenes.find(sceneName);
 		if (find != mScenes.cend())
 			return false;
 		mScenes[sceneName] = scene;
+		if (asCurrent){
+			mCurrentScene = scene;
+		}
 		return true;
 	}
 	bool Engine::SetCurrentScene(const std::string& sceneName){
@@ -184,45 +191,14 @@ namespace sark{
 		glClearColor(mClearColor.r, mClearColor.g, mClearColor.b, mClearColor.a);
 	}
 
-	void Engine::SetViewMode(bool as2D){
-		mbIs2D = as2D;
-	}
-
-	void Engine::ResizeWindow(uinteger width, uinteger height){
+	void Engine::ResizeWindow(uinteger width, uinteger height, bool callOnInside){
 		mnWndWidth = width;
 		mnWndHeight = height;
-
-		SetWindowPos(mhWnd, NULL, 0, 0, mnWndWidth, mnWndHeight, SWP_NOMOVE | SWP_NOZORDER);
-
-		SetViewport(mnWndWidth, mnWndHeight);
-		SetProjectionMatrix(mnWndWidth, mnWndHeight);
+		mCurrentScene->OnScreenChanged(width, height);
+		if (!callOnInside)
+			SetWindowPos(mhWnd, NULL, 0, 0, width, height, SWP_NOMOVE | SWP_NOZORDER);
 	}
 
-	void Engine::SetViewport(uinteger width, uinteger height){
-		glViewport(0, 0, width, height);
-	}
-
-	void Engine::SetProjectionMatrix(uinteger width, uinteger height){
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-
-		if (mbIs2D){
-			// orthogonal view
-			if (height >= width){
-				real ratio = (real)width / (real)height;
-				glOrtho(-500.0f*ratio, 500.0f*ratio, -500.0f, 500.0f, 0.0f, 1000.0f);
-			}
-			else{
-				real ratio = (real)height / (real)width;
-				glOrtho(-500.0f, 500.0f, -500.0f, 500.0f, 0.0f, 1000.0f);
-			}
-		}
-		else{
-			gluPerspective(60, (real)width / (real)height, 0.1f, 1000.0f);
-		}
-
-		glMatrixMode(GL_MODELVIEW);
-	}
 
 	LRESULT CALLBACK Engine::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam){
 		switch (iMessage){
@@ -245,10 +221,7 @@ namespace sark{
 			break;
 
 		case WM_SIZE:
-			Engine::instance->mnWndWidth = LOWORD(lParam);
-			Engine::instance->mnWndHeight = HIWORD(lParam);
-			Engine::instance->SetViewport(Engine::instance->mnWndWidth, Engine::instance->mnWndHeight);
-			Engine::instance->SetProjectionMatrix(Engine::instance->mnWndWidth, Engine::instance->mnWndHeight);
+			Engine::instance->ResizeWindow(LOWORD(lParam), HIWORD(lParam), true);
 			break;
 		};
 		return DefWindowProc(hWnd, iMessage, wParam, lParam);

@@ -53,10 +53,6 @@ namespace sark{
 
 		// color buffer clear color
 		Color mClearColor;
-		
-		// it decides which projection method is used
-		// that true to orthogonal projection, false to perspective projection
-		bool mbIs2D;
 
 
 		typedef std::map<std::string, AScene*> SceneContainer;
@@ -117,18 +113,12 @@ namespace sark{
 
 		// ---------- configuration methods ------------
 	public:
-		bool AddScene(const std::string& sceneName, AScene* scene);
+		bool AddScene(const std::string& sceneName, AScene* scene, bool asCurrent = false);
 		bool SetCurrentScene(const std::string& sceneName);
 
 		void SetClearColor(const Color& color);
 
-		void SetViewMode(bool as2D);
-
-		void ResizeWindow(uinteger width, uinteger height);
-
-		void SetViewport(uinteger width, uinteger height);
-
-		void SetProjectionMatrix(uinteger width, uinteger height);
+		void ResizeWindow(uinteger width, uinteger height, bool callOnInside = false);
 
 	public:
 		static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
