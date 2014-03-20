@@ -41,6 +41,33 @@ namespace sark{
 		return mViewMatrix;
 	}
 
+	// get projection transformation matrix
+	const Matrix4& Camera::GetProjMatrix(){
+		return mView.GetProjMatrix();
+	}
+
+
+	// make camera viewing style as orthographic-view.
+	void Camera::Orthographic(real width, real height, real depth){
+		mView.Orthographic(width, height, depth);
+	}
+
+	// make camera viewing style as perspective-view.
+	void Camera::Perspective(real fovy, real aspect, real znear, real zfar){
+		mView.Perspective(fovy, aspect, znear, zfar);
+	}
+
+
+	// get viewport
+	const Viewport& Camera::GetViewport() const{
+		return mView.GetViewport();
+	}
+	// set viewport
+	void Camera::SetViewport(real x, real y, real width, real height){
+		mView.SetViewport(x, y, width, height);
+	}
+
+
 	// get u-axis basis of view space (it'll be the x-axis). u is the right-direction
 	const Vector3& Camera::GetBasisU(){
 		return mViewMatrix.row[0].xyz;
