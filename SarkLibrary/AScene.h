@@ -89,6 +89,10 @@ namespace sark{
 
 		// render interface
 		virtual void Render() = 0;
+
+		// main scene camera view setting
+		virtual void OnScreenChanged(uinteger width, uinteger height) = 0;
+
 	};
 
 }
