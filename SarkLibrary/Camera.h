@@ -2,7 +2,6 @@
 #define __CAMERA_H__
 
 #include "core.h"
-#include "View.h"
 
 namespace sark{
 
@@ -13,9 +12,63 @@ namespace sark{
 	// camera space is defined by u,v,n orthonormal non-standard basis.
 	// they are extracted from given eye, at, up vectors.
 	// 
-	// view style can be one of the orthographic or perspective, and projection
+	// viewport decides where is the rendered image presented on application window.
+	// it is used for sort of screen to world ray conversion.
+	// 
+	// view volume can be one of the orthographic or perspective, and projection
 	// transformation matrix is decided by its viewing style.
+	// view volume is also used to culling world objects for rendering performance.
 	class Camera{
+	public:
+		// view port definition of window
+		class Viewport{
+		public:
+			real x, y;
+			real width, height;
+
+		public:
+			Viewport();
+
+			// set viewport.
+			void Set(real _x, real _y, real _width, real _height);
+		};
+
+
+		// it defines the features of view, shape of view-volume,
+		// viewport and projection matrix.
+		// there is two viewing style; 'Orthographic view' and 'Perspective view'.
+		class ViewVolume{
+		public:
+			// it is true when if it is orthographic view
+			bool mOrtho;
+
+			// half factor of height. it defines the range as [-mH, mH]
+			real mH;
+
+			// half factor of width. it defines the range as [-mW, mW]
+			real mW;
+
+			// positive value of z-distance from cop to nearest plane.
+			real mzNear;
+
+			// positive value of z-distance from cop to farthest plane.
+			real mzFar;
+
+			// projection matrix
+			Matrix4 mProjMatrix;
+
+		public:
+			ViewVolume(real width, real height, real depth);
+			ViewVolume(real fovy, real aspect, real znear, real zfar);
+			~ViewVolume();
+
+			// set view as orthographically
+			void SetOrthographic(real width, real height, real depth);
+
+			// set view as perspectively
+			void SetPerspective(real fovy, real aspect, real znear, real zfar);
+		};
+
 	protected:
 		//origin of camera space
 		Position3 mEye;
@@ -30,9 +83,13 @@ namespace sark{
 		// view space transform matrix
 		Matrix4 mViewMatrix;
 
-		// what viewing style is (orthographic or perspective).
+
+		// viewport definition
+		Viewport mViewport;
+
+		// what viewing volume is (orthographic or perspective).
 		// it has the projection matrix and viewport definition
-		View mView;
+		ViewVolume mView;
 
 	public:
 		Camera();
@@ -40,8 +97,8 @@ namespace sark{
 		virtual ~Camera();
 
 	private:
-		// make view matrix from camera properties(eye,at,up)
-		void MakeMatrix();
+		// update view matrix from camera properties(eye,at,up)
+		void UpdateViewMatrix();
 
 	public:
 		// get view transformation matrix
@@ -51,13 +108,16 @@ namespace sark{
 		const Matrix4& GetProjMatrix();
 
 
-		// make camera viewing style as orthographic-view.
+		// is this view orthographic view?
+		bool IsOrthoView() const;
+
+		// make camera view volume as orthographic-view.
 		// it defines cube-like view volume
 		// which range of [-width/2, width/2] for x, [-height/2, height/2] for y
 		// and [0, depth] for z.
 		void Orthographic(real width, real height, real depth);
 
-		// make camera viewing style as perspective-view.
+		// make camera view volume as perspective-view.
 		// it defines truncated quadrangular pyramid volume called 'frustum'.
 		// 
 		// fovy is Field Of View as degree,
@@ -71,6 +131,9 @@ namespace sark{
 		const Viewport& GetViewport() const;
 		// set viewport
 		void SetViewport(real x, real y, real width, real height);
+
+		// get view volume
+		const ViewVolume& GetViewVolume() const;
 
 
 		// get u-axis basis of view space (it'll be the x-axis). u is the right-direction

@@ -2,22 +2,101 @@
 
 namespace sark{
 
-	Camera::Camera() :mEye(0.f), mLookat(0.f, 0.f, -1.f), mUp(0.f, 1.f, 0.f)
+	//=============================================
+	//		Camera::Viewport class implementation
+	//=============================================
+
+	Camera::Viewport::Viewport()
+		: x(0.f), y(0.f), width(0.f), height(0.f)
+	{}
+
+	// set viewport.
+	void Camera::Viewport::Set(real _x, real _y, real _width, real _height){
+		x = _x; y = _y;
+		width = _width; height = _height;
+	}
+
+
+
+	//=========================================================
+	//			Camera::ViewVolume class implementation
+	// 
+	// * implementation reference page:
+	// * http://www.songho.ca/opengl/gl_projectionmatrix.html
+	//=========================================================
+
+	Camera::ViewVolume::ViewVolume(real width, real height, real depth){
+		SetOrthographic(width, height, depth);
+	}
+	Camera::ViewVolume::ViewVolume(real fovy, real aspect, real znear, real zfar){
+		SetPerspective(fovy, aspect, znear, zfar);
+	}
+
+	Camera::ViewVolume::~ViewVolume(){}
+
+
+	// set view as orthographically
+	void Camera::ViewVolume::SetOrthographic(real width, real height, real depth){
+		mOrtho = true;
+
+		mH = height / 2.f;
+		mW = width / 2.f;
+		mzNear = 0.f;
+		mzFar = depth;
+
+		// calculate projection matrix
+		mProjMatrix.MakeZero();
+		mProjMatrix.m[0][0] = 1.f / mW;
+		mProjMatrix.m[1][1] = 1.f / mH;
+		mProjMatrix.m[2][2] = -2.f / (mzFar - mzNear);
+		mProjMatrix.m[2][3] = -(mzFar + mzNear) / (mzFar - mzNear);
+		mProjMatrix.m[3][3] = 1.f;
+	}
+
+	// set view as perspectively
+	void Camera::ViewVolume::SetPerspective(real fovy, real aspect, real znear, real zfar){
+		mOrtho = false;
+
+		mH = math::tan(math::deg2rad(fovy / 2.f)) * znear;
+		mW = mH * aspect;
+		mzNear = znear;
+		mzFar = zfar;
+
+
+		// calculate projection matrix
+		mProjMatrix.MakeZero();
+		mProjMatrix.m[0][0] = mzNear / mW;
+		mProjMatrix.m[1][1] = mzNear / mH;
+		mProjMatrix.m[2][2] = -(mzNear + mzFar) / (mzFar - mzNear);
+		mProjMatrix.m[2][3] = -(2.f * mzFar * mzNear) / (mzFar - mzNear);
+		mProjMatrix.m[3][2] = -1.f;
+	}
+
+
+
+	//=============================================
+	//		Camera class implementation
+	//=============================================
+
+	Camera::Camera()
+		: mView(90.f, 1.f, 0.1f, 100.f), 
+		mEye(0.f), mLookat(0.f, 0.f, -1.f), mUp(0.f, 1.f, 0.f)
 	{
 		mViewMatrix.MakeIdentity();
 	}
 
 	Camera::Camera(const Vector3& eye, const Vector3& lookat, const Vector3& up)
-		: mEye(eye), mLookat(lookat), mUp(up)
+		: mView(90.f, 1.f, 0.1f, 100.f), 
+		mEye(eye), mLookat(lookat), mUp(up)
 	{
-		MakeMatrix();
+		UpdateViewMatrix();
 	}
 
 	Camera::~Camera(){}
 
 
 	// make view matrix from camera properties(eye,at,up)
-	void Camera::MakeMatrix(){
+	void Camera::UpdateViewMatrix(){
 		Vector3& n = mViewMatrix.row[2].xyz;
 		n = mEye - mLookat;
 		n.Normalize();
@@ -43,28 +122,47 @@ namespace sark{
 
 	// get projection transformation matrix
 	const Matrix4& Camera::GetProjMatrix(){
-		return mView.GetProjMatrix();
+		return mView.mProjMatrix;
 	}
 
 
-	// make camera viewing style as orthographic-view.
+	// is this view orthographic view?
+	bool Camera::IsOrthoView() const{
+		return mView.mOrtho;
+	}
+
+	// make camera view volume as orthographic-view.
+	// it defines cube-like view volume
+	// which range of [-width/2, width/2] for x, [-height/2, height/2] for y
+	// and [0, depth] for z.
 	void Camera::Orthographic(real width, real height, real depth){
-		mView.Orthographic(width, height, depth);
+		mView.SetOrthographic(width, height, depth);
 	}
 
-	// make camera viewing style as perspective-view.
+	// make camera view volume as perspective-view.
+	// it defines truncated quadrangular pyramid volume called 'frustum'.
+	// 
+	// fovy is Field Of View as degree,
+	// aspect is the ratio of width of height (width/height),
+	// znear is positive distance from cop to nearest plane,
+	// zfar is positive distance from cop to farthest plane.
 	void Camera::Perspective(real fovy, real aspect, real znear, real zfar){
-		mView.Perspective(fovy, aspect, znear, zfar);
+		mView.SetPerspective(fovy, aspect, znear, zfar);
 	}
 
 
 	// get viewport
-	const Viewport& Camera::GetViewport() const{
-		return mView.GetViewport();
+	const Camera::Viewport& Camera::GetViewport() const{
+		return mViewport;
 	}
 	// set viewport
 	void Camera::SetViewport(real x, real y, real width, real height){
-		mView.SetViewport(x, y, width, height);
+		mViewport.Set(x, y, width, height);
+	}
+
+	// get view volume
+	const Camera::ViewVolume& Camera::GetViewVolume() const{
+		return mView;
 	}
 
 
@@ -99,22 +197,22 @@ namespace sark{
 		mEye = eye;
 		mLookat = lookat;
 		mUp = up;
-		MakeMatrix();
+		UpdateViewMatrix();
 	}
 	// set eye position
 	void Camera::SetEye(const Position3& eye){
 		mEye = eye;
-		MakeMatrix();
+		UpdateViewMatrix();
 	}
 	// set lookat position
 	void Camera::SetLookat(const Position3& lookat){
 		mLookat = lookat;
-		MakeMatrix();
+		UpdateViewMatrix();
 	}
 	// set up vector
 	void Camera::SetUp(const Vector3& up){
 		mUp = up;
-		MakeMatrix();
+		UpdateViewMatrix();
 	}
 
 
@@ -125,7 +223,7 @@ namespace sark{
 		mEye = mEye - distance*mViewMatrix.row[2].xyz;
 		mLookat = mLookat - distance*mViewMatrix.row[2].xyz;
 
-		MakeMatrix();
+		UpdateViewMatrix();
 	}
 
 	// move camera into sideward direction (positive distance goes to right)
@@ -133,7 +231,7 @@ namespace sark{
 		mEye = mEye + distance*mViewMatrix.row[0].xyz;
 		mLookat = mLookat + distance*mViewMatrix.row[0].xyz;
 
-		MakeMatrix();
+		UpdateViewMatrix();
 	}
 
 	// move camera into upward direction (positive distance goes to up)
@@ -141,7 +239,7 @@ namespace sark{
 		mEye = mEye + distance*mViewMatrix.row[1].xyz;
 		mLookat = mLookat + distance*mViewMatrix.row[1].xyz;
 
-		MakeMatrix();
+		UpdateViewMatrix();
 	}
 
 	// turn camera on an axis of u (likes x)
@@ -152,7 +250,7 @@ namespace sark{
 		Quaternion::Rotate(mUp, mViewMatrix.row[0].xyz, rad);
 		mLookat = mEye + lookDirection;
 
-		MakeMatrix();
+		UpdateViewMatrix();
 	}
 
 	// turn camera on an axis of v (likes y)
@@ -162,14 +260,14 @@ namespace sark{
 		Quaternion::Rotate(lookDirection, mViewMatrix.row[1].xyz, rad);
 		mLookat = mEye + lookDirection;
 
-		MakeMatrix();
+		UpdateViewMatrix();
 	}
 
 	// turn camera on an axis of n (likes z)
 	// it tilt its sight (positive radian makes it to see left-tilting)
 	void Camera::Roll(real rad){
 		Quaternion::Rotate(mUp, mViewMatrix.row[2].xyz, rad);
-		MakeMatrix();
+		UpdateViewMatrix();
 	}
 
 }

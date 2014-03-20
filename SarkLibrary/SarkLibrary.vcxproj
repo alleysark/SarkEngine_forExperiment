@@ -90,7 +90,6 @@
     <ClCompile Include="test_main.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="View.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ASceneComponent.h" />
@@ -106,7 +105,6 @@
     <ClInclude Include="shapes.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Transform.h" />
-    <ClInclude Include="View.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

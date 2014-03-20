@@ -66,9 +66,6 @@
     <ClCompile Include="RigidCube.cpp">
       <Filter>Header Files\core-util\scene components</Filter>
     </ClCompile>
-    <ClCompile Include="View.cpp">
-      <Filter>Header Files\core-system</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -109,9 +106,6 @@
     </ClInclude>
     <ClInclude Include="RigidCube.h">
       <Filter>Header Files\core-util\scene components</Filter>
-    </ClInclude>
-    <ClInclude Include="View.h">
-      <Filter>Header Files\core-system</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
