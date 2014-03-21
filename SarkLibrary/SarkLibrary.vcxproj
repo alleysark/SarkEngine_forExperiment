@@ -96,6 +96,7 @@
     <ClInclude Include="BMPResource.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="core.h" />
+    <ClInclude Include="Debug.hpp" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Mesh.h" />

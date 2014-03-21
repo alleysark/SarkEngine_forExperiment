@@ -107,5 +107,8 @@
     <ClInclude Include="RigidCube.h">
       <Filter>Header Files\core-util\scene components</Filter>
     </ClInclude>
+    <ClInclude Include="Debug.hpp">
+      <Filter>Header Files\core-util</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
