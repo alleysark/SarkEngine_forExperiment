@@ -1,3 +1,4 @@
+#include <fstream>
 #include "BMPResource.h"
 
 namespace sark{
@@ -10,16 +11,24 @@ namespace sark{
 	}
 
 	BMPResource::~BMPResource(){
-		if (mpPixels != NULL)
-			delete[] mpPixels;
 	}
 
+	void BMPResource::Unload(){
+		if (mpPixels != NULL){
+			delete[] mpPixels;
+			mpPixels = NULL;
+		}
+	}
 
-	IResource* BMPResourceLoader::LoadImp(std::ifstream& stream){
+	BMPResource* BMPResource::LoadImp(std::string& name){
 		BITMAPFILEHEADER bmpFileHead;
 		BITMAPINFOHEADER bmpInfoHead;
 
-		stream.seekg(std::ios::beg);
+		std::ifstream stream;
+		stream.open(name, std::ios::binary | std::ios::beg);
+		if (!stream.is_open())
+			return NULL;
+
 		stream.read((char*)&bmpFileHead, sizeof(BITMAPFILEHEADER));
 		stream.read((char*)&bmpInfoHead, sizeof(BITMAPINFOHEADER));
 

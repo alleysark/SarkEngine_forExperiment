@@ -1,14 +1,13 @@
 #ifndef __RESOURCES_H__
 #define __RESOURCES_H__
 
-#include <fstream>
 #include <string>
-#include <map>
+#include <hash_map>
 
 namespace sark{
 
 	class IResource;
-	template<class ImpResourceLoaderType> class IResourceLoader;
+	template<class ImpResourceType> class IResourceLoader;
 
 
 	// resource management singleton class
@@ -19,7 +18,7 @@ namespace sark{
 		static ResourceManager* instance;
 
 		std::string mstrBasePath;
-		typedef std::map<std::string, IResource*> ResourceMap;
+		typedef std::hash_map<std::string, IResource*> ResourceMap;
 		ResourceMap mRescMap;
 
 		ResourceManager();
@@ -29,26 +28,33 @@ namespace sark{
 
 		void SetBasePath(const std::string& pathName);
 
-		template<class ResourceLoaderType>
-		const IResource* Load(std::string name);
+		template<class ResourceType>
+		const ResourceType* Load(std::string name);
 	};
 
 
-	// derived class must have implemented functionality of 'unload' in destructor
+	// resource interface.
+	// user defined resource should have inherit this and IResourceLoader.
 	class IResource{
 	public:
 		IResource(){}
 		virtual ~IResource(){}
+
+		virtual void Unload() = 0;
 	};
 
-	// crtp pattern
-	// derived class must have implemented static method 'LoadImp'
-	template<class ImpResourceLoaderType>
+	// resource loader static-interface as <crtp pattern>.
+	// user defined resource should have inherit this and IResource.
+	template<class ImpResourceType>
 	class IResourceLoader{
 	public:
-		static IResource* Load(std::ifstream& stream){
-			return static_cast<ImpResourceLoaderType*>(this)->LoadImp(stream);
+		static ImpResourceType* Load(std::string path){
+			return ImpResourceType::LoadImp(path);
 		}
+
+		// do not forget to implementing static method 'LoadImp'.
+		// it'll emit error if you are not.
+		// static ImpResourceType* LoadImp(std::string path) = 0;
 	};
 }
 #endif

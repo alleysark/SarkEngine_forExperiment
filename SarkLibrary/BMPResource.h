@@ -45,7 +45,7 @@ namespace sark{
 
 	// BMP format resource
 	// this BMP resource does not supply 256(8bit), 16bit color format
-	class BMPResource : public IResource{
+	class BMPResource : public IResource, public IResourceLoader<BMPResource>{
 	private:
 		int32 mWidth;
 		int32 mHeight;
@@ -55,12 +55,10 @@ namespace sark{
 	public:
 		BMPResource(int32 width, int32 height, uint16 bitCount, IBMPPIXELFORMAT* pPixels);
 		~BMPResource();
-	};
-	
 
-	class BMPResourceLoader : public IResourceLoader<BMPResourceLoader>{
-	public:
-		static IResource* LoadImp(std::ifstream& stream);
+		void Unload();
+
+		static BMPResource* LoadImp(std::string& name);
 	};
 	
 }

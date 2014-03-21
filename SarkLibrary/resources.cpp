@@ -18,28 +18,20 @@ namespace sark{
 		mstrBasePath = pathName;
 	}
 
-	template<class ResourceLoaderType>
-	const IResource* ResourceManager::Load(std::string name){
+	template<class ResourceType>
+	const ResourceType* ResourceManager::Load(std::string name){
 		ResourceMap::iterator itr = mRescMap.find(name);
 		if (itr != mRescMap.end()){
-			return itr->second;
+			return dynamic_cast<ResourceType*>(itr->second);
 		}
 
-		std::ifstream fin;
-		fin.open(this->mstrBasePath + name, std::ios::binary | std::ios::beg);
-		if (!fin.is_open()){
-			return NULL;
-		}
-
-		IResource* resc = ResourceLoaderType::Load(fin);
+		IResource* resc = ResourceType::Load(this->mstrBasePath + name);
 		if (resc == NULL){
-			fin.close();
 			return NULL;
 		}
 
 		mResourceMap[name] = resc;
 
-		fin.close();
 		return resc;
 	}
 
