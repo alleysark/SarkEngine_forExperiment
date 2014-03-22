@@ -66,6 +66,15 @@
     <ClCompile Include="RigidCube.cpp">
       <Filter>Header Files\core-util\scene components</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderDictionary.cpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderProgram.cpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug.cpp">
+      <Filter>Header Files\core-util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -107,7 +116,13 @@
     <ClInclude Include="RigidCube.h">
       <Filter>Header Files\core-util\scene components</Filter>
     </ClInclude>
-    <ClInclude Include="Debug.hpp">
+    <ClInclude Include="ShaderDictionary.h">
+      <Filter>Header Files\core-system</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderProgram.h">
+      <Filter>Header Files\core-system</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
       <Filter>Header Files\core-util</Filter>
     </ClInclude>
   </ItemGroup>
