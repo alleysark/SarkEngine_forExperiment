@@ -53,7 +53,7 @@ namespace sark{
 	// get registered shader program.
 	// if there does not exist a matched shader program of given name,
 	// it'll return the NULL.
-	const ShaderProgram* ShaderDictionary::GetShaderProgram(const std::string& programName){
+	ShaderProgram* ShaderDictionary::GetShaderProgram(const std::string& programName){
 		Dictionary::iterator find = mProgramDict.find(programName);
 		if (find == mProgramDict.end())
 			return NULL;

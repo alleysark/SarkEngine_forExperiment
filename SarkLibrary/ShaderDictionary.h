@@ -36,7 +36,7 @@ namespace sark{
 		// get registered shader program.
 		// if there does not exist a matched shader program of given name,
 		// it'll return the NULL.
-		const ShaderProgram* GetShaderProgram(const std::string& programName);
+		ShaderProgram* GetShaderProgram(const std::string& programName);
 
 		// clear all registered shader program.
 		void Clear();

@@ -47,37 +47,102 @@ namespace sark{
 		Location GetAttributeLocation(const std::string& name);
 
 	public:
-		//--------  uniform/attribute variable setting methods --------
+		//========================================================
+		//			uniform variable setting methods
+		//========================================================
 
-		// doubles
-		void SetUniform(const std::string& name, double val0){
-			glUniform1d(GetUniformLocation(name), val0);
-		}
-		void SetUniform(const std::string& name, double val0, double val1){
-			glUniform2d(GetUniformLocation(name), val0, val1);
-		}
-		void SetUniform(const std::string& name, double val0, double val1, double val2){
-			glUniform3d(GetUniformLocation(name), val0, val1, val2);
-		}
-		void SetUniform(const std::string& name, double val0, double val1, double val2, double val3){
-			glUniform4d(GetUniformLocation(name), val0, val1, val2, val3);
-		}
+		//---------------------
+		//		boolean
+		//---------------------
 
-		// floats
-		void SetUniform(const std::string& name, float val0){
-			glUniform1f(GetUniformLocation(name), val0);
-		}
-		void SetUniform(const std::string& name, float val0, float val1){
-			glUniform2f(GetUniformLocation(name), val0, val1);
-		}
-		void SetUniform(const std::string& name, float val0, float val1, float val2){
-			glUniform3f(GetUniformLocation(name), val0, val1, val2);
-		}
-		void SetUniform(const std::string& name, float val0, float val1, float val2, float val3){
-			glUniform4f(GetUniformLocation(name), val0, val1, val2, val3);
-		}
+		// set bool uniform value (it's size of 4-byte in glsl)
+		void SetUniform(const std::string& name, bool val);
+		// set bool uniform array (it's size of 4-byte in glsl)
+		void SetUniform(const std::string& name, bool vals[], uinteger count);
 
-	
+
+		//---------------------
+		//		signed int
+		//---------------------
+
+		// set int uniform value
+		void SetUniform(const std::string& name, int32 val);
+		// set int uniform array
+		void SetUniform(const std::string& name, int32 vals[], uinteger count);
+		// set ivec2 uniform value
+		void SetUniform(const std::string& name, int32 vecs[][2], uinteger count);
+		// set ivec3 uniform value
+		void SetUniform(const std::string& name, int32 vecs[][3], uinteger count);
+		// set ivec4 uniform value
+		void SetUniform(const std::string& name, int32 vecs[][4], uinteger count);
+
+
+		//---------------------
+		//	   unsigned int
+		//---------------------
+
+		// set uint uniform value
+		void SetUniform(const std::string& name, uint32 val);
+		// set uint uniform array
+		void SetUniform(const std::string& name, uint32 vals[], uinteger count);
+		// set uvec2 uniform value
+		void SetUniform(const std::string& name, uint32 vecs[][2], uinteger count);
+		// set uvec3 uniform value
+		void SetUniform(const std::string& name, uint32 vecs[][3], uinteger count);
+		// set uvec4 uniform value
+		void SetUniform(const std::string& name, uint32 vecs[][4], uinteger count);
+
+
+		//---------------------
+		//		real
+		//---------------------
+
+		// set real uniform value
+		void SetUniform(const std::string& name, real val);
+		// set real uniform array
+		void SetUniform(const std::string& name, real vals[], uinteger count);
+
+
+		//---------------------
+		//		vector
+		//---------------------
+
+		// set vec2 uniform value
+		void SetUniform(const std::string& name, const Vector2& vec);
+		// set vec2 uniform array
+		void SetUniform(const std::string& name, const Vector2 vecs[], uinteger count);
+
+		// set vec3 uniform value
+		void SetUniform(const std::string& name, const Vector3& vec);
+		// set vec3 uniform array
+		void SetUniform(const std::string& name, const Vector3 vecs[], uinteger count);
+
+		// set vec4 uniform value
+		void SetUniform(const std::string& name, const Vector4& vec);
+		// set vec4 uniform array
+		void SetUniform(const std::string& name, const Vector4 vecs[], uinteger count);
+
+
+		//---------------------
+		//		matrix
+		//---------------------
+
+		// set mat3 uniform value
+		void SetUniform(const std::string& name, const Matrix3& mat);
+		// set mat3 uniform array
+		void SetUniform(const std::string& name, const Matrix3 mats[], uinteger count);
+
+		// set mat4 uniform value
+		void SetUniform(const std::string& name, const Matrix4& mat);
+		// set mat4 uniform array
+		void SetUniform(const std::string& name, const Matrix4 mats[], uinteger count);
+
+
+
+		//========================================================
+		//			attribute variable setting methods
+		//========================================================
+
 	};
 
 }
