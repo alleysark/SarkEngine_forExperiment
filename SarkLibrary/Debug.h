@@ -11,7 +11,7 @@ namespace sark{
 	// it defines library compiling mode as 'debug'.
 	// if it does not defined, some functions in Debug
 	// are just skipped on compile time
-	#define SARKLIB_DBGMODE
+	//#define SARKLIB_DBGMODE
 
 
 	// debug helper class
@@ -123,6 +123,14 @@ namespace sark{
 		#define LogFatal(msg) sark::Debug::Log(msg, sark::Debug::LogLevel::Fatal(), DBG_FILE, DBG_LINE, DBG_FUNCNAME)
 	#else
 		#define LogFatal(msg)
+	#endif
+
+
+	// code block macro only for debug mode
+	#ifdef SARKLIB_DBGMODE
+		#define ONLYDBG_CODEBLOCK(codes) do{ codes }while(0)
+	#else
+		#define ONLYDBG_CODEBLOCK(codes)
 	#endif
 
 }
