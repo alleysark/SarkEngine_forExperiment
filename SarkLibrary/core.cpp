@@ -2,6 +2,7 @@
 #include <memory.h>
 
 #include "core.h"
+#include "Debug.h"
 
 
 namespace sark{
@@ -97,10 +98,18 @@ namespace sark{
 
 	// vector constnat division operator
 	const Vector2 Vector2::operator/(real fConstant) const{
+		ONLYDBG_CODEBLOCK(
+		if (fConstant == 0.f)
+			LogFatal("division by zero");
+		);
 		return Vector2(x / fConstant, y / fConstant);
 	}
 
 	const Vector2& Vector2::operator/=(real fConstant){
+		ONLYDBG_CODEBLOCK(
+		if (fConstant == 0.f)
+			LogFatal("division by zero");
+		);
 		x /= fConstant; y /= fConstant;
 		return *this;
 	}
@@ -129,10 +138,18 @@ namespace sark{
 	// get normal and normalize this
 	const Vector2 Vector2::Normal() const{
 		real mag = Magnitude();
+		ONLYDBG_CODEBLOCK(
+		if (mag == 0.f)
+			LogFatal("division by zero");
+		);
 		return Vector2(x / mag, y / mag);
 	}
 	void Vector2::Normalize(){
 		real mag = Magnitude();
+		ONLYDBG_CODEBLOCK(
+		if (mag == 0.f)
+			LogFatal("division by zero");
+		);
 		x /= mag;
 		y /= mag;
 	}
@@ -273,10 +290,18 @@ namespace sark{
 
 	// vector constnat division operator
 	const Vector3 Vector3::operator/(real fConstant) const{
+		ONLYDBG_CODEBLOCK(
+		if (fConstant == 0.f)
+			LogFatal("division by zero");
+		);
 		return Vector3(x / fConstant, y / fConstant, z / fConstant);
 	}
 
 	const Vector3& Vector3::operator/=(real fConstant){
+		ONLYDBG_CODEBLOCK(
+		if (fConstant == 0.f)
+			LogFatal("division by zero");
+		);
 		x /= fConstant; y /= fConstant; z /= fConstant;
 		return *this;
 	}
@@ -310,10 +335,18 @@ namespace sark{
 	// get normal and normalize this
 	const Vector3 Vector3::Normal() const{
 		real mag = Magnitude();
+		ONLYDBG_CODEBLOCK(
+		if (mag == 0.f)
+			LogFatal("division by zero");
+		);
 		return Vector3(x / mag, y / mag, z / mag);
 	}
 	void Vector3::Normalize(){
 		real mag = Magnitude();
+		ONLYDBG_CODEBLOCK(
+		if (mag == 0.f)
+			LogFatal("division by zero");
+		);
 		x /= mag;
 		y /= mag;
 		z /= mag;
@@ -463,10 +496,18 @@ namespace sark{
 
 	// vector constnat division operator
 	const Vector4 Vector4::operator/(real fConstant) const{
+		ONLYDBG_CODEBLOCK(
+		if (fConstant == 0.f)
+			LogFatal("division by zero");
+		);
 		return Vector4(x / fConstant, y / fConstant, z / fConstant, w / fConstant);
 	}
 
 	const Vector4& Vector4::operator/=(real fConstant){
+		ONLYDBG_CODEBLOCK(
+		if (fConstant == 0.f)
+			LogFatal("division by zero");
+		);
 		x /= fConstant; y /= fConstant; z /= fConstant; w /= fConstant;
 		return *this;
 	}
@@ -494,10 +535,18 @@ namespace sark{
 	// get normal and normalize this
 	const Vector4 Vector4::Normal() const{
 		real mag = Magnitude();
+		ONLYDBG_CODEBLOCK(
+		if (mag == 0.f)
+			LogFatal("division by zero");
+		);
 		return Vector4(x / mag, y / mag, z / mag, w / mag);
 	}
 	void Vector4::Normalize(){
 		real mag = Magnitude();
+		ONLYDBG_CODEBLOCK(
+		if (mag == 0.f)
+			LogFatal("division by zero");
+		);
 		x /= mag;
 		y /= mag;
 		z /= mag;
@@ -597,6 +646,10 @@ namespace sark{
 
 	// matrix constant division operator
 	const Matrix3 Matrix3::operator / (real fConstant) const{
+		ONLYDBG_CODEBLOCK(
+		if (fConstant == 0.f)
+			LogFatal("division by zero");
+		);
 		return Matrix3(
 			m[0][0] / fConstant, m[0][1] / fConstant, m[0][2] / fConstant,
 			m[1][0] / fConstant, m[1][1] / fConstant, m[1][2] / fConstant,
@@ -698,8 +751,10 @@ namespace sark{
 		const Matrix3 adjM = this->Adjugate();
 		real det = m[0][0] * adjM.m[0][0] + m[0][1] * adjM.m[1][0] + m[0][2] * adjM.m[2][0];
 
-		if (det == 0.0f)
-			return Matrix3();
+		ONLYDBG_CODEBLOCK(
+		if (det == 0.f)
+			LogFatal("uninvertible matrix");
+		);
 
 		return adjM / det;
 	}
@@ -720,6 +775,10 @@ namespace sark{
 	}
 
 	const Matrix3 operator/(real fConstant, const Matrix3& mat3){
+		ONLYDBG_CODEBLOCK(
+		if (fConstant == 0.f)
+			LogFatal("division by zero");
+		);
 		return Matrix3(
 			mat3.m[0][0] / fConstant, mat3.m[0][1] / fConstant, mat3.m[0][2] / fConstant,
 			mat3.m[1][0] / fConstant, mat3.m[1][1] / fConstant, mat3.m[1][2] / fConstant,
@@ -826,6 +885,10 @@ namespace sark{
 
 	// matrix constant division operator
 	const Matrix4 Matrix4::operator/(real fConstant) const{
+		ONLYDBG_CODEBLOCK(
+		if (fConstant == 0.f)
+			LogFatal("division by zero");
+		);
 		return Matrix4(
 			m[0][0] / fConstant, m[0][1] / fConstant, m[0][2] / fConstant, m[0][3] / fConstant,
 			m[1][0] / fConstant, m[1][1] / fConstant, m[1][2] / fConstant, m[1][3] / fConstant,
@@ -980,8 +1043,10 @@ namespace sark{
 		const Matrix4 adjM = this->Adjugate();
 		real det = m[0][0] * adjM.m[0][0] + m[0][1] * adjM.m[1][0] + m[0][2] * adjM.m[2][0] + m[0][3] * adjM.m[3][0];
 
-		if (det == 0.0f)
-			return Matrix4();
+		ONLYDBG_CODEBLOCK(
+		if (det == 0.f)
+			LogFatal("uninvertible matrix");
+		);
 
 		return adjM / det;
 	}
@@ -1004,6 +1069,10 @@ namespace sark{
 	}
 
 	const Matrix4 operator/(real fConstant, const Matrix4& mat4){
+		ONLYDBG_CODEBLOCK(
+		if (fConstant == 0.f)
+			LogFatal("division by zero");
+		);
 		return Matrix4(
 			mat4.m[0][0] / fConstant, mat4.m[0][1] / fConstant, mat4.m[0][2] / fConstant, mat4.m[0][3] / fConstant,
 			mat4.m[1][0] / fConstant, mat4.m[1][1] / fConstant, mat4.m[1][2] / fConstant, mat4.m[1][3] / fConstant,
@@ -1113,10 +1182,18 @@ namespace sark{
 	//get normal and normalize this
 	const Quaternion Quaternion::Normal() const{
 		real mag = Magnitude();
+		ONLYDBG_CODEBLOCK(
+		if (mag == 0.f)
+			LogFatal("division by zero");
+		);
 		return Quaternion(x / mag, y / mag, z / mag, s / mag);
 	}
 	const Quaternion& Quaternion::Normalize(){
 		real mag = Magnitude();
+		ONLYDBG_CODEBLOCK(
+		if (mag == 0.f)
+			LogFatal("division by zero");
+		);
 		s /= mag;
 		x /= mag;
 		y /= mag;
@@ -1127,6 +1204,10 @@ namespace sark{
 	//inverse, q^{-1} = conj(q)/(norm(q)^2)
 	const Quaternion Quaternion::Inverse() const{
 		real factor = MagnitudeSq();
+		ONLYDBG_CODEBLOCK(
+		if (factor == 0.f)
+			LogFatal("division by zero");
+		);
 		return Quaternion(-x / factor, -y / factor, -z / factor, s / factor);
 	}
 
