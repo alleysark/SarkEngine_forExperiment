@@ -1146,7 +1146,7 @@ namespace sark{
 		return *this;
 	}
 
-	//Hamilton product: [s1, v1]*[s2, v2] = [s1*s2 - dot(v1,v2), s1*v2 + s2*v1 + cross(v1,v2)]
+	// Hamilton product: [s1, v1]*[s2, v2] = [s1*s2 - dot(v1,v2), s1*v2 + s2*v1 + cross(v1,v2)]
 	const Quaternion Quaternion::operator*(const Quaternion& q) const{
 		return Quaternion(
 			s*q.x + x*q.s + y*q.z - z*q.y,
@@ -1162,16 +1162,17 @@ namespace sark{
 		return *this;
 	}
 
-	//get conjugation and conjugate this
+	// get conjugation
 	const Quaternion Quaternion::Conjugation() const{
 		return Quaternion(-x, -y, -z, s);
 	}
+	// conjugate this
 	const Quaternion& Quaternion::Conjugate(){
 		Set(-x, -y, -z, s);
 		return *this;
 	}
 
-	//magnitude which called 'norm' or 'the tensor of quaternion'
+	// magnitude which called 'norm' or 'the tensor of quaternion'
 	real Quaternion::Magnitude() const{
 		return math::sqrt(math::sqre(s) + math::sqre(x) + math::sqre(y) + math::sqre(z));
 	}
@@ -1179,7 +1180,7 @@ namespace sark{
 		return math::sqre(s) + math::sqre(x) + math::sqre(y) + math::sqre(z);
 	}
 
-	//get normal and normalize this
+	// get normalized quaternion of this
 	const Quaternion Quaternion::Normal() const{
 		real mag = Magnitude();
 		ONLYDBG_CODEBLOCK(
@@ -1188,6 +1189,7 @@ namespace sark{
 		);
 		return Quaternion(x / mag, y / mag, z / mag, s / mag);
 	}
+	// normalize this
 	const Quaternion& Quaternion::Normalize(){
 		real mag = Magnitude();
 		ONLYDBG_CODEBLOCK(
@@ -1201,7 +1203,7 @@ namespace sark{
 		return *this;
 	}
 
-	//inverse, q^{-1} = conj(q)/(norm(q)^2)
+	// inverse, q^{-1} = conj(q)/(norm(q)^2)
 	const Quaternion Quaternion::Inverse() const{
 		real factor = MagnitudeSq();
 		ONLYDBG_CODEBLOCK(
@@ -1321,7 +1323,7 @@ namespace sark{
 		Quaternion q;
 		q.MakeRotatingQuat(axis, theta);
 
-		P = (q * P) * q.Inverse();
+		P = (q * P) * q.Conjugation();
 		v.Set(P.x, P.y, P.z);
 	}
 
@@ -1332,7 +1334,7 @@ namespace sark{
 		Quaternion q;
 		q.MakeRotatingQuat(roll, pitch, yaw);
 
-		P = (q * P) * q.Inverse();
+		P = (q * P) * q.Conjugation();
 		v.Set(P.x, P.y, P.z);
 	}
 
