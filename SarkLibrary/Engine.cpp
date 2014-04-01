@@ -186,7 +186,7 @@ namespace sark{
 		return true;
 	}
 
-	void Engine::SetClearColor(const Color& color){
+	void Engine::SetClearColor(const ColorRGBA& color){
 		mClearColor = color;
 		glClearColor(mClearColor.r, mClearColor.g, mClearColor.b, mClearColor.a);
 	}

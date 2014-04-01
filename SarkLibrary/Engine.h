@@ -52,7 +52,7 @@ namespace sark{
 		uinteger mnWndWidth, mnWndHeight;
 
 		// color buffer clear color
-		Color mClearColor;
+		ColorRGBA mClearColor;
 
 
 		typedef std::map<std::string, AScene*> SceneContainer;
@@ -116,7 +116,7 @@ namespace sark{
 		bool AddScene(const std::string& sceneName, AScene* scene, bool asCurrent = false);
 		bool SetCurrentScene(const std::string& sceneName);
 
-		void SetClearColor(const Color& color);
+		void SetClearColor(const ColorRGBA& color);
 
 		void ResizeWindow(uinteger width, uinteger height, bool callOnInside = false);
 

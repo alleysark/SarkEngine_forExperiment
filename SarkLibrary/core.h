@@ -464,7 +464,7 @@ namespace sark{
 	typedef Vector4 Vertex4;
 	typedef Vector4 Position4;
 	typedef Vector4 Point4;
-	typedef Vector4 Color;
+	typedef Vector4 ColorRGBA;
 
 
 	//=============== Matrix Types =================
