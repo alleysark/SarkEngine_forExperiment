@@ -66,6 +66,21 @@ namespace sark{
 		}
 	}
 
+	// get world space direction.
+	// formal direction vector is (0,0,-1)
+	const Vector3 Transform::GetDirection(){
+		const Matrix4& myAbsMat = GetMatrix();
+
+		if (myAbsMat.IsIdentity()){
+			return Vector3(0, 0, -1);
+		}
+		else{
+			// getting rotation factor
+			Matrix3 rotMat(myAbsMat.row[0].xyz, myAbsMat.row[1].xyz, myAbsMat.row[2].xyz);
+			return rotMat * Vector3(0, 0, -1);
+		}
+	}
+
 	// get local position (translation) 
 	const Position3& Transform::GetLocalPosition() const{
 		return mTranslation;

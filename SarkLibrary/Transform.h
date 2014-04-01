@@ -51,6 +51,10 @@ namespace sark{
 		// get world space position
 		const Position3 GetPosition();
 
+		// get world space direction.
+		// formal direction vector is (0,0,-1)
+		const Vector3 GetDirection();
+
 		// get local position (translation) 
 		const Position3& GetLocalPosition() const;
 
