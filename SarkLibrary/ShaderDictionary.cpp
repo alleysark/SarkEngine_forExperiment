@@ -21,29 +21,39 @@ namespace sark{
 		if (find != mProgramDict.end())
 			return false;
 
-		ObjectHandle progObj = glCreateProgramObjectARB();
+		ObjectHandle progObj = glCreateProgram();
 		if (progObj == 0)
 			return false;
 
-		ObjectHandle vtxObj = CreateShader(GL_VERTEX_SHADER_ARB, vtxShaders);
+		ObjectHandle vtxObj = CreateShader(GL_VERTEX_SHADER, vtxShaders);
 		if (vtxObj == 0){
-			glDeleteObjectARB(progObj);
+			glDeleteProgram(progObj);
 			return false;
 		}
-		ObjectHandle fragObj = CreateShader(GL_FRAGMENT_SHADER_ARB, fragShaders);
+		ObjectHandle fragObj = CreateShader(GL_FRAGMENT_SHADER, fragShaders);
 		if (fragObj == 0){
-			glDeleteObjectARB(progObj);
+			glDeleteShader(vtxObj);
+			glDeleteProgram(progObj);
 			return false;
 		}
 
-		glAttachObjectARB(progObj, vtxObj);
-		glAttachObjectARB(progObj, fragObj);
-		glLinkProgramARB(progObj);
-		glDetachObjectARB(progObj, vtxObj);
-		glDetachObjectARB(progObj, fragObj);
+		glAttachShader(progObj, vtxObj);
+		glAttachShader(progObj, fragObj);
 
-		glDeleteObjectARB(vtxObj);
-		glDeleteObjectARB(fragObj);
+		glLinkProgram(progObj);
+
+		if (!CheckProgram(progObj)){
+			glDeleteShader(vtxObj);
+			glDeleteShader(fragObj);
+			glDeleteProgram(progObj);
+			return false;
+		}
+
+		glDetachShader(progObj, vtxObj);
+		glDetachShader(progObj, fragObj);
+
+		glDeleteShader(vtxObj);
+		glDeleteShader(fragObj);
 
 		ShaderProgram* program = new ShaderProgram(progObj);
 		mProgramDict[programName] = program;
@@ -71,7 +81,7 @@ namespace sark{
 
 	// create shader object
 	ShaderDictionary::ObjectHandle ShaderDictionary::CreateShader(GLenum shaderType, const std::vector<const char*>& shaders){
-		ObjectHandle newShaderHandle = glCreateShaderObjectARB(shaderType);
+		ObjectHandle newShaderHandle = glCreateShader(shaderType);
 		if (newShaderHandle == 0)
 			return 0;
 
@@ -98,33 +108,56 @@ namespace sark{
 			fin.close();
 		}
 
-		glShaderSourceARB(newShaderHandle, count, const_cast<const char**>(sources), NULL);
+		glShaderSource(newShaderHandle, count, (const char**)(sources), NULL);
 		for (uinteger i = 0; i < count; i++){
 			delete[] sources[i];
 		}
 		delete[] sources;
 
-		glCompileShaderARB(newShaderHandle);
-		if (!CheckCompilation(newShaderHandle)){
+		glCompileShader(newShaderHandle);
+
+		if (!CheckShader(newShaderHandle)){
 			return 0;
 		}
 
 		return newShaderHandle;
 	}
 
-	// check shader source compilation
-	// it'll log the info if there are compilation errors.
-	bool ShaderDictionary::CheckCompilation(ObjectHandle obj){
-		integer length = 0;
-		char *infoLog;
 
-		glGetObjectParameterivARB(obj, GL_OBJECT_INFO_LOG_LENGTH_ARB, &length);
-		if (length > 0){
-			infoLog = new char[length];
-			integer writtenLen = 0;
-			glGetInfoLogARB(obj, length, &writtenLen, infoLog);
-			LogError(infoLog);
-			delete[] infoLog;
+	// check shader after compilation. it'll log the info if there are compilation errors.
+	bool ShaderDictionary::CheckShader(ObjectHandle obj){
+		GLint state;
+		glGetShaderiv(obj, GL_COMPILE_STATUS, &state);
+		if (GL_FALSE == state){
+			int infologLength = 0;
+			glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
+			if (infologLength > 1){
+				int charsWritten = 0;
+				char *infoLog = new char[infologLength];
+				glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);
+				LogError(infoLog);
+				delete[] infoLog;
+				
+			}
+			return false;
+		}
+		return true;
+	}
+
+	// check program after linking. it'll log the info if there are compilation errors.
+	bool ShaderDictionary::CheckProgram(ObjectHandle obj){
+		GLint state;
+		glGetProgramiv(obj, GL_LINK_STATUS, &state);
+		if (GL_FALSE == state) {
+			int infologLength = 0;
+			glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
+			if (infologLength > 1){
+				int charsWritten = 0;
+				char *infoLog = new char[infologLength];
+				glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
+				LogError(infoLog);
+				delete[] infoLog;
+			}
 			return false;
 		}
 		return true;

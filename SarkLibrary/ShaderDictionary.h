@@ -17,7 +17,7 @@ namespace sark{
 	// it contains registered shader programs and supports shader getter.
 	class ShaderDictionary{
 	public:
-		typedef GLhandleARB ObjectHandle;
+		typedef GLuint ObjectHandle;
 		typedef std::hash_map<const std::string, ShaderProgram*> Dictionary;
 
 	private:
@@ -45,9 +45,11 @@ namespace sark{
 		// create shader object
 		ObjectHandle CreateShader(GLenum shaderType, const std::vector<const char*>& shaders);
 
-		// check shader source compilation
-		// it'll log the info if there are compilation errors.
-		bool CheckCompilation(ObjectHandle obj);
+		// check shader after compil. it'll log the info if there are compilation errors.
+		bool CheckShader(ObjectHandle obj);
+
+		// check program after linking. it'll log the info if there are compilation errors.
+		bool CheckProgram(ObjectHandle obj);
 	};
 
 }

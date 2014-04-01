@@ -10,20 +10,20 @@ namespace sark{
 	{}
 
 	ShaderProgram::~ShaderProgram(){
-		glDeleteObjectARB(mhProgram);
+		glDeleteProgram(mhProgram);
 		mhProgram = 0;
 		mLocationDict.clear();
 	}
 
 	// before rendering, user should've Use() to use shader program.
 	void ShaderProgram::Use(){
-		glUseProgramObjectARB(mhProgram);
+		glUseProgram(mhProgram);
 	}
 
 	// after using shader program, user should've Unuse()
 	// to disable this shader program.
 	void ShaderProgram::Unuse(){
-		glUseProgramObjectARB(0);
+		glUseProgram(0);
 	}
 
 
@@ -33,7 +33,7 @@ namespace sark{
 		if (find != mLocationDict.end())
 			return find->second;
 
-		Location loca = glGetUniformLocationARB(mhProgram, name.c_str());
+		Location loca = glGetUniformLocation(mhProgram, name.c_str());
 		if (loca == -1){
 			LogWarn("inappropriate uniform variable name");
 			return -1;
@@ -47,7 +47,7 @@ namespace sark{
 		if (find != mLocationDict.end())
 			return find->second;
 		
-		Location loca = glGetAttribLocationARB(mhProgram, name.c_str());
+		Location loca = glGetAttribLocation(mhProgram, name.c_str());
 		if (loca == -1){
 			LogWarn("inappropriate attribute variable name");
 			return -1;

@@ -14,7 +14,7 @@ namespace sark{
 	// it'll be created by ShaderDictionary 
 	class ShaderProgram{
 	public:	
-		typedef GLhandleARB ProgramHandle;
+		typedef GLuint ProgramHandle;
 		typedef GLint Location;
 		typedef std::hash_map<const std::string, Location> LocationDictionary;
 
