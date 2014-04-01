@@ -7,13 +7,19 @@ namespace sark{
 	//=============================================
 
 	Camera::Viewport::Viewport()
-		: x(0.f), y(0.f), width(0.f), height(0.f)
+		: x(0.f), y(0.f), width(0.f), height(0.f), viewportMatrix(true)
 	{}
 
-	// set viewport.
+	// set viewport. re-calculate viewport transform matrix.
 	void Camera::Viewport::Set(real _x, real _y, real _width, real _height){
 		x = _x; y = _y;
 		width = _width; height = _height;
+
+		viewportMatrix.MakeIdentity();
+		viewportMatrix.m[0][0] = width / 2.f;
+		viewportMatrix.m[0][3] = x + width / 2.f;
+		viewportMatrix.m[1][1] = -height / 2.f;
+		viewportMatrix.m[1][3] = y + height / 2.f;
 	}
 
 
@@ -25,51 +31,51 @@ namespace sark{
 	// * http://www.songho.ca/opengl/gl_projectionmatrix.html
 	//=========================================================
 
-	Camera::ViewVolume::ViewVolume(real width, real height, real depth){
-		SetOrthographic(width, height, depth);
+	Camera::ViewVolume::ViewVolume(real _width, real _height, real _depth){
+		SetOrthographic(_width, _height, _depth);
 	}
-	Camera::ViewVolume::ViewVolume(real fovy, real aspect, real znear, real zfar){
-		SetPerspective(fovy, aspect, znear, zfar);
+	Camera::ViewVolume::ViewVolume(real _fovy, real _aspect, real _znear, real _zfar){
+		SetPerspective(_fovy, _aspect, _znear, _zfar);
 	}
 
 	Camera::ViewVolume::~ViewVolume(){}
 
 
 	// set view as orthographically
-	void Camera::ViewVolume::SetOrthographic(real width, real height, real depth){
-		mOrtho = true;
+	void Camera::ViewVolume::SetOrthographic(real _width, real _height, real _depth){
+		ortho = true;
 
-		mH = height / 2.f;
-		mW = width / 2.f;
-		mzNear = 0.f;
-		mzFar = depth;
+		height = _height / 2.f;
+		width = _width / 2.f;
+		zNear = 0.f;
+		zFar = _depth;
 
 		// calculate projection matrix
-		mProjMatrix.MakeZero();
-		mProjMatrix.m[0][0] = 1.f / mW;
-		mProjMatrix.m[1][1] = 1.f / mH;
-		mProjMatrix.m[2][2] = -2.f / (mzFar - mzNear);
-		mProjMatrix.m[2][3] = -(mzFar + mzNear) / (mzFar - mzNear);
-		mProjMatrix.m[3][3] = 1.f;
+		projMatrix.MakeZero();
+		projMatrix.m[0][0] = 1.f / width;
+		projMatrix.m[1][1] = 1.f / height;
+		projMatrix.m[2][2] = -2.f / (zFar - zNear);
+		projMatrix.m[2][3] = -(zFar + zNear) / (zFar - zNear);
+		projMatrix.m[3][3] = 1.f;
 	}
 
 	// set view as perspectively
-	void Camera::ViewVolume::SetPerspective(real fovy, real aspect, real znear, real zfar){
-		mOrtho = false;
+	void Camera::ViewVolume::SetPerspective(real _fovy, real _aspect, real _znear, real _zfar){
+		ortho = false;
 
-		mH = math::tan(math::deg2rad(fovy / 2.f)) * znear;
-		mW = mH * aspect;
-		mzNear = znear;
-		mzFar = zfar;
+		height = math::tan(math::deg2rad(_fovy / 2.f)) * _znear;
+		width = height * _aspect;
+		zNear = _znear;
+		zFar = _zfar;
 
 
 		// calculate projection matrix
-		mProjMatrix.MakeZero();
-		mProjMatrix.m[0][0] = mzNear / mW;
-		mProjMatrix.m[1][1] = mzNear / mH;
-		mProjMatrix.m[2][2] = -(mzNear + mzFar) / (mzFar - mzNear);
-		mProjMatrix.m[2][3] = -(2.f * mzFar * mzNear) / (mzFar - mzNear);
-		mProjMatrix.m[3][2] = -1.f;
+		projMatrix.MakeZero();
+		projMatrix.m[0][0] = zNear / width;
+		projMatrix.m[1][1] = zNear / height;
+		projMatrix.m[2][2] = -(zNear + zFar) / (zFar - zNear);
+		projMatrix.m[2][3] = -(2.f * zFar * zNear) / (zFar - zNear);
+		projMatrix.m[3][2] = -1.f;
 	}
 
 
@@ -79,56 +85,56 @@ namespace sark{
 	//=============================================
 
 	Camera::Camera()
-		: mView(90.f, 1.f, 0.1f, 100.f), 
+		: mVolume(90.f, 1.f, 0.1f, 100.f),
 		mEye(0.f), mLookat(0.f, 0.f, -1.f), mUp(0.f, 1.f, 0.f)
 	{
-		mViewMatrix.MakeIdentity();
+		mCameraMatrix.MakeIdentity();
 	}
 
 	Camera::Camera(const Vector3& eye, const Vector3& lookat, const Vector3& up)
-		: mView(90.f, 1.f, 0.1f, 100.f), 
+		: mVolume(90.f, 1.f, 0.1f, 100.f),
 		mEye(eye), mLookat(lookat), mUp(up)
 	{
-		UpdateViewMatrix();
+		UpdateCameraMatrix();
 	}
 
 	Camera::~Camera(){}
 
 
 	// make view matrix from camera properties(eye,at,up)
-	void Camera::UpdateViewMatrix(){
-		Vector3& n = mViewMatrix.row[2].xyz;
+	void Camera::UpdateCameraMatrix(){
+		Vector3& n = mCameraMatrix.row[2].xyz;
 		n = mEye - mLookat;
 		n.Normalize();
 
-		Vector3& u = mViewMatrix.row[0].xyz;
+		Vector3& u = mCameraMatrix.row[0].xyz;
 		u = mUp.Cross(n);
 		u.Normalize();
 
-		Vector3& v = mViewMatrix.row[1].xyz;
+		Vector3& v = mCameraMatrix.row[1].xyz;
 		v = n.Cross(u);
 		v.Normalize();
 
-		mViewMatrix.m[0][3] = -mEye.Dot(u);
-		mViewMatrix.m[1][3] = -mEye.Dot(v);
-		mViewMatrix.m[2][3] = -mEye.Dot(n);
-		mViewMatrix.m[3][3] = 1.f;
+		mCameraMatrix.m[0][3] = -mEye.Dot(u);
+		mCameraMatrix.m[1][3] = -mEye.Dot(v);
+		mCameraMatrix.m[2][3] = -mEye.Dot(n);
+		mCameraMatrix.m[3][3] = 1.f;
 	}
 
 	// get view transformation matrix
-	const Matrix4& Camera::GetViewMatrix(){
-		return mViewMatrix;
+	const Matrix4& Camera::GetCameraMatrix(){
+		return mCameraMatrix;
 	}
 
 	// get projection transformation matrix
 	const Matrix4& Camera::GetProjMatrix(){
-		return mView.mProjMatrix;
+		return mVolume.projMatrix;
 	}
 
 
 	// is this view orthographic view?
 	bool Camera::IsOrthoView() const{
-		return mView.mOrtho;
+		return mVolume.ortho;
 	}
 
 	// make camera view volume as orthographic-view.
@@ -136,7 +142,7 @@ namespace sark{
 	// which range of [-width/2, width/2] for x, [-height/2, height/2] for y
 	// and [0, depth] for z.
 	void Camera::Orthographic(real width, real height, real depth){
-		mView.SetOrthographic(width, height, depth);
+		mVolume.SetOrthographic(width, height, depth);
 	}
 
 	// make camera view volume as perspective-view.
@@ -147,7 +153,7 @@ namespace sark{
 	// znear is positive distance from cop to nearest plane,
 	// zfar is positive distance from cop to farthest plane.
 	void Camera::Perspective(real fovy, real aspect, real znear, real zfar){
-		mView.SetPerspective(fovy, aspect, znear, zfar);
+		mVolume.SetPerspective(fovy, aspect, znear, zfar);
 	}
 
 
@@ -162,21 +168,21 @@ namespace sark{
 
 	// get view volume
 	const Camera::ViewVolume& Camera::GetViewVolume() const{
-		return mView;
+		return mVolume;
 	}
 
 
 	// get u-axis basis of view space (it'll be the x-axis). u is the right-direction
 	const Vector3& Camera::GetBasisU(){
-		return mViewMatrix.row[0].xyz;
+		return mCameraMatrix.row[0].xyz;
 	}
 	// get v-axis basis of view space (it'll be the y-axis). v is the up-direction
 	const Vector3& Camera::GetBasisV(){
-		return mViewMatrix.row[1].xyz;
+		return mCameraMatrix.row[1].xyz;
 	}
 	// get n-axis basis of view space (it'll be the z-axis). n is the opposite view-direction
 	const Vector3& Camera::GetBasisN(){
-		return mViewMatrix.row[2].xyz;
+		return mCameraMatrix.row[2].xyz;
 	}
 
 	// get eye position
@@ -197,22 +203,22 @@ namespace sark{
 		mEye = eye;
 		mLookat = lookat;
 		mUp = up;
-		UpdateViewMatrix();
+		UpdateCameraMatrix();
 	}
 	// set eye position
 	void Camera::SetEye(const Position3& eye){
 		mEye = eye;
-		UpdateViewMatrix();
+		UpdateCameraMatrix();
 	}
 	// set lookat position
 	void Camera::SetLookat(const Position3& lookat){
 		mLookat = lookat;
-		UpdateViewMatrix();
+		UpdateCameraMatrix();
 	}
 	// set up vector
 	void Camera::SetUp(const Vector3& up){
 		mUp = up;
-		UpdateViewMatrix();
+		UpdateCameraMatrix();
 	}
 
 
@@ -220,54 +226,54 @@ namespace sark{
 
 	// move camera into forward direction (positive distance goes to forward)
 	void Camera::MoveForward(real distance){
-		mEye = mEye - distance*mViewMatrix.row[2].xyz;
-		mLookat = mLookat - distance*mViewMatrix.row[2].xyz;
+		mEye = mEye - distance*mCameraMatrix.row[2].xyz;
+		mLookat = mLookat - distance*mCameraMatrix.row[2].xyz;
 
-		UpdateViewMatrix();
+		UpdateCameraMatrix();
 	}
 
 	// move camera into sideward direction (positive distance goes to right)
 	void Camera::MoveSideward(real distance){
-		mEye = mEye + distance*mViewMatrix.row[0].xyz;
-		mLookat = mLookat + distance*mViewMatrix.row[0].xyz;
+		mEye = mEye + distance*mCameraMatrix.row[0].xyz;
+		mLookat = mLookat + distance*mCameraMatrix.row[0].xyz;
 
-		UpdateViewMatrix();
+		UpdateCameraMatrix();
 	}
 
 	// move camera into upward direction (positive distance goes to up)
 	void Camera::MoveUpward(real distance){
-		mEye = mEye + distance*mViewMatrix.row[1].xyz;
-		mLookat = mLookat + distance*mViewMatrix.row[1].xyz;
+		mEye = mEye + distance*mCameraMatrix.row[1].xyz;
+		mLookat = mLookat + distance*mCameraMatrix.row[1].xyz;
 
-		UpdateViewMatrix();
+		UpdateCameraMatrix();
 	}
 
 	// turn camera on an axis of u (likes x)
 	// it nod its sight (positive radian makes it to see up)
 	void Camera::Pitch(real rad){
 		Vector3 lookDirection = mLookat - mEye;
-		Quaternion::Rotate(lookDirection, mViewMatrix.row[0].xyz, rad);
-		Quaternion::Rotate(mUp, mViewMatrix.row[0].xyz, rad);
+		Quaternion::Rotate(lookDirection, mCameraMatrix.row[0].xyz, rad);
+		Quaternion::Rotate(mUp, mCameraMatrix.row[0].xyz, rad);
 		mLookat = mEye + lookDirection;
 
-		UpdateViewMatrix();
+		UpdateCameraMatrix();
 	}
 
 	// turn camera on an axis of v (likes y)
 	// it shakes its sight (positive radian makes it to see left)
 	void Camera::Yaw(real rad){
 		Vector3 lookDirection = mLookat - mEye;
-		Quaternion::Rotate(lookDirection, mViewMatrix.row[1].xyz, rad);
+		Quaternion::Rotate(lookDirection, mCameraMatrix.row[1].xyz, rad);
 		mLookat = mEye + lookDirection;
 
-		UpdateViewMatrix();
+		UpdateCameraMatrix();
 	}
 
 	// turn camera on an axis of n (likes z)
 	// it tilt its sight (positive radian makes it to see left-tilting)
 	void Camera::Roll(real rad){
-		Quaternion::Rotate(mUp, mViewMatrix.row[2].xyz, rad);
-		UpdateViewMatrix();
+		Quaternion::Rotate(mUp, mCameraMatrix.row[2].xyz, rad);
+		UpdateCameraMatrix();
 	}
 
 }

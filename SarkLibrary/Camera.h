@@ -26,10 +26,18 @@ namespace sark{
 			real x, y;
 			real width, height;
 
+			// [minZ, maxZ] always [0, 1]
+
+			// viewport transform matrix.
+			// even it does not need to transform the vertices on user-level,
+			// its inverse can be required to transform the screen-coord mouse position into NDC space.
+			// (and then, transform into camera space by inverse of projection matrix)
+			Matrix4 viewportMatrix;
+
 		public:
 			Viewport();
 
-			// set viewport.
+			// set viewport. re-calculate viewport transform matrix.
 			void Set(real _x, real _y, real _width, real _height);
 		};
 
@@ -40,33 +48,33 @@ namespace sark{
 		class ViewVolume{
 		public:
 			// it is true when if it is orthographic view
-			bool mOrtho;
+			bool ortho;
 
-			// half factor of height. it defines the range as [-mH, mH]
-			real mH;
+			// half factor of height. it defines the range as [-H, H]
+			real height;
 
-			// half factor of width. it defines the range as [-mW, mW]
-			real mW;
+			// half factor of width. it defines the range as [-W, W]
+			real width;
 
 			// positive value of z-distance from cop to nearest plane.
-			real mzNear;
+			real zNear;
 
 			// positive value of z-distance from cop to farthest plane.
-			real mzFar;
+			real zFar;
 
 			// projection matrix
-			Matrix4 mProjMatrix;
+			Matrix4 projMatrix;
 
 		public:
-			ViewVolume(real width, real height, real depth);
-			ViewVolume(real fovy, real aspect, real znear, real zfar);
+			ViewVolume(real _width, real _height, real _depth);
+			ViewVolume(real _fovy, real _aspect, real _znear, real _zfar);
 			~ViewVolume();
 
 			// set view as orthographically
-			void SetOrthographic(real width, real height, real depth);
+			void SetOrthographic(real _width, real _height, real _depth);
 
 			// set view as perspectively
-			void SetPerspective(real fovy, real aspect, real znear, real zfar);
+			void SetPerspective(real _fovy, real _aspect, real _znear, real _zfar);
 		};
 
 	protected:
@@ -80,8 +88,8 @@ namespace sark{
 		Vector3 mUp;
 
 
-		// view space transform matrix
-		Matrix4 mViewMatrix;
+		// camera space transform matrix
+		Matrix4 mCameraMatrix;
 
 
 		// viewport definition
@@ -89,7 +97,7 @@ namespace sark{
 
 		// what viewing volume is (orthographic or perspective).
 		// it has the projection matrix and viewport definition
-		ViewVolume mView;
+		ViewVolume mVolume;
 
 	public:
 		Camera();
@@ -97,12 +105,12 @@ namespace sark{
 		virtual ~Camera();
 
 	private:
-		// update view matrix from camera properties(eye,at,up)
-		void UpdateViewMatrix();
+		// update camera matrix from camera properties(eye,at,up)
+		void UpdateCameraMatrix();
 
 	public:
-		// get view transformation matrix
-		const Matrix4& GetViewMatrix();
+		// get camera transformation matrix
+		const Matrix4& GetCameraMatrix();
 
 		// get projection transformation matrix
 		const Matrix4& GetProjMatrix();
