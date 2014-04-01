@@ -68,8 +68,16 @@ namespace sark{
 			}
 			else{
 				if (mTimer.Update()){
-					Update();
-					Render();
+					// update current scene
+					mCurrentScene->Update();
+
+					// render current scene
+					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+					glLoadIdentity();
+
+					mCurrentScene->Render();
+
+					SwapBuffers(mhDC);
 				}
 			}
 		}
@@ -146,25 +154,6 @@ namespace sark{
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 	}
-
-
-
-	// update current scene and other frame depentent components
-	void Engine::Update(){
-		mCurrentScene->Update();
-	}
-
-	// render current scene
-	void Engine::Render(){
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glLoadIdentity();
-
-		mCurrentScene->Render();
-
-		SwapBuffers(mhDC);
-	}
-
-	
 
 	// ---------- configuration methods ------------
 

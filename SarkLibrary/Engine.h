@@ -103,14 +103,6 @@ namespace sark{
 		// setup opengl state
 		void SetupGL();
 
-	private:
-		// update current scene and other frame depentent components
-		void Update();
-
-		// render current scene
-		void Render();
-
-
 		// ---------- configuration methods ------------
 	public:
 		bool AddScene(const std::string& sceneName, AScene* scene, bool asCurrent = false);
