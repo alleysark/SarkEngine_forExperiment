@@ -269,4 +269,175 @@ namespace sark{
 	}
 #endif
 
+
+	//========================================================
+	//			attribute variable setting methods
+	//========================================================
+
+	//---------------------
+	//		boolean
+	//---------------------
+
+	// set bool vertex attribute value (it's size of 4-byte in glsl)
+	void ShaderProgram::SetAttrib(const std::string& name, bool val){
+		glVertexAttribI1ui(GetAttributeLocation(name), (val ? 1 : 0));
+	}
+
+
+	//---------------------
+	//		signed int
+	//---------------------
+
+	// set int vertex attribute value
+	void ShaderProgram::SetAttrib(const std::string& name, int32 val){
+		glVertexAttribI1i(GetAttributeLocation(name), val);
+	}
+	// set ivec2 vertex attribute value
+	void ShaderProgram::SetAttrib(const std::string& name, int32 val1, int32 val2){
+		glVertexAttribI2i(GetAttributeLocation(name), val1, val2);
+	}
+	// set ivec3 vertex attribute value
+	void ShaderProgram::SetAttrib(const std::string& name, int32 val1, int32 val2, int32 val3){
+		glVertexAttribI3i(GetAttributeLocation(name), val1, val2, val3);
+	}
+	// set ivec4 vertex attribute value
+	void ShaderProgram::SetAttrib(const std::string& name, int32 val1, int32 val2, int32 val3, int32 val4){
+		glVertexAttribI4i(GetAttributeLocation(name), val1, val2, val3, val4);
+	}
+
+
+	//---------------------
+	//	   unsigned int
+	//---------------------
+
+	// set uint vertex attribute value
+	void ShaderProgram::SetAttrib(const std::string& name, uint32 val){
+		glVertexAttribI1ui(GetAttributeLocation(name), val);
+	}
+	// set uvec2 vertex attribute value
+	void ShaderProgram::SetAttrib(const std::string& name, uint32 val1, uint32 val2){
+		glVertexAttribI2ui(GetAttributeLocation(name), val1, val2);
+	}
+	// set uvec3 vertex attribute value
+	void ShaderProgram::SetAttrib(const std::string& name, uint32 val1, uint32 val2, uint32 val3){
+		glVertexAttribI3ui(GetAttributeLocation(name), val1, val2, val3);
+	}
+	// set uvec4 vertex attribute value
+	void ShaderProgram::SetAttrib(const std::string& name, uint32 val1, uint32 val2, uint32 val3, uint32 val4){
+		glVertexAttribI4ui(GetAttributeLocation(name), val1, val2, val3, val4);
+	}
+
+#ifndef SARKLIB_USING_DOUBLE
+	//---------------------
+	//		real
+	//---------------------
+
+	// set real vertex attribute value
+	void ShaderProgram::SetAttrib(const std::string& name, real val){
+		glVertexAttrib1f(GetAttributeLocation(name), val);
+	}
+
+
+	//---------------------
+	//		vector
+	//---------------------
+
+	// set vec2 vertex attribute value
+	void ShaderProgram::SetAttrib(const std::string& name, const Vector2& vec){
+		glVertexAttrib2fv(GetAttributeLocation(name), vec.v);
+	}
+
+	// set vec3 vertex attribute value
+	void ShaderProgram::SetAttrib(const std::string& name, const Vector3& vec){
+		glVertexAttrib3fv(GetAttributeLocation(name), vec.v);
+	}
+
+	// set vec4 vertex attribute value
+	void ShaderProgram::SetAttrib(const std::string& name, const Vector4& vec){
+		glVertexAttrib4fv(GetAttributeLocation(name), vec.v);
+	}
+
+
+	//---------------------
+	//		pointer
+	//---------------------
+
+	// set vec2 vertex attribute pointer
+	void ShaderProgram::SetAttribPointer(const std::string& name, Vector2 vecs[]){
+		glVertexAttribPointer(GetAttributeLocation(name), 2, GL_FLOAT, GL_FALSE, 0, vecs);
+	}
+	// set vec3 vertex attribute pointer
+	void ShaderProgram::SetAttribPointer(const std::string& name, Vector3 vecs[]){
+		glVertexAttribPointer(GetAttributeLocation(name), 3, GL_FLOAT, GL_FALSE, 0, vecs);
+	}
+	// set vec4 vertex attribute pointer
+	void ShaderProgram::SetAttribPointer(const std::string& name, Vector4 vecs[]){
+		glVertexAttribPointer(GetAttributeLocation(name), 4, GL_FLOAT, GL_FALSE, 0, vecs);
+	}
+#else
+	//---------------------
+	//		real
+	//---------------------
+
+	// set real vertex attribute value
+	void ShaderProgram::SetAttrib(const std::string& name, real val){
+		glVertexAttribL1d(GetAttributeLocation(name), val);
+	}
+
+
+	//---------------------
+	//		vector
+	//---------------------
+
+	// set vec2 vertex attribute value
+	void ShaderProgram::SetAttrib(const std::string& name, const Vector2& vec){
+		glVertexAttribL2dv(GetAttributeLocation(name), vec.v);
+	}
+
+	// set vec3 vertex attribute value
+	void ShaderProgram::SetAttrib(const std::string& name, const Vector3& vec){
+		glVertexAttribL3dv(GetAttributeLocation(name), vec.v);
+	}
+
+	// set vec4 vertex attribute value
+	void ShaderProgram::SetAttrib(const std::string& name, const Vector4& vec){
+		glVertexAttribL4dv(GetAttributeLocation(name), vec.v);
+	}
+
+
+	//---------------------
+	//		pointer
+	//---------------------
+
+	// set vec2 vertex attribute pointer
+	void ShaderProgram::SetAttribPointer(const std::string& name, Vector2 vecs[]){
+		glVertexAttribLPointer(GetAttributeLocation(name), 2, GL_DOUBLE, GL_FALSE, 0, vecs);
+	}
+	// set vec3 vertex attribute pointer
+	void ShaderProgram::SetAttribPointer(const std::string& name, Vector3 vecs[]){
+		glVertexAttribLPointer(GetAttributeLocation(name), 3, GL_DOUBLE, GL_FALSE, 0, vecs);
+	}
+	// set vec4 vertex attribute pointer
+	void ShaderProgram::SetAttribPointer(const std::string& name, Vector4 vecs[]){
+		glVertexAttribLPointer(GetAttributeLocation(name), 4, GL_DOUBLE, GL_FALSE, 0, vecs);
+	}
+#endif
+	
+
+
+	//---------------------
+	//	array enable
+	//---------------------
+
+	// enable vertex attribute array buffer
+	void ShaderProgram::EnableAttribArray(const std::string& name){
+		glEnableVertexAttribArray(GetAttributeLocation(name));
+	}
+	// disable vertex attribute array buffer
+	void ShaderProgram::DisableAttribArray(const std::string& name){
+		glDisableVertexAttribArray(GetAttributeLocation(name));
+	}
+
+
+	
 }

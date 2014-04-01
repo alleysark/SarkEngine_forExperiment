@@ -143,6 +143,85 @@ namespace sark{
 		//			attribute variable setting methods
 		//========================================================
 
+		//---------------------
+		//		boolean
+		//---------------------
+
+		// set bool vertex attribute value (it's size of 4-byte in glsl)
+		void SetAttrib(const std::string& name, bool val);
+
+
+		//---------------------
+		//		signed int
+		//---------------------
+
+		// set int vertex attribute value
+		void SetAttrib(const std::string& name, int32 val);
+		// set ivec2 vertex attribute value
+		void SetAttrib(const std::string& name, int32 val1, int32 val2);
+		// set ivec3 vertex attribute value
+		void SetAttrib(const std::string& name, int32 val1, int32 val2, int32 val3);
+		// set ivec4 vertex attribute value
+		void SetAttrib(const std::string& name, int32 val1, int32 val2, int32 val3, int32 val4);
+
+
+		//---------------------
+		//	   unsigned int
+		//---------------------
+
+		// set uint vertex attribute value
+		void SetAttrib(const std::string& name, uint32 val);
+		// set uvec2 vertex attribute value
+		void SetAttrib(const std::string& name, uint32 val1, uint32 val2);
+		// set uvec3 vertex attribute value
+		void SetAttrib(const std::string& name, uint32 val1, uint32 val2, uint32 val3);
+		// set uvec4 vertex attribute value
+		void SetAttrib(const std::string& name, uint32 val1, uint32 val2, uint32 val3, uint32 val4);
+
+
+		//---------------------
+		//		real
+		//---------------------
+
+		// set real vertex attribute value
+		void SetAttrib(const std::string& name, real val);
+
+
+		//---------------------
+		//		vector
+		//---------------------
+
+		// set vec2 vertex attribute value
+		void SetAttrib(const std::string& name, const Vector2& vec);
+		
+		// set vec3 vertex attribute value
+		void SetAttrib(const std::string& name, const Vector3& vec);
+		
+		// set vec4 vertex attribute value
+		void SetAttrib(const std::string& name, const Vector4& vec);
+
+
+		//---------------------
+		//		pointer
+		//---------------------
+
+		// set vec2 vertex attribute pointer
+		void SetAttribPointer(const std::string& name, Vector2 vecs[]);
+		// set vec3 vertex attribute pointer
+		void SetAttribPointer(const std::string& name, Vector3 vecs[]);
+		// set vec4 vertex attribute pointer
+		void SetAttribPointer(const std::string& name, Vector4 vecs[]);
+
+
+		//---------------------
+		//	array enable
+		//---------------------
+
+		// enable vertex attribute array buffer
+		void EnableAttribArray(const std::string& name);
+		// disable vertex attribute array buffer
+		void DisableAttribArray(const std::string& name);
+
 	};
 
 }
