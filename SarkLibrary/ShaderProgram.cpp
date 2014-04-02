@@ -6,9 +6,7 @@ namespace sark{
 	const char* const ShaderProgram::AttribVarNames[] = {
 		"position",
 		"normal",
-		"mtrlAmbient",
-		"mtrlDiffuse",
-		"mtrlSpecular",
+		"color",
 		"texCoord0",
 		"texCoord1",
 		"texCoord2",

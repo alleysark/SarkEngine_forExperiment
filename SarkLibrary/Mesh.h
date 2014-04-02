@@ -9,21 +9,17 @@
 namespace sark{
 
 	// mesh defines the vertices and indices of model.
-	// mesh must have to have position data and it can have other datas
-	// like normal, texcoord, etc. optionally.
-	// (i think it doesn't need to be an extendable class...)
+	// mesh must have to have position data and its face data.
+	// color, normal, texcoord datas are optional.
 	class Mesh{
 	public:
-		#define OFFSET(i) ((int8*)NULL + i)
-
 		// gl's buffer copying api has a dependency of type of element.
 		// so it just redicines element type according to the library type
 #ifdef SARKLIB_USING_DOUBLE
-		#define VERTEX_TYPE GL_DOUBLE
+		#define GL_REAL GL_DOUBLE
 #else
-		#define VERTEX_TYPE GL_FLOAT
+		#define GL_REAL GL_FLOAT
 #endif
-		#define INDEX_TYPE	GL_UNSIGNED_SHORT
 
 		// face defines a primitive polygon surface
 		// it is packed byte as 1 to make sure when it copies into
@@ -38,30 +34,45 @@ namespace sark{
 		};
 		#pragma pack(pop)
 
-		typedef GLuint BufferHandle;
-		typedef GLenum ClientState;
+		typedef GLuint ObjectHandle;
 
-	protected:
-		// vertex buffer object id
-		BufferHandle mhVertexBufId;
-		// index buffer object id
-		BufferHandle mhIndexBufId;
+	private:
+		// variable vertex buffer object pair.
+		struct VBOPair{
+			ObjectHandle hBufId;
+			GLenum bufTarget;
+			uinteger bufSize;
+			void* bufData;
 
-		// list of state which is used on vertex buffer
-		std::list<ClientState> mUsedStates;
+			integer attribTarget;
+			GLenum attribType;
+			uinteger attribSize;
+		};
 
-		// position data of vertex elements
-		// it couldn't be empty.
-		std::vector<Position3> mPositions;
+		// handle of vertex buffer object
+		std::list<VBOPair> mVBOs;
 
-		// face data for vertex elements
+		// handle of vertex array object
+		ObjectHandle mhVertexArray;
+
+
+		// vertex primitive face data.
 		std::vector<Face> mFaces;
 
-		// normal data of vertex elements
-		std::vector<Normal> mNormals;
+		// vertex position data. it couldn't be empty.
+		std::vector<Position3> mPositions;
 
-		// texcoord data of vertex elements
-		std::vector<Texcoord> mTexcoords;
+		// vertex normal data.
+		std::vector<Normal> mNormals;
+		
+		// vertex color data.
+		std::vector<ColorRGBA> mColors;
+
+		// vertex texcoord series data.
+		std::vector<Texcoord> mTexcoord0s;
+		std::vector<Texcoord> mTexcoord1s;
+		std::vector<Texcoord> mTexcoord2s;
+		std::vector<Texcoord> mTexcoord3s;
 
 	public:
 		Mesh();
@@ -69,38 +80,34 @@ namespace sark{
 		// buffer objects are deleted in destructor
 		~Mesh();
 
-		// create mesh with given position and face data
-		bool Create(
-			std::vector<Position3>& positions, 
-			std::vector<Face>& faces);
+		// set face data
+		void SetFaces(const std::vector<Face>& faces);
 
-		// create mesh with given position, normal and face data
-		bool Create(
-			std::vector<Position3>& positions, 
-			std::vector<Normal>& normals, 
-			std::vector<Face>& faces);
+		// set position data
+		void SetPositions(const std::vector<Position3>& positions);
 
-		// create mesh with given position, normal, texcoord and face data
-		bool Create(
-			std::vector<Position3>& positions, 
-			std::vector<Normal>& normals, 
-			std::vector<Texcoord>& texcoords, 
-			std::vector<Face>& faces);
+		// set normal data
+		void SetNormals(const std::vector<Normal>& normals);
 
-	private:
-		bool Create();
+		// set color data
+		void SetColors(const std::vector<ColorRGBA>& colors);
 
-	public:
-		// bind mesh buffer into the graphic system
-		void Bind();
+		// set texcoord0 data
+		void SetTexcoord0s(const std::vector<Texcoord>& texcoords);
+		// set texcoord1 data
+		void SetTexcoord1s(const std::vector<Texcoord>& texcoords);
+		// set texcoord2 data
+		void SetTexcoord2s(const std::vector<Texcoord>& texcoords);
+		// set texcoord3 data
+		void SetTexcoord3s(const std::vector<Texcoord>& texcoords);
 
-		// draw this.
-		// it must have been binded before drawing.
+		
+		// bind setted vertex datas into vbo and vao.
+		bool BindDatas();
+
+
+		// draw this mesh
 		void Draw();
-
-		// unbind mesh buffer from graphic system.
-		// it must have been unbinded after binding
-		void Unbind();
 
 
 		// get position data
@@ -109,8 +116,17 @@ namespace sark{
 		// get normal data
 		const std::vector<Normal>& GetNormals() const;
 
-		// get texcoord data
-		const std::vector<Texcoord>& GetTexcoords() const;
+		// get color data
+		const std::vector<ColorRGBA>& GetColors() const;
+
+		// get texcoord0 data
+		const std::vector<Texcoord>& GetTexcoord0s() const;
+		// get texcoord1 data
+		const std::vector<Texcoord>& GetTexcoord1s() const;
+		// get texcoord2 data
+		const std::vector<Texcoord>& GetTexcoord2s() const;
+		// get texcoord3 data
+		const std::vector<Texcoord>& GetTexcoord3s() const;
 
 		// get face data
 		const std::vector<Face>& GetFaces() const;

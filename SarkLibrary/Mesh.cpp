@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include "ShaderProgram.h"
 
 namespace sark{
 
@@ -8,134 +9,184 @@ namespace sark{
 
 
 	Mesh::Mesh()
-		: mhVertexBufId(0), mhIndexBufId(0)
+		: mhVertexArray(0)
 	{}
 
 	// buffer objects are deleted in destructor
 	Mesh::~Mesh(){
-		glDeleteBuffersARB(1, &mhVertexBufId);
-		glDeleteBuffersARB(1, &mhIndexBufId);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+
+		for (std::list<VBOPair>::iterator itr = mVBOs.begin(); itr != mVBOs.end(); itr++){
+			if (itr->hBufId != 0){
+				glDeleteBuffers(1, &(itr->hBufId));
+				glDisableVertexAttribArray(itr->attribTarget);
+			}
+		}
+		mVBOs.clear();
+
+		if (mhVertexArray != 0){
+			glDeleteVertexArrays(1, &mhVertexArray);
+			mhVertexArray = 0;
+		}
+
+		mFaces.clear();
 
 		mPositions.clear();
 		mNormals.clear();
-		mTexcoords.clear();
-		mFaces.clear();
+		mColors.clear();
+		mTexcoord0s.clear();
+		mTexcoord1s.clear();
+		mTexcoord2s.clear();
+		mTexcoord3s.clear();
 	}
 
-	// create mesh with given position and face data
-	bool Mesh::Create(std::vector<Position3>& positions, std::vector<Face>& faces){
-		if (positions.size() == 0)
-			return false;
-		if (faces.size() == 0)
-			return false;
 
-		mPositions = positions;
+	// set face data
+	void Mesh::SetFaces(const std::vector<Mesh::Face>& faces){
 		mFaces = faces;
 
-		return Create();
+		VBOPair vboPair;
+		glGenBuffers(1, &vboPair.hBufId);
+		vboPair.bufTarget = GL_ELEMENT_ARRAY_BUFFER;
+		vboPair.bufSize = mFaces.size()*sizeof(Face);
+		vboPair.bufData = &mFaces[0];
+		vboPair.attribTarget = ShaderProgram::ATTR_INDICES;
+		vboPair.attribType = GL_UNSIGNED_SHORT;
+		vboPair.attribSize = 3;
+		mVBOs.push_back(vboPair);
 	}
 
-	// create mesh with given position, normal and face data
-	bool Mesh::Create(std::vector<Position3>& positions, std::vector<Normal>& normals, std::vector<Face>& faces){
-		if (positions.size() == 0)
-			return false;
-		if (positions.size() != normals.size())
-			return false;
-		if (faces.size() == 0)
-			return false;
-
+	// set position data
+	void Mesh::SetPositions(const std::vector<Position3>& positions){
 		mPositions = positions;
+
+		VBOPair vboPair;
+		glGenBuffers(1, &vboPair.hBufId);
+		vboPair.bufTarget = GL_ARRAY_BUFFER;
+		vboPair.bufSize = mPositions.size()*sizeof(Position3);
+		vboPair.bufData = &mPositions[0];
+		vboPair.attribTarget = ShaderProgram::ATTR_POSITION;
+		vboPair.attribType = GL_REAL;
+		vboPair.attribSize = 3;
+		mVBOs.push_back(vboPair);
+	}
+
+	// set normal data
+	void Mesh::SetNormals(const std::vector<Normal>& normals){
 		mNormals = normals;
-		mFaces = faces;
-
-		return Create();
+		
+		VBOPair vboPair;
+		glGenBuffers(1, &vboPair.hBufId);
+		vboPair.bufTarget = GL_ARRAY_BUFFER;
+		vboPair.bufSize = mNormals.size()*sizeof(Normal);
+		vboPair.bufData = &mNormals[0];
+		vboPair.attribTarget = ShaderProgram::ATTR_NORMAL;
+		vboPair.attribType = GL_REAL;
+		vboPair.attribSize = 3;
+		mVBOs.push_back(vboPair);
 	}
 
-	// create mesh with given position, normal, texcoord and face data
-	bool Mesh::Create(std::vector<Position3>& positions, std::vector<Normal>& normals, std::vector<Texcoord>& texcoords, std::vector<Face>& faces){
-		if (positions.size() == 0)
-			return false;
-		if (positions.size() != normals.size())
-			return false;
-		if (positions.size() != texcoords.size())
-			return false;
-		if (faces.size() == 0)
-			return false;
-
-		mPositions = positions;
-		mNormals = normals;
-		mTexcoords = texcoords;
-		mFaces = faces;
-
-		return Create();
+	// set color data
+	void Mesh::SetColors(const std::vector<ColorRGBA>& colors){
+		mColors = colors;
+		
+		VBOPair vboPair;
+		glGenBuffers(1, &vboPair.hBufId);
+		vboPair.bufTarget = GL_ARRAY_BUFFER;
+		vboPair.bufSize = mColors.size()*sizeof(ColorRGBA);
+		vboPair.bufData = &mColors[0];
+		vboPair.attribTarget = ShaderProgram::ATTR_COLOR;
+		vboPair.attribType = GL_REAL;
+		vboPair.attribSize = 4;
+		mVBOs.push_back(vboPair);
 	}
 
-	bool Mesh::Create(){
-		glGenBuffersARB(1, &mhVertexBufId);
-		if (mhVertexBufId == 0)
-			return false;
-		glGenBuffersARB(1, &mhIndexBufId);
-		if (mhIndexBufId == 0)
-			return false;
+	// set texcoord0 data
+	void Mesh::SetTexcoord0s(const std::vector<Texcoord>& texcoords){
+		mTexcoord0s = texcoords;
+		
+		VBOPair vboPair;
+		glGenBuffers(1, &vboPair.hBufId);
+		vboPair.bufTarget = GL_ARRAY_BUFFER;
+		vboPair.bufSize = mTexcoord0s.size()*sizeof(Texcoord);
+		vboPair.bufData = &mTexcoord0s[0];
+		vboPair.attribTarget = ShaderProgram::ATTR_TEX_COORD0;
+		vboPair.attribType = GL_REAL;
+		vboPair.attribSize = 2;
+		mVBOs.push_back(vboPair);
+	}
+	// set texcoord1 data
+	void Mesh::SetTexcoord1s(const std::vector<Texcoord>& texcoords){
+		mTexcoord1s = texcoords;
+		
+		VBOPair vboPair;
+		glGenBuffers(1, &vboPair.hBufId);
+		vboPair.bufTarget = GL_ARRAY_BUFFER;
+		vboPair.bufSize = mTexcoord1s.size()*sizeof(Texcoord);
+		vboPair.bufData = &mTexcoord1s[0];
+		vboPair.attribTarget = ShaderProgram::ATTR_TEX_COORD1;
+		vboPair.attribType = GL_REAL;
+		vboPair.attribSize = 2;
+		mVBOs.push_back(vboPair);
+	}
+	// set texcoord2 data
+	void Mesh::SetTexcoord2s(const std::vector<Texcoord>& texcoords){
+		mTexcoord2s = texcoords;
+		
+		VBOPair vboPair;
+		glGenBuffers(1, &vboPair.hBufId);
+		vboPair.bufTarget = GL_ARRAY_BUFFER;
+		vboPair.bufSize = mTexcoord2s.size()*sizeof(Texcoord);
+		vboPair.bufData = &mTexcoord2s[0];
+		vboPair.attribTarget = ShaderProgram::ATTR_TEX_COORD2;
+		vboPair.attribType = GL_REAL;
+		vboPair.attribSize = 2;
+		mVBOs.push_back(vboPair);
+	}
+	// set texcoord3 data
+	void Mesh::SetTexcoord3s(const std::vector<Texcoord>& texcoords){
+		mTexcoord3s = texcoords;
+		
+		VBOPair vboPair;
+		glGenBuffers(1, &vboPair.hBufId);
+		vboPair.bufTarget = GL_ARRAY_BUFFER;
+		vboPair.bufSize = mTexcoord3s.size()*sizeof(Texcoord);
+		vboPair.bufData = &mTexcoord3s[0];
+		vboPair.attribTarget = ShaderProgram::ATTR_TEX_COORD3;
+		vboPair.attribType = GL_REAL;
+		vboPair.attribSize = 2;
+		mVBOs.push_back(vboPair);
+	}
 
-		// set vertex buffer
-		integer posBufSize = mPositions.size()*sizeof(Position3);
-		integer normBufSize = mNormals.size()*sizeof(Normal);
-		integer texBufSize = mTexcoords.size()*sizeof(Texcoord);
-		glBindBufferARB(GL_ARRAY_BUFFER_ARB, mhVertexBufId);
-		glBufferDataARB(GL_ARRAY_BUFFER_ARB, posBufSize + normBufSize + texBufSize, NULL, GL_STATIC_DRAW_ARB);
 
-		glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, 0, posBufSize, &mPositions[0]);
-		glVertexPointer(3, VERTEX_TYPE, 0, OFFSET(0));
-		mUsedStates.push_back(GL_VERTEX_ARRAY);
+	// bind setted vertex datas into vbo and vao.
+	bool Mesh::BindDatas(){
+		glGenVertexArrays(1, &mhVertexArray);
+		glBindVertexArray(mhVertexArray);
 
-		if (normBufSize != 0){
-			glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, posBufSize, normBufSize, &mNormals[0]);
-			glNormalPointer(VERTEX_TYPE, 0, OFFSET(posBufSize));
-			mUsedStates.push_back(GL_NORMAL_ARRAY);
+		// set vertex attribute buffers
+		for (std::list<VBOPair>::iterator itr = mVBOs.begin(); itr != mVBOs.end(); itr++){
+			if (itr->hBufId == 0)
+				return false;
+
+			glBindBuffer(itr->bufTarget, itr->hBufId);
+			glBufferData(itr->bufTarget, itr->bufSize, itr->bufData, GL_STATIC_DRAW);
+			glEnableVertexAttribArray(itr->attribTarget);
+			glVertexAttribPointer(itr->attribTarget, itr->attribSize, itr->attribType, 0, 0, NULL);
 		}
-		if (texBufSize != 0){
-			glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, normBufSize, texBufSize, &mTexcoords[0]);
-			glTexCoordPointer(2, VERTEX_TYPE, 0, OFFSET(normBufSize));
-			mUsedStates.push_back(GL_TEXTURE_COORD_ARRAY);
-		}
-
-		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-
-		// set index buffer
-		integer faceBufSize = mFaces.size()*sizeof(Face);
-		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, mhIndexBufId);
-		glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, faceBufSize, &mFaces[0], GL_STATIC_DRAW_ARB);
-		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+		glBindVertexArray(0);
 
 		return true;
 	}
 
-	// bind mesh buffer into the graphic system
-	void Mesh::Bind(){
-		glBindBufferARB(GL_ARRAY_BUFFER_ARB, mhVertexBufId);
-		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, mhIndexBufId);
 
-		for (std::list<ClientState>::iterator itr = mUsedStates.begin(); itr != mUsedStates.end(); itr++){
-			glEnableClientState((*itr));
-		}
-	}
-
-	// draw this.
-	// it must have been binded before drawing.
+	// draw this mesh
 	void Mesh::Draw(){
-		glDrawElements(GL_TRIANGLES, mFaces.size() * 3, INDEX_TYPE, 0);
-	}
-
-	// unbind mesh buffer from graphic system.
-	// it must have been unbinded after binding
-	void Mesh::Unbind(){
-		for (std::list<ClientState>::iterator itr = mUsedStates.begin(); itr != mUsedStates.end(); itr++){
-			glDisableClientState((*itr));
-		}
-
-		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+		glBindVertexArray(mhVertexArray);
+		glDrawElements(GL_TRIANGLES, mFaces.size() * 3, GL_UNSIGNED_SHORT, 0);
+		glBindVertexArray(0);
 	}
 
 
@@ -149,9 +200,26 @@ namespace sark{
 		return mNormals;
 	}
 
-	// get texcoord data
-	const std::vector<Texcoord>& Mesh::GetTexcoords() const{
-		return mTexcoords;
+	// get color data
+	const std::vector<ColorRGBA>& Mesh::GetColors() const{
+		return mColors;
+	}
+
+	// get texcoord0 data
+	const std::vector<Texcoord>& Mesh::GetTexcoord0s() const{
+		return mTexcoord0s;
+	}
+	// get texcoord1 data
+	const std::vector<Texcoord>& Mesh::GetTexcoord1s() const{
+		return mTexcoord1s;
+	}
+	// get texcoord2 data
+	const std::vector<Texcoord>& Mesh::GetTexcoord2s() const{
+		return mTexcoord2s;
+	}
+	// get texcoord3 data
+	const std::vector<Texcoord>& Mesh::GetTexcoord3s() const{
+		return mTexcoord3s;
 	}
 
 	// get face data
