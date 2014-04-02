@@ -3,6 +3,19 @@
 
 namespace sark{
 
+	const char* const ShaderProgram::AttribVarNames[] = {
+		"position",
+		"normal",
+		"mtrlAmbient",
+		"mtrlDiffuse",
+		"mtrlSpecular",
+		"texCoord0",
+		"texCoord1",
+		"texCoord2",
+		"texCoord3",
+		"indices"
+	};
+
 	// shader program is created from ShaderDictionary
 	// with full liked shaders.
 	ShaderProgram::ShaderProgram(ProgramHandle hProgram)
@@ -356,24 +369,6 @@ namespace sark{
 	void ShaderProgram::SetAttrib(const std::string& name, const Vector4& vec){
 		glVertexAttrib4fv(GetAttributeLocation(name), vec.v);
 	}
-
-
-	//---------------------
-	//		pointer
-	//---------------------
-
-	// set vec2 vertex attribute pointer
-	void ShaderProgram::SetAttribPointer(const std::string& name, Vector2 vecs[]){
-		glVertexAttribPointer(GetAttributeLocation(name), 2, GL_FLOAT, GL_FALSE, 0, vecs);
-	}
-	// set vec3 vertex attribute pointer
-	void ShaderProgram::SetAttribPointer(const std::string& name, Vector3 vecs[]){
-		glVertexAttribPointer(GetAttributeLocation(name), 3, GL_FLOAT, GL_FALSE, 0, vecs);
-	}
-	// set vec4 vertex attribute pointer
-	void ShaderProgram::SetAttribPointer(const std::string& name, Vector4 vecs[]){
-		glVertexAttribPointer(GetAttributeLocation(name), 4, GL_FLOAT, GL_FALSE, 0, vecs);
-	}
 #else
 	//---------------------
 	//		real
@@ -403,41 +398,6 @@ namespace sark{
 	void ShaderProgram::SetAttrib(const std::string& name, const Vector4& vec){
 		glVertexAttribL4dv(GetAttributeLocation(name), vec.v);
 	}
-
-
-	//---------------------
-	//		pointer
-	//---------------------
-
-	// set vec2 vertex attribute pointer
-	void ShaderProgram::SetAttribPointer(const std::string& name, Vector2 vecs[]){
-		glVertexAttribLPointer(GetAttributeLocation(name), 2, GL_DOUBLE, GL_FALSE, 0, vecs);
-	}
-	// set vec3 vertex attribute pointer
-	void ShaderProgram::SetAttribPointer(const std::string& name, Vector3 vecs[]){
-		glVertexAttribLPointer(GetAttributeLocation(name), 3, GL_DOUBLE, GL_FALSE, 0, vecs);
-	}
-	// set vec4 vertex attribute pointer
-	void ShaderProgram::SetAttribPointer(const std::string& name, Vector4 vecs[]){
-		glVertexAttribLPointer(GetAttributeLocation(name), 4, GL_DOUBLE, GL_FALSE, 0, vecs);
-	}
 #endif
-	
-
-
-	//---------------------
-	//	array enable
-	//---------------------
-
-	// enable vertex attribute array buffer
-	void ShaderProgram::EnableAttribArray(const std::string& name){
-		glEnableVertexAttribArray(GetAttributeLocation(name));
-	}
-	// disable vertex attribute array buffer
-	void ShaderProgram::DisableAttribArray(const std::string& name){
-		glDisableVertexAttribArray(GetAttributeLocation(name));
-	}
-
-
 	
 }

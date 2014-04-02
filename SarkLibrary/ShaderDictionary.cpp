@@ -40,6 +40,11 @@ namespace sark{
 		glAttachShader(progObj, vtxObj);
 		glAttachShader(progObj, fragObj);
 
+		// bind pre-defined attribute semantics
+		for (int attrLoca = 0; attrLoca < ShaderProgram::ATTR_COUNT; attrLoca++){
+			glBindAttribLocation(progObj, attrLoca, ShaderProgram::AttribVarNames[attrLoca]);
+		}
+
 		glLinkProgram(progObj);
 
 		if (!CheckProgram(progObj)){

@@ -18,6 +18,23 @@ namespace sark{
 		typedef GLint Location;
 		typedef std::hash_map<const std::string, Location> LocationDictionary;
 
+		enum AttribVarSemantic{
+			ATTR_POSITION=0,
+			ATTR_NORMAL,
+			ATTR_MTRL_AMBIENT,
+			ATTR_MTRL_DIFFIUSE,
+			ATTR_MTRL_SPECULAR,
+			ATTR_TEX_COORD0,
+			ATTR_TEX_COORD1,
+			ATTR_TEX_COORD2,
+			ATTR_TEX_COORD3,
+			ATTR_INDICES,
+
+			//for counting semantic.
+			ATTR_COUNT
+		};
+		static const char* const AttribVarNames[];
+
 	private:
 		// program handler
 		ProgramHandle mhProgram;
@@ -199,28 +216,6 @@ namespace sark{
 		
 		// set vec4 vertex attribute value
 		void SetAttrib(const std::string& name, const Vector4& vec);
-
-
-		//---------------------
-		//		pointer
-		//---------------------
-
-		// set vec2 vertex attribute pointer
-		void SetAttribPointer(const std::string& name, Vector2 vecs[]);
-		// set vec3 vertex attribute pointer
-		void SetAttribPointer(const std::string& name, Vector3 vecs[]);
-		// set vec4 vertex attribute pointer
-		void SetAttribPointer(const std::string& name, Vector4 vecs[]);
-
-
-		//---------------------
-		//	array enable
-		//---------------------
-
-		// enable vertex attribute array buffer
-		void EnableAttribArray(const std::string& name);
-		// disable vertex attribute array buffer
-		void DisableAttribArray(const std::string& name);
 
 	};
 
