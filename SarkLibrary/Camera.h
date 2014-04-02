@@ -28,17 +28,7 @@ namespace sark{
 
 			// [minZ, maxZ] always [0, 1]
 
-			// viewport transform matrix.
-			// even it does not need to transform the vertices on user-level,
-			// its inverse can be required to transform the screen-coord mouse position into NDC space.
-			// (and then, transform into camera space by inverse of projection matrix)
-			Matrix4 viewportMatrix;
-
-		public:
 			Viewport();
-
-			// set viewport. re-calculate viewport transform matrix.
-			void Set(real _x, real _y, real _width, real _height);
 		};
 
 
@@ -88,8 +78,8 @@ namespace sark{
 		Vector3 mUp;
 
 
-		// camera space transform matrix
-		Matrix4 mCameraMatrix;
+		// view transform matrix for transforming into camera space.
+		Matrix4 mViewMatrix;
 
 
 		// viewport definition
@@ -105,12 +95,12 @@ namespace sark{
 		virtual ~Camera();
 
 	private:
-		// update camera matrix from camera properties(eye,at,up)
-		void UpdateCameraMatrix();
+		// update view matrix from camera properties(eye,at,up)
+		void UpdateViewMatrix();
 
 	public:
-		// get camera transformation matrix
-		const Matrix4& GetCameraMatrix();
+		// get view transformation matrix
+		const Matrix4& GetViewMatrix();
 
 		// get projection transformation matrix
 		const Matrix4& GetProjMatrix();
@@ -138,7 +128,7 @@ namespace sark{
 		// get viewport
 		const Viewport& GetViewport() const;
 		// set viewport
-		void SetViewport(real x, real y, real width, real height);
+		void SetViewport(integer x, integer y, integer width, integer height);
 
 		// get view volume
 		const ViewVolume& GetViewVolume() const;
