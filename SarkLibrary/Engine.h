@@ -15,6 +15,8 @@
 #include <map>
 #include "core.h"
 #include "AScene.h"
+#include "ShaderDictionary.h"
+#include "ShaderProgram.h"
 #include "Timer.h"
 #include "Input.h"
 
@@ -41,6 +43,9 @@ namespace sark{
 		HGLRC mhRC;
 
 		// ----------- engine properties -------------
+
+		// shader dictionary of sark engine
+		ShaderDictionary mShDict;
 
 		// engine timer
 		Timer mTimer;
@@ -77,6 +82,9 @@ namespace sark{
 
 		// run engine loop
 		void Run();
+
+		// get shader dictionary
+		ShaderDictionary& GetShaderDict();
 
 		// get engine timer
 		const Timer& GetTimer() const;

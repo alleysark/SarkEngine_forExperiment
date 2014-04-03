@@ -83,6 +83,11 @@ namespace sark{
 		}
 	}
 
+	// get shader dictionary
+	ShaderDictionary& Engine::GetShaderDict(){
+		return mShDict;
+	}
+
 	// get engine timer
 	const Timer& Engine::GetTimer() const{
 		return mTimer;
