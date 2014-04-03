@@ -214,6 +214,31 @@ namespace sark{
 			Input::keyboard.Up(wParam);
 			break;
 
+			// mouse input handling
+		case WM_MOUSEMOVE:
+			Input::mouse.MovementUpdate(LOWORD(lParam), HIWORD(lParam));
+			break;
+
+		case WM_LBUTTONDOWN:
+		case WM_LBUTTONUP:
+			Input::mouse.LButtonUpdate(LOWORD(lParam), HIWORD(lParam));
+			break;
+
+		case WM_MBUTTONDOWN:
+		case WM_MBUTTONUP:
+			Input::mouse.MButtonUpdate(LOWORD(lParam), HIWORD(lParam));
+			break;
+
+		case WM_RBUTTONDOWN:
+		case WM_RBUTTONUP:
+			Input::mouse.RButtonUpdate(LOWORD(lParam), HIWORD(lParam));
+			break;
+
+		case WM_MOUSEWHEEL:
+			Input::mouse.WheelUpdate(LOWORD(lParam), HIWORD(lParam),
+				(real)GET_WHEEL_DELTA_WPARAM(wParam) / (real)WHEEL_DELTA);
+			break;
+
 		case WM_SIZE:
 			Engine::instance->ResizeWindow(LOWORD(lParam), HIWORD(lParam), true);
 			break;

@@ -3,7 +3,7 @@
 
 #include "core.h"
 #include <Windows.h>
-#include <map>
+#include <hash_map>
 #include <list>
 #include <functional>
 
@@ -121,51 +121,90 @@ namespace sark{
 
 			typedef uint32 KeyComb;
 			typedef std::function<void(void)> KeyCombHandler;
-			typedef std::list<KeyCode> KeyCodeContainer;
-			typedef std::map<KeyComb, KeyCombHandler> KeyCombHandlerContainer;
+			typedef std::hash_map<KeyComb, KeyCombHandler> KeyCombHandlerContainer;
 
 		private:
-			KeyCodeContainer mCodes;
+			static const uinteger MAX_CODE_COUNT = 4;
+			uinteger mCodeCount;
+			KeyCode mCodes[MAX_CODE_COUNT];
 			KeyCombHandlerContainer mCombHandlers;
 		public:
 			Keyboard();
 
-			bool RegisterKeyCombHandler(KeyCombHandler keyCombHandler,
+			// register key combination handler.
+			// it overrides the handler for same code combination.
+			void RegisterKeyCombHandler(KeyCombHandler keyCombHandler,
 				KeyCode code1, KeyCode code2 = CODE_NONE, KeyCode code3 = CODE_NONE, KeyCode code4 = CODE_NONE);
 
 			void Down(KeyCode code);
 			void Up(KeyCode code);
+
 		private:
-			KeyComb BuildKeyComb(KeyCodeContainer& codes);
+			KeyComb BuildKeyComb(KeyCode codes[MAX_CODE_COUNT]);
 		};
 
 
 		// ------------	mouse properties	------------------
 		class Mouse{
 		public:
-			typedef uint8 mouse_state_t;
-			const mouse_state_t STATE_MOVEMENT = 0;
+			enum MouseState{
+				STATE_NONE = 0,
 
-			const mouse_state_t STATE_LBUTTON_DOWN = 0;
-			const mouse_state_t STATE_LBUTTON_UP = 0;
+				STATE_MOVEMENT = 1 << 0,
+				STATE_LBUTTON = 1 << 1,
+				STATE_MBUTTON = 1 << 2,
+				STATE_RBUTTON = 1 << 3,
 
-			const mouse_state_t STATE_MBUTTON_DOWN = 0;
-			const mouse_state_t STATE_MBUTTON_UP = 0;
+				STATE_WHEEL = 1 << 4,
+			};
 
-			const mouse_state_t STATE_RBUTTON_DOWN = 0;
-			const mouse_state_t STATE_RBUTTON_UP = 0;
+			enum MouseEvent{
+				EVENT_MOVE = 0,
+				
+				// drag: button down and move
+				EVENT_LBUTTON_DRAG,
+				EVENT_MBUTTON_DRAG,
+				EVENT_RBUTTON_DRAG,
 
-			const mouse_state_t STATE_WHEEL_DOWN = 0;
-			const mouse_state_t STATE_WHEEL_UP = 0;
+				// click: button down and up
+				EVENT_LBUTTON_CLICK,
+				EVENT_MBUTTON_CLICK,
+				EVENT_RBUTTON_CLICK,
+
+				EVENT_WHEEL,
+
+				// only for counting
+				EVENT_COUNT
+			};
+
+			typedef std::function<void(const Position2&, real)> EventHandler;
+
+		private:
+			uint32 mActiveStates;
+			EventHandler mEventHandlers[EVENT_COUNT];
 
 		public:
-			Position2 position;
-			mouse_state_t state;
+			Mouse();
 
-		public:
-			Mouse() :position(0), state(0){}
-			Mouse(const Mouse& mouse) :position(mouse.position), state(mouse.state){}
-			Mouse(const Position2& _position, mouse_state_t _state) :position(_position), state(_state){}
+			// register mouse event handler.
+			// it overrides the handler for the same event
+			void RegisterMouseHandler(MouseEvent eventCode, EventHandler handler);
+
+			void MovementUpdate(uint32 x, uint32 y);
+			void LButtonUpdate(uint32 x, uint32 y);
+			void MButtonUpdate(uint32 x, uint32 y);
+			void RButtonUpdate(uint32 x, uint32 y);
+			void WheelUpdate(uint32 x, uint32 y, real delta);
+
+			bool IsLButtonDown() const;
+			bool IsMButtonDown() const;
+			bool IsRButtonDown() const;
+
+		private:
+			inline void TriggerEvent(MouseEvent evt, const Position2& pos, real extra){
+				if (mEventHandlers[evt])
+					mEventHandlers[evt](pos, extra);
+			}
 		};
 
 	private:
