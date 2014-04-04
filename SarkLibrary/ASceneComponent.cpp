@@ -151,6 +151,10 @@ namespace sark{
 		return mTransform;
 	}
 
+	// get bounding shape. it is Nullable pointer.
+	const IShape* ASceneComponent::GetBoundingShape() const{
+		return mBoundingShape;
+	}
 
 	// is this component activated?
 	bool ASceneComponent::IsActive() const{

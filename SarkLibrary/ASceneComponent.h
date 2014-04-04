@@ -7,6 +7,7 @@
 #include <map>
 #include "core.h"
 #include "Transform.h"
+#include "shapes.h"
 
 namespace sark{
 
@@ -40,6 +41,10 @@ namespace sark{
 
 		// local scene component transform object
 		Transform mTransform;
+
+		// bounding shape(volume usually).
+		// it can be NULL for the non-bounceable component.
+		IShape* mBoundingShape;
 
 		// component activation indicator
 		bool mActivated;
@@ -104,11 +109,14 @@ namespace sark{
 
 
 		// it considers the Transform class as its friend 
-		// to allow the access of 'TransformChanged()' method
+		// to allow the accessing component hierarchy.
 		friend Transform;
 
 		// get transform object of this component. it is local transform object.
 		Transform& GetTransform();
+
+		// get bounding shape. it is Nullable pointer.
+		const IShape* GetBoundingShape() const;
 
 	public:
 		// is this component activated?
