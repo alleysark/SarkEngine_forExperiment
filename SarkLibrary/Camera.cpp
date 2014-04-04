@@ -8,7 +8,7 @@ namespace sark{
 	//=============================================
 
 	Camera::Viewport::Viewport()
-		: x(0.f), y(0.f), width(0.f), height(0.f)
+		: x(0.f), y(0.f), width(0.f), height(0.f), minZ(0.f), maxZ(1.f)
 	{}
 
 
@@ -158,6 +158,18 @@ namespace sark{
 		mViewport.width = (real)width;
 		mViewport.height = (real)height;
 	}
+	// set viewport with depth range.
+	void Camera::SetViewport(integer x, integer y, integer width, integer height, real minz, real maxz){
+		glViewport(x, y, width, height);
+		glDepthRange(minz, maxz);
+
+		mViewport.x = (real)x;
+		mViewport.y = (real)y;
+		mViewport.width = (real)width;
+		mViewport.height = (real)height;
+		mViewport.minZ = minz;
+		mViewport.maxZ = maxz;
+	}
 
 	// get view volume
 	const Camera::ViewVolume& Camera::GetViewVolume() const{
@@ -212,6 +224,41 @@ namespace sark{
 	void Camera::SetUp(const Vector3& up){
 		mUp = up;
 		UpdateViewMatrix();
+	}
+
+
+	// generate ray from screen coordinates
+	const Ray Camera::ScreenToWorldRay(const Position2& screenCoord){
+		// from viewport transform,
+		// projection coord(px, py) can be calculated.
+		real px = (2.f / mViewport.width) * (screenCoord.x - mViewport.x) - 1.f;
+		real py = -(2.f / mViewport.height) * (screenCoord.y - mViewport.y) + 1.f;
+
+		real cx, cy; // coord in camera near plane
+		if (mVolume.ortho){
+		}
+		else{
+			// cx = px * (zn*aspectr/cot(fovy/2))
+			// cy = py * (zn/cot(fovy/2))
+			cx = px * mVolume.zNear / mVolume.projMatrix.m[0][0];
+			cy = py * mVolume.zNear / mVolume.projMatrix.m[1][1];
+		}
+
+		// W = inv(VT) x C
+		//   = inv(R x T) x C
+		//   = inv(T) x inv(R) x C
+		//   = inv(T) x transp(R) x C.
+		// and inv(T) is translation into Eye
+		const Vector3& u = GetBasisU();
+		const Vector3& v = GetBasisV();
+		const Vector3& n = GetBasisN();
+		Matrix4 invVT(
+			u.x, v.x, n.x, mEye.x,
+			u.y, v.y, n.y, mEye.y,
+			u.z, v.z, n.z, mEye.z,
+			0.f, 0.f, 0.f, 1.f);
+		Vector4 worldCoord = invVT * Vector4(cx, cy, -mVolume.zNear, 1);
+		return Ray(worldCoord.xyz, (worldCoord.xyz - mEye));
 	}
 
 

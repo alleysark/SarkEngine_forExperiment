@@ -2,6 +2,7 @@
 #define __CAMERA_H__
 
 #include "core.h"
+#include "shapes.h"
 
 namespace sark{
 
@@ -26,7 +27,7 @@ namespace sark{
 			real x, y;
 			real width, height;
 
-			// [minZ, maxZ] always [0, 1]
+			real minZ, maxZ;
 
 			Viewport();
 		};
@@ -129,6 +130,8 @@ namespace sark{
 		const Viewport& GetViewport() const;
 		// set viewport
 		void SetViewport(integer x, integer y, integer width, integer height);
+		// set viewport with depth range.
+		void SetViewport(integer x, integer y, integer width, integer height, real minz, real maxz);
 
 		// get view volume
 		const ViewVolume& GetViewVolume() const;
@@ -157,6 +160,10 @@ namespace sark{
 		void SetLookat(const Position3& lookat);
 		// set up vector
 		void SetUp(const Vector3& up = Vector3(0.f, 1.f, 0.f));
+
+
+		// generate ray from screen coordinates
+		const Ray ScreenToWorldRay(const Position2& screenCoord);
 
 
 		// basic camera functions
