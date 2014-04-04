@@ -33,7 +33,7 @@ namespace sark{
 		// get type of shape
 		Type GetType() const;
 
-		virtual bool IsIntersectedWith(const IShape* shape) = 0;
+		virtual bool IsIntersectedWith(const IShape* shape) const = 0;
 
 		static void SetExtensionShapeIntersectionChecker(ExtShapeIntersectionChecker checker);
 	};
@@ -57,7 +57,7 @@ namespace sark{
 		Ray(const Position3& position, const Vector3& direction,
 			bool dir_normalized = false, real limitation = REAL_MAX);
 
-		bool IsIntersectedWith(const IShape* shape) override;
+		bool IsIntersectedWith(const IShape* shape) const override;
 	};
 
 
@@ -72,7 +72,7 @@ namespace sark{
 
 		Sphere(const Position3& position, real radius);
 
-		bool IsIntersectedWith(const IShape* shape) override;
+		bool IsIntersectedWith(const IShape* shape) const override;
 	};
 
 
@@ -88,7 +88,7 @@ namespace sark{
 
 		AxisAlignedBox(const Position3& posMin, const Position3& posMax);
 
-		bool IsIntersectedWith(const IShape* shape) override;
+		bool IsIntersectedWith(const IShape* shape) const override;
 	};
 
 
@@ -108,7 +108,7 @@ namespace sark{
 			const Vector4& basisXext, const Vector4& basisYext, const Vector4& basisZext,
 			bool basis_normalized = false);
 
-		bool IsIntersectedWith(const IShape* shape) override;
+		bool IsIntersectedWith(const IShape* shape) const override;
 	};
 
 
@@ -123,7 +123,7 @@ namespace sark{
 
 		Polyhedron(const Mesh* mesh);
 
-		bool IsIntersectedWith(const IShape* shape) override;
+		bool IsIntersectedWith(const IShape* shape) const override;
 	};
 
 

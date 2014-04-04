@@ -32,7 +32,7 @@ namespace sark{
 			dir.Normalize();
 	}
 
-	bool Ray::IsIntersectedWith(const IShape* shape){
+	bool Ray::IsIntersectedWith(const IShape* shape) const{
 		switch (shape->GetType()){
 		case IShape::RAY:
 			return false;
@@ -57,7 +57,7 @@ namespace sark{
 		: IShape(IShape::SPHERE), pos(position), r(radius)
 	{}
 
-	bool Sphere::IsIntersectedWith(const IShape* shape){
+	bool Sphere::IsIntersectedWith(const IShape* shape) const{
 		switch (shape->GetType()){
 		case IShape::RAY:
 			return IsIntersected(dynamic_cast<const Ray*>(shape), this);
@@ -82,7 +82,7 @@ namespace sark{
 		: IShape(IShape::AABOX), min(posMin), max(posMax)
 	{}
 
-	bool AxisAlignedBox::IsIntersectedWith(const IShape* shape){
+	bool AxisAlignedBox::IsIntersectedWith(const IShape* shape) const{
 		switch (shape->GetType()){
 		case IShape::RAY:
 			return IsIntersected(dynamic_cast<const Ray*>(shape), this);
@@ -132,7 +132,7 @@ namespace sark{
 		}
 	}
 
-	bool OrientedBox::IsIntersectedWith(const IShape* shape){
+	bool OrientedBox::IsIntersectedWith(const IShape* shape) const{
 		switch (shape->GetType()){
 		case IShape::RAY:
 			return IsIntersected(dynamic_cast<const Ray*>(shape), this);
@@ -157,7 +157,7 @@ namespace sark{
 		: IShape(IShape::POLYHEDRON), refMesh(mesh)
 	{}
 
-	bool Polyhedron::IsIntersectedWith(const IShape* shape){
+	bool Polyhedron::IsIntersectedWith(const IShape* shape) const{
 		switch (shape->GetType()){
 		case IShape::RAY:
 			return IsIntersected(dynamic_cast<const Ray*>(shape), this);
