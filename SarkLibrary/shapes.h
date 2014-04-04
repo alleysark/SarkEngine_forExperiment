@@ -5,116 +5,163 @@
 
 namespace sark{
 
-	class Line;
+	class IShape;
+	
+	class Ray;
+
 	class Sphere;
 	class AxisAlignedBox;
 	class OrientedBox;
-	class Polygon;
+	class Polyhedron;
+
 	
-	// interface of shape things
-	// shape can be intersected with other shapes
+	// interface of shape things.
+	// shape can be intersected with each others.
 	class IShape{
 	public:
-		enum Type{ LINE=1, SPHERE, AABOX, OBOX, POLY, EXT_SHAPE };
-		typedef bool(*ExtIntersectionChecker)(IShape* me, IShape* target, Position3* interPosBuf);
+		enum Type{ RAY, SPHERE, AABOX, OBOX, POLYHEDRON, EXTENSION };
+		typedef bool(*ExtShapeIntersectionChecker)(const IShape* shape1, const IShape* shape2);
+
 	protected:
 		Type mType;
-		static ExtIntersectionChecker extChecker;
+		static ExtShapeIntersectionChecker extChecker;
 
 	public:
 		IShape(Type type);
 		virtual ~IShape();
+
+		// get type of shape
 		Type GetType() const;
 
-		virtual bool Intersect(IShape* shape, Position3* interPosBuf = NULL) = 0;
+		virtual bool IsIntersectedWith(const IShape* shape) = 0;
 
-	public:
-		static void SetExtendedIntersectionChecker(ExtIntersectionChecker checker);
-		
-		// intersection check functions
-
-		static bool CheckIntersection(Line* line1, Line* line2,	Position3* interPosBuf);
-		static bool CheckIntersection(Line* line, Sphere* sphere, Position3* interPosBuf);
-		static bool CheckIntersection(Line* line, AxisAlignedBox* aabox, Position3* interPosBuf);
-		static bool CheckIntersection(Line* line, OrientedBox* obox, Position3* interPosBuf);
-		static bool CheckIntersection(Line* line, Polygon* tri_poly, Position3* interPosBuf);
-
-		static bool CheckIntersection(Sphere* sphere1, Sphere* sphere2, Position3* interPosBuf);
-		static bool CheckIntersection(Sphere* sphere, AxisAlignedBox* aabox, Position3* interPosBuf);
-		static bool CheckIntersection(Sphere* sphere, OrientedBox* obox, Position3* interPosBuf);
-		static bool CheckIntersection(Sphere* sphere, Polygon* tri_poly, Position3* interPosBuf);
-
-		static bool CheckIntersection(AxisAlignedBox* aabox1, AxisAlignedBox* aabox2, Position3* interPosBuf);
-		static bool CheckIntersection(AxisAlignedBox* aabox, OrientedBox* obox, Position3* interPosBuf);
-		static bool CheckIntersection(AxisAlignedBox* aabox, Polygon* tri_poly, Position3* interPosBuf);
-
-		static bool CheckIntersection(OrientedBox* obox1, OrientedBox* obox2, Position3* interPosBuf);
-		static bool CheckIntersection(OrientedBox* obox, Polygon* tri_poly, Position3* interPosBuf);
-
-		static bool CheckIntersection(Polygon* tri_poly1, Polygon* tri_poly2, Position3* interPosBuf);
-
-		// helpful intersection check functions
-
-		static bool _RangeIntersect(real rangeA1, real rangeA2, real rangeB1, real rangeB2);
+		static void SetExtensionShapeIntersectionChecker(ExtShapeIntersectionChecker checker);
 	};
 
 
-	// parametri_polyc equations of line
-	class Line : public IShape{
+
+	// ray the half line.
+	// it is represented by start position and normalized direction vector.
+	// and it also has the limitation of its distance.
+	class Ray : public IShape{
 	public:
+		// start position. the origin of ray
 		Position3 pos;
+
+		// normalized direction vector
 		Vector3 dir;
-		real minp, maxp;
-		
-		#define DEFAULT_PARAM_RANGE 1000000000.0f
-		Line(const Position3& position, const Vector3& direction, 
-			real minParam = -DEFAULT_PARAM_RANGE, real maxParam = DEFAULT_PARAM_RANGE);
-		virtual bool Intersect(IShape* shape, Position3* interPosBuf = NULL);
+
+		// limitation of ray distance. positive value.
+		real limit;
+
+		Ray(const Position3& position, const Vector3& direction,
+			bool dir_normalized = false, real limitation = REAL_MAX);
+
+		bool IsIntersectedWith(const IShape* shape) override;
 	};
+
 
 	// center and radius form of sphere
 	class Sphere : public IShape{
 	public:
+		// origin position of sphere
 		Position3 pos;
+
+		// radius
 		real r;
 
 		Sphere(const Position3& position, real radius);
-		virtual bool Intersect(IShape* shape, Position3* interPosBuf = NULL);
+
+		bool IsIntersectedWith(const IShape* shape) override;
 	};
 
-	// box that its faces are aligned by coordinate axis orientation
-	// it is represented by center position and half of width, height, depth
+
+	// box that its faces are aligned by coordinate axis orientation.
+	// it is represented by two cater-cornered positions.
 	class AxisAlignedBox : public IShape{
 	public:
-		Position3 min, max;
+		// cater-cornered minimum position.
+		Position3 min;
+
+		// cater-cornered maximum position.
+		Position3 max;
 
 		AxisAlignedBox(const Position3& posMin, const Position3& posMax);
-		virtual bool Intersect(IShape* shape, Position3* interPosBuf = NULL);
+
+		bool IsIntersectedWith(const IShape* shape) override;
 	};
 
-	// box which has the orientation for itself
+
+	// box which has the own orientation.
+	// it is represented by center position of box and its own basis with extensions.
 	class OrientedBox : public IShape{
+		// center position of box.
 		Position3 pos;
-		Vector4 axis[3]; //vec3 as axis, w factor as extention
 
-		OrientedBox(const Position3& position, const Vector3& e1, const Vector3& e2, const Vector3& e3, const Vector3& halfOfExt);
-		virtual bool Intersect(IShape* shape, Position3* interPosBuf = NULL);
+		//vec3 as axis, w factor as extension
+		Vector4 axis[3]; 
+
+		OrientedBox(const Position3& position,
+			const Vector3& basisX, const Vector3& basisY, const Vector3& basisZ, const Vector3& halfOfExt,
+			bool basis_normalized = false);
+		OrientedBox(const Position3& position,
+			const Vector4& basisXext, const Vector4& basisYext, const Vector4& basisZext,
+			bool basis_normalized = false);
+
+		bool IsIntersectedWith(const IShape* shape) override;
 	};
 
-	// triangle set polygon
-	class Polygon : public IShape{
+
+	class Mesh;
+
+	// polyhedron of triangle set.
+	// it has the reference of mesh
+	class Polyhedron : public IShape{
 	public:
-		class Face{
-		public:
-			Vertex3 *va, *vb, *vc;
-			Face(const Vertex3* vtxA, const Vertex3* vtxB, const Vertex3* vtxC);
-		};
-		
-	public:
-		
-		Polygon();
-		virtual bool Intersect(IShape* shape, Position3* interPosBuf = NULL);
+		// const reference of mesh.
+		const Mesh* refMesh;
+
+		Polyhedron(const Mesh* mesh);
+
+		bool IsIntersectedWith(const IShape* shape) override;
 	};
+
+
+
+	// intersection check functions
+	
+	// ray - sphere intersection
+	bool IsIntersected(const Ray* ray, const Sphere* sphere);
+	// ray - axis aligned box intersection
+	bool IsIntersected(const Ray* ray, const AxisAlignedBox* aabox);
+	// ray - oriented box intersection
+	bool IsIntersected(const Ray* ray, const OrientedBox* obox);
+	// ray - polyhedron intersection
+	bool IsIntersected(const Ray* ray, const Polyhedron* poly);
+
+	// sphere - sphere intersection
+	bool IsIntersected(const Sphere* sphere1, const Sphere* sphere2);
+	// sphere - axis aligned box intersection
+	bool IsIntersected(const Sphere* sphere, const AxisAlignedBox* aabox);
+	// sphere - oriented box intersection
+	bool IsIntersected(const Sphere* sphere, const OrientedBox* obox);
+	// sphere - polyhedron intersection
+	bool IsIntersected(const Sphere* sphere, const Polyhedron* poly);
+
+	// axis aligned box - axis aligned box intersection
+	bool IsIntersected(const AxisAlignedBox* aabox1, const AxisAlignedBox* aabox2);
+	// axis aligned box - oriented box intersection
+	bool IsIntersected(const AxisAlignedBox* aabox, const OrientedBox* obox);
+	// axis aligned box - polyhedron intersection
+	bool IsIntersected(const AxisAlignedBox* aabox, const Polyhedron* poly);
+
+	// oriented box - oriented box intersection
+	bool IsIntersected(const OrientedBox* obox1, const OrientedBox* obox2);
+	// oriented box - polyhedron intersection
+	bool IsIntersected(const OrientedBox* obox, const Polyhedron* poly);
+
+	// polyhedron - polyhedron intersection
+	bool IsIntersected(const Polyhedron* poly1, const Polyhedron* poly2);
 
 }
 #endif
