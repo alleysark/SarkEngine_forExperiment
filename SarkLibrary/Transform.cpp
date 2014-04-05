@@ -4,11 +4,8 @@
 namespace sark{
 
 	Transform::Transform(ASceneComponent* reference)
-		: mReference(reference), mScale(1.f)
-	{
-		mLocalTM.MakeIdentity();
-		mAbsoluteTM.MakeIdentity();
-	}
+		: mReference(reference), mScale(1.f), mLocalTM(true), mAbsoluteTM(true)
+	{}
 	Transform::~Transform(){}
 
 	// get absolute transformation matrix
@@ -57,13 +54,7 @@ namespace sark{
 	// get world space position
 	const Position3 Transform::GetPosition(){
 		const Matrix4& myAbsMat = GetMatrix();
-
-		if (myAbsMat.IsIdentity()){
-			return mTranslation;
-		}
-		else{
-			return (myAbsMat * Vector4(mTranslation, 1.f)).xyz;
-		}
+		return Position3(myAbsMat.m[0][3], myAbsMat.m[1][3], myAbsMat.m[2][3]);
 	}
 
 	// get world space direction.
