@@ -168,7 +168,11 @@ namespace sark{
 			return false;
 		mScenes[sceneName] = scene;
 		if (asCurrent){
+			if (mCurrentScene != NULL){
+				mCurrentScene->OnLeave();
+			}
 			mCurrentScene = scene;
+			mCurrentScene->OnEnter();
 		}
 		return true;
 	}
@@ -176,7 +180,11 @@ namespace sark{
 		SceneContainer::const_iterator find = mScenes.find(sceneName);
 		if (find == mScenes.cend())
 			return false;
+		if (mCurrentScene != NULL){
+			mCurrentScene->OnLeave();
+		}
 		mCurrentScene = find->second;
+		mCurrentScene->OnEnter();
 		return true;
 	}
 
