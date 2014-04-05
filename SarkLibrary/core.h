@@ -98,14 +98,9 @@ namespace sark{
 			return (v1 < v2 ? v1 : v2);
 		}
 
-		// approximately equal
-		inline bool apprx_equal(real v1, real v2, int8 precision = 3){
-			while (precision){
-				v1 *= 10.0f;
-				v2 *= 10.0f;
-				precision--;
-			}
-			return static_cast<integer>(v1) == static_cast<integer>(v2);
+		// check the given two real values are practically equal.
+		inline bool real_equal(real v1, real v2){
+			return abs(v1 - v2) < EPSILON;
 		}
 
 

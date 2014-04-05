@@ -95,6 +95,7 @@ namespace sark{
 	// box which has the own orientation.
 	// it is represented by center position of box and its own basis with extensions.
 	class OrientedBox : public IShape{
+	public:
 		// center position of box.
 		Position3 pos;
 
@@ -113,15 +114,20 @@ namespace sark{
 
 
 	class Mesh;
+	class Transform;
 
 	// polyhedron of triangle set.
-	// it has the reference of mesh
+	// it has the reference of mesh and relation transform
 	class Polyhedron : public IShape{
 	public:
 		// const reference of mesh.
-		const Mesh* refMesh;
+		const Mesh& refMesh;
 
-		Polyhedron(const Mesh* mesh);
+		// const reference of transform
+		// (paradoxically, it can't be const for GetMatrix()..)
+		Transform& refTransform;
+
+		Polyhedron(const Mesh& mesh, Transform& transform);
 
 		bool IsIntersectedWith(const IShape* shape) const override;
 	};
@@ -162,6 +168,27 @@ namespace sark{
 
 	// polyhedron - polyhedron intersection
 	bool IsIntersected(const Polyhedron* poly1, const Polyhedron* poly2);
+
+
+
+	// assistance functions
+
+	// is the given value 't' in between arbitrary order 'a' and 'b'?
+	inline bool IsInBetween(real a, real b, real t){
+		return((a < b)
+			? (t < a || b < t) ? false : true
+			: (t < b || a < t) ? false : true);
+	}
+
+	// is aabb contains the given position?
+	inline bool ContainsIn(const AxisAlignedBox* aabox, const Position3& pos){
+		if ((pos.x < aabox->min.x || aabox->max.x < pos.x) ||
+			(pos.y < aabox->min.y || aabox->max.y < pos.y) ||
+			(pos.z < aabox->min.z || aabox->max.z < pos.z)){
+			return false;
+		}
+		return true;
+	}
 
 }
 #endif
