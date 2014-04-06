@@ -88,6 +88,11 @@ namespace sark{
 		return mShDict;
 	}
 
+	// get resource manager
+	ResourceManager& Engine::GetResourceManager(){
+		return mResourceMgr;
+	}
+
 	// get engine timer
 	const Timer& Engine::GetTimer() const{
 		return mTimer;

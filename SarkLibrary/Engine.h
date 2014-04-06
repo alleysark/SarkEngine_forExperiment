@@ -17,6 +17,7 @@
 #include "AScene.h"
 #include "ShaderDictionary.h"
 #include "ShaderProgram.h"
+#include "resources.h"
 #include "Timer.h"
 #include "Input.h"
 
@@ -46,6 +47,9 @@ namespace sark{
 
 		// shader dictionary of sark engine
 		ShaderDictionary mShDict;
+
+		// resource manager
+		ResourceManager mResourceMgr;
 
 		// engine timer
 		Timer mTimer;
@@ -85,6 +89,9 @@ namespace sark{
 
 		// get shader dictionary
 		ShaderDictionary& GetShaderDict();
+
+		// get resource manager
+		ResourceManager& GetResourceManager();
 
 		// get engine timer
 		const Timer& GetTimer() const;

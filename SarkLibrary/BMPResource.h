@@ -6,14 +6,17 @@
 
 namespace sark{
 
+#pragma pack(push, 1)
 	struct BITMAPFILEHEADER {	// 14 = 2+4+2+2+4 (byte)
-		uint16 bfType;			// "BM"
+		uint16 bfID;			// "BM"
 		uint32 bfSize;			// file size
 		uint16 bfReserved1;		// reserved variable (0)
 		uint16 bfReserved2;		// reserved variable (0)
 		uint32 bfOffBits;		// offset of bitmap in this file
 	};
+#pragma pack(pop)
 
+#pragma pack(push, 1)
 	struct BITMAPINFOHEADER {	// 40 = 4+4+4+2+2+4+4+4+4+4+4 (byte)
 		uint32 biSize;			// size of this structure
 		int32 biWidth;			// width of bitmap image
@@ -27,38 +30,41 @@ namespace sark{
 		uint32 biClrUsed;		// used color count
 		uint32 biClrImportant;	// important color of this file
 	};
+#pragma pack(pop)
 
-	struct IBMPPIXELFORMAT{};
-
-	struct BMPPIXELFORMAT24 : public IBMPPIXELFORMAT{ // B-G-R order
-		uint8 b;
-		uint8 g;
-		uint8 r;
-	};
-
-	struct BMPPIXELFORMAT32 : public IBMPPIXELFORMAT{
-		uint8 r;
-		uint8 g;
-		uint8 b;
-		uint8 a;
-	};
 
 	// BMP format resource
 	// this BMP resource does not supply 256(8bit), 16bit color format
-	class BMPResource : public IResource, public IResourceLoader<BMPResource>{
+	class BMPResource : public ITextureResource, public IResourceLoader<BMPResource>{
 	private:
 		int32 mWidth;
 		int32 mHeight;
-		uint16 mBitCount;
-		IBMPPIXELFORMAT* mpPixels;
+
+		// RGB format
+		uint8* mPixels;
 
 	public:
-		BMPResource(int32 width, int32 height, uint16 bitCount, IBMPPIXELFORMAT* pPixels);
+		BMPResource();
+		BMPResource(const BMPResource& bmp);
 		~BMPResource();
 
-		void Unload();
+		// get width
+		const int32& GetWidth() const;
+		// get height
+		const int32& GetHeight() const;
 
-		static BMPResource* LoadImp(std::string& name);
+		// get pixel data
+		uint8& operator[](uinteger idx);
+		// get pixel data
+		const uint8& operator[](uinteger idx) const;
+
+		// bind bmp texture
+		void Bind() override;
+
+		// un bind bmp texture
+		void Unbind() override;
+
+		static BMPResource* LoadImp(const std::string& name);
 	};
 	
 }

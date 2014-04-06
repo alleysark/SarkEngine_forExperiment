@@ -118,12 +118,8 @@ namespace sark{
 		#define LogError(msg)
 	#endif
 
-	// LogError macro
-	#ifdef SARKLIB_DBGMODE
-		#define LogFatal(msg) sark::Debug::Log(msg, sark::Debug::LogLevel::Fatal(), DBG_FILE, DBG_LINE, DBG_FUNCNAME)
-	#else
-		#define LogFatal(msg)
-	#endif
+	// LogFatal macro
+	#define LogFatal(msg) sark::Debug::Log(msg, sark::Debug::LogLevel::Fatal(), DBG_FILE, DBG_LINE, DBG_FUNCNAME)
 
 
 	// code block macro only for debug mode
