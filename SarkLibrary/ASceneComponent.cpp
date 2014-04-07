@@ -7,20 +7,18 @@ namespace sark{
 		return _nextComponentID++;
 	}
 
-	// component id is automatically generated when constructor is called
-	ASceneComponent::ASceneComponent(ASceneComponent* parent)
-		: mParent(parent), mTransform(this), mActivated(true)
-	{
-		mComponentId = _getUniqueComponentID();
-		mComponentName = std::to_string(mComponentId);
-	}
-
 	// component id is automatically generated when constructor is called.
-	ASceneComponent::ASceneComponent(const std::string& name, ASceneComponent* parent)
-		: mParent(parent), mTransform(this), mActivated(true)
+	// 'name' can be empty to make default name.
+	// 'parent' can be NULL for the root scene component.
+	// 'activate' avtivates this scene component or not.
+	ASceneComponent::ASceneComponent(const std::string& name, ASceneComponent* parent, bool activate)
+		: mParent(parent), mTransform(this), mActivated(activate)
 	{
 		mComponentId = _getUniqueComponentID();
-		mComponentName = name;
+		if (name.empty())
+			mComponentName = std::to_string(mComponentId);
+		else
+			mComponentName = name;
 	}
 
 	// every derived class have to ensure release of your resources.

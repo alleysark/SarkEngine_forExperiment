@@ -52,10 +52,10 @@ namespace sark{
 
 	public:
 		// component id is automatically generated when constructor is called.
-		ASceneComponent(ASceneComponent* parent = NULL);
-
-		// component id is automatically generated when constructor is called.
-		ASceneComponent(const std::string& name, ASceneComponent* parent = NULL);
+		// 'name' can be empty to make default name.
+		// 'parent' can be NULL for the root scene component.
+		// 'activate' avtivates this scene component or not.
+		ASceneComponent(const std::string& name, ASceneComponent* parent, bool activate);
 
 		// every derived class have to ensure release of your resources.
 		virtual ~ASceneComponent();

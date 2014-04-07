@@ -10,7 +10,8 @@ namespace sark{
 	// simple rigid cube scene component.
 	class RigidCube : public ASceneComponent{
 	private:
-		Mesh mMesh;
+		// static mesh object
+		Mesh* mMesh;
 
 		// bounding box
 		OrientedBox mOBox, mUpdatedObox;
@@ -22,6 +23,10 @@ namespace sark{
 		// create cube from given properties
 		RigidCube(real width, real height, real depth);
 
+		// create cube from given properties
+		RigidCube(const std::string& name, ASceneComponent* parent, bool activate,
+			real width, real height, real depth);
+		
 		~RigidCube();
 
 		const IShape* GetBoundingShape() const override;
@@ -29,6 +34,9 @@ namespace sark{
 		void Update() override;
 
 		void Render() override;
+
+	private:
+		void CreateCube();
 	};
 
 }

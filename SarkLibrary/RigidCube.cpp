@@ -2,17 +2,13 @@
 
 namespace sark{
 
-	// create cube from given properties
-	RigidCube::RigidCube(real width, real height, real depth){
-		mWidth = width;
-		mHeight = height;
-		mDepth = depth;
+	void RigidCube::CreateCube(){
+		real width = mWidth / 2.f;
+		real height = mHeight / 2.f;
+		real depth = mDepth / 2.f;
 
-		width /= 2.f;
-		height /= 2.f;
-		depth /= 2.f;
-
-		mMesh.SetPositions({
+		mMesh = new Mesh();
+		mMesh->SetPositions({
 			Position3(-width, -height, -depth),
 			Position3(width, -height, -depth),
 			Position3(width, -height, depth),
@@ -22,7 +18,7 @@ namespace sark{
 			Position3(width, height, depth),
 			Position3(-width, height, depth),
 		});
-		mMesh.SetNormals({
+		mMesh->SetNormals({
 			Normal(-1, -1, -1),
 			Normal(1, -1, -1),
 			Normal(1, -1, 1),
@@ -32,7 +28,7 @@ namespace sark{
 			Normal(1, 1, 1),
 			Normal(-1, 1, 1)
 		});
-		mMesh.SetTexcoord0s({
+		mMesh->SetTexcoord0s({
 			Texcoord(0, 1),
 			Texcoord(1, 1),
 			Texcoord(1, 0),
@@ -43,7 +39,7 @@ namespace sark{
 			Texcoord(0, 0)
 		});
 
-		mMesh.SetFaces({
+		mMesh->SetFaces({
 			Mesh::Face(0, 1, 2),
 			Mesh::Face(0, 2, 3),
 			Mesh::Face(0, 4, 1),
@@ -58,12 +54,31 @@ namespace sark{
 			Mesh::Face(7, 6, 4)
 		});
 
-		mMesh.BindDatas();
+		mMesh->BindDatas();
 
 		mOBox.Set(Position3(0, 0, 0), Vector4(1, 0, 0, width), Vector4(0, 1, 0, height), Vector4(0, 0, 1, depth), true);
 	}
 
+	// create cube from given properties
+	RigidCube::RigidCube(real width, real height, real depth)
+		: ASceneComponent("", NULL, true),
+		mWidth(width), mHeight(height), mDepth(depth)
+	{
+		CreateCube();
+	}
+
+	// create cube from given properties
+	RigidCube::RigidCube(const std::string& name, ASceneComponent* parent, bool activate,
+		real width, real height, real depth)
+		: ASceneComponent(name, parent, activate),
+		mWidth(width), mHeight(height), mDepth(depth)
+	{
+		CreateCube();
+	}
+
 	RigidCube::~RigidCube(){
+		if (mMesh != NULL)
+			delete mMesh;
 	}
 
 	const IShape* RigidCube::GetBoundingShape() const{
@@ -81,7 +96,7 @@ namespace sark{
 	}
 
 	void RigidCube::Render(){
-		mMesh.Draw();
+		mMesh->Draw();
 	}
 
 }

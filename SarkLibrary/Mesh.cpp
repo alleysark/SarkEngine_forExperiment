@@ -43,6 +43,27 @@ namespace sark{
 	}
 
 
+	// full copy from another mesh object
+	void Mesh::CopyFrom(const Mesh& mesh){
+		if (!mesh.mFaces.empty())
+			SetFaces(mesh.mFaces);
+		if (!mesh.mPositions.empty())
+			SetPositions(mesh.mPositions);
+		if (!mesh.mNormals.empty())
+			SetNormals(mesh.mNormals);
+		if (!mesh.mColors.empty())
+			SetColors(mesh.mColors);
+		if (!mesh.mTexcoord0s.empty())
+			SetTexcoord0s(mesh.mTexcoord0s);
+		if (!mesh.mTexcoord1s.empty())
+			SetTexcoord0s(mesh.mTexcoord1s);
+		if (!mesh.mTexcoord2s.empty())
+			SetTexcoord0s(mesh.mTexcoord2s);
+		if (!mesh.mTexcoord3s.empty())
+			SetTexcoord0s(mesh.mTexcoord3s);
+		BindDatas();
+	}
+
 	// set face data
 	void Mesh::SetFaces(const std::vector<Mesh::Face>& faces){
 		mFaces = faces;

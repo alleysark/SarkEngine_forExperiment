@@ -74,11 +74,18 @@ namespace sark{
 		std::vector<Texcoord> mTexcoord2s;
 		std::vector<Texcoord> mTexcoord3s;
 
+		// mesh can't be assigned implicitly
+		Mesh(const Mesh& mesh){}
+		const Mesh&  operator=(const Mesh&){}
+
 	public:
 		Mesh();
 
 		// buffer objects are deleted in destructor
 		~Mesh();
+
+		// full copy from another mesh object
+		void CopyFrom(const Mesh& mesh);
 
 		// set face data
 		void SetFaces(const std::vector<Face>& faces);
