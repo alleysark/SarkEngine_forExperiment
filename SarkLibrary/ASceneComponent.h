@@ -42,10 +42,6 @@ namespace sark{
 		// local scene component transform object
 		Transform mTransform;
 
-		// bounding shape(volume usually).
-		// it can be NULL for the non-bounceable component.
-		IShape* mBoundingShape;
-
 		// component activation indicator
 		bool mActivated;
 
@@ -115,10 +111,11 @@ namespace sark{
 		// get transform object of this component. it is local transform object.
 		Transform& GetTransform();
 
-		// get bounding shape. it is Nullable pointer.
-		const IShape* GetBoundingShape() const;
 
-	public:
+		// get bounding shape. it is Nullable pointer.
+		virtual const IShape* GetBoundingShape() const = 0;
+
+
 		// is this component activated?
 		bool IsActive() const;
 		// set component activation property

@@ -3,6 +3,7 @@
 
 #include "ASceneComponent.h"
 #include "Mesh.h"
+#include "shapes.h"
 
 namespace sark{
 
@@ -10,6 +11,9 @@ namespace sark{
 	class RigidCube : public ASceneComponent{
 	private:
 		Mesh mMesh;
+
+		// bounding box
+		OrientedBox mOBox, mUpdatedObox;
 
 		// basic properties of cube
 		real mWidth, mHeight, mDepth;
@@ -20,9 +24,11 @@ namespace sark{
 
 		~RigidCube();
 
-		void Update();
+		const IShape* GetBoundingShape() const override;
 
-		void Render();
+		void Update() override;
+
+		void Render() override;
 	};
 
 }

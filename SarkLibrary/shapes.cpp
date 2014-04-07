@@ -26,9 +26,20 @@ namespace sark{
 	//			implemented shapes below..
 	// ======================================================
 
+	Ray::Ray() : IShape(IShape::RAY){}
+
 	Ray::Ray(const Position3& position, const Vector3& direction, bool dir_normalized, real limitation)
 		: IShape(IShape::RAY), pos(position), dir(direction), limit(limitation)
 	{
+		if (!dir_normalized)
+			dir.Normalize();
+	}
+
+	void Ray::Set(const Position3& position, const Vector3& direction, bool dir_normalized, real limitation){
+		pos = position;
+		dir = direction;
+		limit = limitation;
+
 		if (!dir_normalized)
 			dir.Normalize();
 	}
@@ -53,10 +64,16 @@ namespace sark{
 	}
 
 
-	// sphere
+	Sphere::Sphere() : IShape(IShape::SPHERE){}
+
 	Sphere::Sphere(const Point3& position, real radius)
 		: IShape(IShape::SPHERE), pos(position), r(radius)
 	{}
+
+	void Sphere::Set(const Point3& position, real radius){
+		pos = position;
+		r = radius;
+	}
 
 	bool Sphere::IsIntersectedWith(const IShape* shape) const{
 		switch (shape->GetType()){
@@ -78,10 +95,16 @@ namespace sark{
 	}
 
 
-	// axis aligned box
+	AxisAlignedBox::AxisAlignedBox() : IShape(IShape::AABOX){}
+
 	AxisAlignedBox::AxisAlignedBox(const Point3& posMin, const Point3& posMax)
 		: IShape(IShape::AABOX), min(posMin), max(posMax)
 	{}
+
+	void AxisAlignedBox::Set(const Point3& posMin, const Point3& posMax){
+		min = posMin;
+		max = posMax;
+	}
 
 	bool AxisAlignedBox::IsIntersectedWith(const IShape* shape) const{
 		switch (shape->GetType()){
@@ -103,26 +126,27 @@ namespace sark{
 	}
 
 
-	// oriented box
+	OrientedBox::OrientedBox() : IShape(IShape::OBOX){}
+
 	OrientedBox::OrientedBox(const Position3& position,
-		const Vector3& basisX, const Vector3& basisY, const Vector3& basisZ, const Vector3& halfOfExt,
+		const Vector4& basisXext, const Vector4& basisYext, const Vector4& basisZext,
 		bool basis_normalized)
 		: IShape(IShape::OBOX), pos(position)
 	{
-		axis[0] = Vector4(basisX, halfOfExt.x);
-		axis[1] = Vector4(basisY, halfOfExt.y);
-		axis[2] = Vector4(basisZ, halfOfExt.z);
+		axis[0] = basisXext;
+		axis[1] = basisYext;
+		axis[2] = basisZext;
 		if (!basis_normalized){
 			axis[0].xyz.Normalize();
 			axis[1].xyz.Normalize();
 			axis[2].xyz.Normalize();
 		}
 	}
-	OrientedBox::OrientedBox(const Position3& position,
+
+	void OrientedBox::Set(const Position3& position,
 		const Vector4& basisXext, const Vector4& basisYext, const Vector4& basisZext,
-		bool basis_normalized)
-		: IShape(IShape::OBOX), pos(position)
-	{
+		bool basis_normalized){
+		pos = position;
 		axis[0] = basisXext;
 		axis[1] = basisYext;
 		axis[2] = basisZext;

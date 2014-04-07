@@ -54,7 +54,11 @@ namespace sark{
 		// limitation of ray distance. positive value.
 		real limit;
 
+		Ray();
 		Ray(const Position3& position, const Vector3& direction,
+			bool dir_normalized = false, real limitation = REAL_MAX);
+
+		void Set(const Position3& position, const Vector3& direction,
 			bool dir_normalized = false, real limitation = REAL_MAX);
 
 		bool IsIntersectedWith(const IShape* shape) const override;
@@ -70,7 +74,10 @@ namespace sark{
 		// radius
 		real r;
 
+		Sphere();
 		Sphere(const Position3& position, real radius);
+
+		void Set(const Position3& position, real radius);
 
 		bool IsIntersectedWith(const IShape* shape) const override;
 	};
@@ -86,7 +93,10 @@ namespace sark{
 		// cater-cornered maximum position.
 		Position3 max;
 
+		AxisAlignedBox();
 		AxisAlignedBox(const Position3& posMin, const Position3& posMax);
+
+		void Set(const Position3& posMin, const Position3& posMax);
 
 		bool IsIntersectedWith(const IShape* shape) const override;
 	};
@@ -102,10 +112,12 @@ namespace sark{
 		//vec3 as axis, w factor as extension
 		Vector4 axis[3]; 
 
+		OrientedBox();
 		OrientedBox(const Position3& position,
-			const Vector3& basisX, const Vector3& basisY, const Vector3& basisZ, const Vector3& halfOfExt,
+			const Vector4& basisXext, const Vector4& basisYext, const Vector4& basisZext,
 			bool basis_normalized = false);
-		OrientedBox(const Position3& position,
+
+		void Set(const Position3& position,
 			const Vector4& basisXext, const Vector4& basisYext, const Vector4& basisZext,
 			bool basis_normalized = false);
 

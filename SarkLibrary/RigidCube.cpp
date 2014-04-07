@@ -32,6 +32,16 @@ namespace sark{
 			Normal(1, 1, 1),
 			Normal(-1, 1, 1)
 		});
+		mMesh.SetTexcoord0s({
+			Texcoord(0, 1),
+			Texcoord(1, 1),
+			Texcoord(1, 0),
+			Texcoord(0, 0),
+			Texcoord(0, 1),
+			Texcoord(1, 1),
+			Texcoord(1, 0),
+			Texcoord(0, 0)
+		});
 
 		mMesh.SetFaces({
 			Mesh::Face(0, 1, 2),
@@ -49,12 +59,26 @@ namespace sark{
 		});
 
 		mMesh.BindDatas();
+
+		mOBox.Set(Position3(0, 0, 0), Vector4(1, 0, 0, width), Vector4(0, 1, 0, height), Vector4(0, 0, 1, depth), true);
 	}
 
 	RigidCube::~RigidCube(){
 	}
 
-	void RigidCube::Update(){ }
+	const IShape* RigidCube::GetBoundingShape() const{
+		return &mUpdatedObox;
+	}
+
+	void RigidCube::Update(){
+		mUpdatedObox.pos = mTransform.GetPosition();
+		const Matrix4& mat = mTransform.GetMatrix();
+		Matrix3 rotmat(mat.row[0].xyz, mat.row[1].xyz, mat.row[2].xyz);
+		for (integer i = 0; i < 3; i++){
+			mUpdatedObox.axis[i].xyz = rotmat * mOBox.axis[i].xyz;
+			mUpdatedObox.axis[i].w = mOBox.axis[i].w;
+		}
+	}
 
 	void RigidCube::Render(){
 		mMesh.Draw();
