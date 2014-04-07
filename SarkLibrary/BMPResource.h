@@ -48,21 +48,17 @@ namespace sark{
 		BMPResource(const BMPResource& bmp);
 		~BMPResource();
 
-		// get width
-		const int32& GetWidth() const;
-		// get height
-		const int32& GetHeight() const;
+		const integer GetWidth() const override;
 
-		// get pixel data
-		uint8& operator[](uinteger idx);
-		// get pixel data
-		const uint8& operator[](uinteger idx) const;
+		const integer GetHeight() const override;
 
-		// bind bmp texture
-		void Bind() override;
+		const integer GetDepth() const override;
 
-		// un bind bmp texture
-		void Unbind() override;
+		Format GetPixelFormat() const override;
+
+		PixelType GetPixelType() const override;
+
+		const void* GetPixels() const override;
 
 		static BMPResource* LoadImp(const std::string& name);
 	};

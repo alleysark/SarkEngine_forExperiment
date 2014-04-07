@@ -75,6 +75,12 @@
     <ClCompile Include="Debug.cpp">
       <Filter>Header Files\core-util</Filter>
     </ClCompile>
+    <ClCompile Include="Sampler.cpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -124,6 +130,12 @@
     </ClInclude>
     <ClInclude Include="Debug.h">
       <Filter>Header Files\core-util</Filter>
+    </ClInclude>
+    <ClInclude Include="Sampler.h">
+      <Filter>Header Files\core-system</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files\core-system</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

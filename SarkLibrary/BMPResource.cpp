@@ -17,48 +17,33 @@ namespace sark{
 	}
 
 	BMPResource::~BMPResource(){
-		if (mTexId != 0){
-			glDeleteTextures(1, &mTexId);
-		}
 		if (mPixels != NULL){
 			delete[] mPixels;
 		}
 	}
 
-	// get width
-	const int32& BMPResource::GetWidth() const{
+	const integer BMPResource::GetWidth() const{
 		return mWidth;
 	}
-	// get height
-	const int32& BMPResource::GetHeight() const{
+
+	const integer BMPResource::GetHeight() const{
 		return mHeight;
 	}
 
-	// get pixel data
-	uint8& BMPResource::operator[](uinteger idx){
-		ONLYDBG_CODEBLOCK(
-		if (idx >= mWidth*mHeight)
-			LogFatal("invalid index");
-		);
-		return mPixels[idx];
-	}
-	// get pixel data
-	const uint8& BMPResource::operator[](uinteger idx) const{
-		ONLYDBG_CODEBLOCK(
-		if (idx >= mWidth*mHeight)
-			LogFatal("invalid index");
-		);
-		return mPixels[idx];
+	const integer BMPResource::GetDepth() const{
+		return 0;
 	}
 
-	// bind bmp texture
-	void BMPResource::Bind(){
-		glBindTexture(GL_TEXTURE_2D, mTexId);
+	ITextureResource::Format BMPResource::GetPixelFormat() const{
+		return ITextureResource::Format::RGB;
 	}
 
-	// un bind bmp texture
-	void BMPResource::Unbind(){
-		glBindTexture(GL_TEXTURE_2D, 0);
+	ITextureResource::PixelType BMPResource::GetPixelType() const{
+		return ITextureResource::PixelType::UINT8;
+	}
+
+	const void* BMPResource::GetPixels() const{
+		return mPixels;
 	}
 
 	BMPResource* BMPResource::LoadImp(const std::string& name){
@@ -91,15 +76,7 @@ namespace sark{
 				return NULL;
 		}
 
-		uinteger texId;
-		glGenTextures(1, &texId);
-		if (texId == 0){
-			LogWarn("failed to generate texture");
-			return NULL;
-		}
-
 		BMPResource* bmp = new BMPResource();
-		bmp->mTexId = texId;
 		bmp->mWidth = bmpInfoHead.biWidth;
 		bmp->mHeight = bmpInfoHead.biHeight;
 		bmp->mPixels = new uint8[bmp->mWidth * bmp->mHeight * 3];
@@ -125,12 +102,21 @@ namespace sark{
 			}
 		}
 		else if (bmpInfoHead.biBitCount == 32){
-			stream.read((char*)bmp->mPixels, bmp->mWidth*bmp->mHeight * 3);
-		}
+			uint8 rgba[4];
+			int64 i, k;
+			for (i = 0; i < bmp->mHeight; i++){
+				for (k = 0; k < bmp->mWidth; k++){
+					// read rgba order
+					stream.read((char*)rgba, 4);
 
-		glBindTexture(GL_TEXTURE_2D, bmp->mTexId);
-		glTexImage2D(GL_TEXTURE_2D, 0, 3, bmp->mWidth, bmp->mHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, bmp->mPixels);
-		glBindTexture(GL_TEXTURE_2D, 0);
+					int64 pix_idx = i*bmp->mWidth * 3 + k * 3;
+					bmp->mPixels[pix_idx] = rgba[0];
+					bmp->mPixels[pix_idx+1] = rgba[1];
+					bmp->mPixels[pix_idx+2] = rgba[2];
+					// alpha value is discarded
+				}
+			}
+		}
 		return bmp;
 	}
 

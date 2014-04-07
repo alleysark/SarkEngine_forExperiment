@@ -2,7 +2,7 @@
 #define __SHADER_PROGRAM_H__
 
 #include <string>
-#include <hash_map>
+#include <map>
 #include <GL/glew.h>
 #include "core.h"
 
@@ -10,13 +10,16 @@ namespace sark{
 
 	class ShaderDictionary;
 
+	class Sampler;
+	class Texture;
+
 	// programmable shader program.
 	// it'll be created by ShaderDictionary 
 	class ShaderProgram{
 	public:	
 		typedef GLuint ProgramHandle;
 		typedef GLint Location;
-		typedef std::hash_map<const std::string, Location> LocationDictionary;
+		typedef std::map<const std::string, Location> LocationDictionary;
 
 		enum AttribVarSemantic{
 			ATTR_POSITION=0,
@@ -65,6 +68,16 @@ namespace sark{
 		//========================================================
 		//			uniform variable setting methods
 		//========================================================
+
+		//---------------------
+		//		sampler
+		//---------------------
+
+		// set sampler with texture into the uniform sampler 'name'
+		// as active texture unit 'activeTex'
+		void SetSampler(const std::string& name,
+			Sampler* sampler, Texture* texture, uint16 activeTex = 0);
+
 
 		//---------------------
 		//		boolean

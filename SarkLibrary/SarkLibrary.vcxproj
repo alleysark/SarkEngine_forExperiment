@@ -87,10 +87,12 @@
     <ClCompile Include="resources.cpp" />
     <ClCompile Include="AScene.cpp" />
     <ClCompile Include="RigidCube.cpp" />
+    <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="ShaderDictionary.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="shapes.cpp" />
     <ClCompile Include="test_main.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
@@ -106,9 +108,11 @@
     <ClInclude Include="resources.h" />
     <ClInclude Include="AScene.h" />
     <ClInclude Include="RigidCube.h" />
+    <ClInclude Include="Sampler.h" />
     <ClInclude Include="ShaderDictionary.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="shapes.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Transform.h" />
   </ItemGroup>
