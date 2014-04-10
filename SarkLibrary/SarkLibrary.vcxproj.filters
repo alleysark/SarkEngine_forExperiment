@@ -81,6 +81,9 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
+    <ClCompile Include="ALight.cpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -135,6 +138,9 @@
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
+      <Filter>Header Files\core-system</Filter>
+    </ClInclude>
+    <ClInclude Include="ALight.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
   </ItemGroup>

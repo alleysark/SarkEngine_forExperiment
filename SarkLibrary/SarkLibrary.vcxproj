@@ -82,6 +82,7 @@
     <ClCompile Include="core.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="ALight.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="resources.cpp" />
@@ -97,6 +98,7 @@
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ALight.h" />
     <ClInclude Include="ASceneComponent.h" />
     <ClInclude Include="BMPResource.h" />
     <ClInclude Include="Camera.h" />
