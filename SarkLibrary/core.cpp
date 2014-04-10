@@ -175,6 +175,14 @@ namespace sark{
 		return Vector2(fConstant * v.x, fConstant * v.y);
 	}
 
+	// x-axis right
+	const Vector2 Vector2::Right(1, 0);
+	// y-axis up
+	const Vector2 Vector2::Up(0, 1);
+
+	// general gravity force. 9.8 m/s^2 of negative y-axis
+	const Vector2 Vector2::Gravity(0, -9.80665f);
+
 
 
 	/**
@@ -371,6 +379,17 @@ namespace sark{
 	const Vector3 operator*(real fConstant, const Vector3& v){
 		return Vector3(fConstant * v.x, fConstant * v.y, fConstant * v.z);
 	}
+
+	// x-axis right
+	const Vector3 Vector3::Right(1, 0, 0);
+	// y-axis up
+	const Vector3 Vector3::Up(0, 1, 0);
+	// negative z-axis forward
+	const Vector3 Vector3::Forward(0, 0, -1);
+
+	// general gravity force. 9.8 m/s^2 of negative y-axis
+	const Vector3 Vector3::Gravity(0, -9.80665f, 0);
+
 
 
 	/**
@@ -1167,9 +1186,8 @@ namespace sark{
 		return Quaternion(-x, -y, -z, s);
 	}
 	// conjugate this
-	const Quaternion& Quaternion::Conjugate(){
+	void Quaternion::Conjugate(){
 		Set(-x, -y, -z, s);
-		return *this;
 	}
 
 	// magnitude which called 'norm' or 'the tensor of quaternion'
@@ -1190,7 +1208,7 @@ namespace sark{
 		return Quaternion(x / mag, y / mag, z / mag, s / mag);
 	}
 	// normalize this
-	const Quaternion& Quaternion::Normalize(){
+	void Quaternion::Normalize(){
 		real mag = Magnitude();
 		ONLYDBG_CODEBLOCK(
 		if (mag == 0.f)
@@ -1200,7 +1218,6 @@ namespace sark{
 		x /= mag;
 		y /= mag;
 		z /= mag;
-		return *this;
 	}
 
 	// inverse, q^{-1} = conj(q)/(norm(q)^2)
@@ -1214,8 +1231,11 @@ namespace sark{
 	}
 
 	// make this as the rotating quaternion from given axis vector and theta
-	void Quaternion::MakeRotatingQuat(const Vector3& axis, real theta){
-		v = math::sin(theta / 2.0f) * axis.Normal();
+	void Quaternion::MakeRotatingQuat(const Vector3& axis, real theta, bool axis_normalized){
+		if (axis_normalized)
+			v = math::sin(theta / 2.0f) * axis;
+		else
+			v = math::sin(theta / 2.0f) * axis.Normal();
 		s = math::cos(theta / 2.0f);
 	}
 	// make this as the rotating quaternion from given each axis rotating factor
@@ -1235,7 +1255,7 @@ namespace sark{
 	}
 
 
-	// convert quaternion to matrix 3D
+	// convert quaternion to matrix 3D (only for rotation quaternion)
 	const Matrix3 Quaternion::ToMatrix3(bool isNormalized){
 		real xx, xy, xz, xs;
 		real yy, yz, ys;
@@ -1275,7 +1295,7 @@ namespace sark{
 			2.0f*(xz - ys), 2.0f*(yz + xs), 1.0f - 2.0f*(xx + yy));
 	}
 
-	// convert quaternion to matrix 4D
+	// convert quaternion to matrix 4D (only for rotation quaternion)
 	const Matrix4 Quaternion::ToMatrix4(bool isNormalized){
 		real xx, xy, xz, xs;
 		real yy, yz, ys;
@@ -1318,10 +1338,10 @@ namespace sark{
 
 
 	// rotate input vector from given axis vector and theta
-	void Quaternion::Rotate(Vector3& v, const Vector3& axis, real theta){
+	void Quaternion::Rotate(Vector3& v, const Vector3& axis, real theta, bool axis_normalized){
 		Quaternion P(v);
 		Quaternion q;
-		q.MakeRotatingQuat(axis, theta);
+		q.MakeRotatingQuat(axis, theta, axis_normalized);
 
 		P = (q * P) * q.Conjugation();
 		v.Set(P.x, P.y, P.z);

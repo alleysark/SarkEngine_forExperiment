@@ -234,6 +234,15 @@ namespace sark{
 
 		// calculate radians of given two vectors
 		static real Angle(const Vector2& v1, const Vector2& v2);
+
+		
+		// x-axis right
+		static const Vector2 Right;
+		// y-axis up
+		static const Vector2 Up;
+
+		// general gravity force. 9.8 m/s^2 of negative y-axis
+		static const Vector2 Gravity;
 	};
 	typedef Vector2 Vertex2;
 	typedef Vector2 Position2;
@@ -344,6 +353,17 @@ namespace sark{
 
 		// calculate radians of given two vectors
 		static real Angle(const Vector3& v1, const Vector3& v2);
+
+
+		// x-axis right
+		static const Vector3 Right;
+		// y-axis up
+		static const Vector3 Up;
+		// negative z-axis forward
+		static const Vector3 Forward;
+
+		// general gravity force. 9.8 m/s^2 of negative y-axis
+		static const Vector3 Gravity;
 	};
 	typedef Vector3 Vertex3;
 	typedef Vector3 Position3;
@@ -719,7 +739,7 @@ namespace sark{
 
 		// get conjugation and conjugate this
 		const Quaternion Conjugation() const;
-		const Quaternion& Conjugate();
+		void Conjugate();
 
 
 		// magnitude which called 'norm' or 'the tensor of quaternion'
@@ -729,29 +749,29 @@ namespace sark{
 
 		// get normal and normalize this
 		const Quaternion Normal() const;
-		const Quaternion& Normalize();
+		void Normalize();
 
 
 		// inverse, q^{-1} = conj(q)/(norm(q)^2)
 		const Quaternion Inverse() const;
 
 		// make this as the rotating quaternion from given axis vector and theta
-		void MakeRotatingQuat(const Vector3& axis, real theta);
+		void MakeRotatingQuat(const Vector3& axis, real theta, bool axis_normalized = false);
 
 		// make this as the rotating quaternion from given each axis rotating factor
 		// (roll: z, pitch: x, yaw: y axis rotating factor)
 		void MakeRotatingQuat(const real roll, real pitch, real yaw);
 
 
-		// convert quaternion to matrix 3D
+		// convert quaternion to matrix 3D (only for rotation quaternion)
 		const Matrix3 ToMatrix3(bool isNormalized = false);
 
-		// convert quaternion to matrix 4D
+		// convert quaternion to matrix 4D (only for rotation quaternion)
 		const Matrix4 ToMatrix4(bool isNormalized = false);
 
 
 		// rotate input vector from given axis vector and theta
-		static void Rotate(Vector3& v, const Vector3& axis, real theta);
+		static void Rotate(Vector3& v, const Vector3& axis, real theta, bool axis_normalized = false);
 
 		// rotate input vector from given each axis rotating factor
 		// (roll: z, pitch: x, yaw: y axis rotating factor)
