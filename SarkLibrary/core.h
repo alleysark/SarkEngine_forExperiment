@@ -102,7 +102,10 @@ namespace sark{
 		inline bool real_equal(real v1, real v2){
 			return abs(v1 - v2) < EPSILON;
 		}
-
+		// check the given two real values are practically not equal.
+		inline bool real_notequal(real v1, real v2){
+			return abs(v1 - v2) >= EPSILON;
+		}
 
 		// for specifying the methods within math.h
 		using ::abs;
@@ -215,6 +218,9 @@ namespace sark{
 		bool operator==(const Vector2& v) const;
 
 		bool operator!=(const Vector2& v) const;
+
+		// it consider real type equal
+		bool Equal(const Vector2& v) const;
 
 
 		// check if zero vector
@@ -332,6 +338,8 @@ namespace sark{
 
 		bool operator!=(const Vector3& v) const;
 
+		// it consider real type equal
+		bool Equal(const Vector3& v) const;
 
 		// check if zero vector
 		bool IsZero() const;
@@ -461,6 +469,9 @@ namespace sark{
 		bool operator==(const Vector4& v) const;
 
 		bool operator!=(const Vector4& v) const;
+
+		// it consider real type equal
+		bool Equal(const Vector4& v) const;
 
 		// check if zero vector
 		bool IsZero() const;

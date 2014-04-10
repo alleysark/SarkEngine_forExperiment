@@ -123,6 +123,11 @@ namespace sark{
 		return (x != v.x || y != v.y);
 	}
 
+	// it consider real type equal
+	bool Vector2::Equal(const Vector2& v) const{
+		return (math::real_equal(x, v.x) && math::real_equal(y, v.y));
+	}
+
 
 	// check if zero vector
 	bool Vector2::IsZero() const{
@@ -139,7 +144,7 @@ namespace sark{
 	const Vector2 Vector2::Normal() const{
 		real mag = Magnitude();
 		ONLYDBG_CODEBLOCK(
-		if (mag == 0.f)
+		if (math::real_equal(mag, 0.f))
 			LogFatal("division by zero");
 		);
 		return Vector2(x / mag, y / mag);
@@ -147,7 +152,7 @@ namespace sark{
 	void Vector2::Normalize(){
 		real mag = Magnitude();
 		ONLYDBG_CODEBLOCK(
-		if (mag == 0.f)
+		if (math::real_equal(mag, 0.f))
 			LogFatal("division by zero");
 		);
 		x /= mag;
@@ -323,6 +328,10 @@ namespace sark{
 		return (x != v.x || y != v.y || z != v.z);
 	}
 
+	// it consider real type equal
+	bool Vector3::Equal(const Vector3& v) const{
+		return (math::real_equal(x, v.x) && math::real_equal(y, v.y) && math::real_equal(z, v.z));
+	}
 
 	// check if zero vector
 	bool Vector3::IsZero() const{
@@ -344,7 +353,7 @@ namespace sark{
 	const Vector3 Vector3::Normal() const{
 		real mag = Magnitude();
 		ONLYDBG_CODEBLOCK(
-		if (mag == 0.f)
+		if (math::real_equal(mag, 0.f))
 			LogFatal("division by zero");
 		);
 		return Vector3(x / mag, y / mag, z / mag);
@@ -352,7 +361,7 @@ namespace sark{
 	void Vector3::Normalize(){
 		real mag = Magnitude();
 		ONLYDBG_CODEBLOCK(
-		if (mag == 0.f)
+		if (math::real_equal(mag, 0.f))
 			LogFatal("division by zero");
 		);
 		x /= mag;
@@ -540,6 +549,11 @@ namespace sark{
 		return (x != v.x || y != v.y || z != v.z || w != v.w);
 	}
 
+	// it consider real type equal
+	bool Vector4::Equal(const Vector4& v) const{
+		return (math::real_equal(x, v.x) && math::real_equal(y, v.y)
+			&& math::real_equal(z, v.z) && math::real_equal(w, v.w));
+	}
 
 	// check if zero vector
 	bool Vector4::IsZero() const{
@@ -555,7 +569,7 @@ namespace sark{
 	const Vector4 Vector4::Normal() const{
 		real mag = Magnitude();
 		ONLYDBG_CODEBLOCK(
-		if (mag == 0.f)
+		if (math::real_equal(mag, 0.f))
 			LogFatal("division by zero");
 		);
 		return Vector4(x / mag, y / mag, z / mag, w / mag);
@@ -563,7 +577,7 @@ namespace sark{
 	void Vector4::Normalize(){
 		real mag = Magnitude();
 		ONLYDBG_CODEBLOCK(
-		if (mag == 0.f)
+		if (math::real_equal(mag, 0.f))
 			LogFatal("division by zero");
 		);
 		x /= mag;
