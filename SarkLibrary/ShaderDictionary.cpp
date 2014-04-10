@@ -11,11 +11,14 @@ namespace sark{
 	ShaderDictionary::~ShaderDictionary(){}
 
 
-	// register shader program with full-dependent source file definitions.
+	// register shader program with full-dependent source files.
 	// it must be preceded before getting shader program.
-	bool ShaderDictionary::RegisterProgram(const std::string& programName,
-		const std::vector<const char*>& vtxShaders,
-		const std::vector<const char*>& fragShaders)
+	// shaders are compiled as 'version' and other version notations
+	// of each shader sources are ignored.
+	bool ShaderDictionary::RegisterProgramFromFiles(const std::string& programName,
+		const std::vector<const char*>& vertexShaderFiles,
+		const std::vector<const char*>& fragmentShaderFiles,
+		CompileVersion version)
 	{
 		Dictionary::iterator find = mProgramDict.find(programName);
 		if (find != mProgramDict.end())
@@ -25,12 +28,28 @@ namespace sark{
 		if (progObj == 0)
 			return false;
 
-		ObjectHandle vtxObj = CreateShader(GL_VERTEX_SHADER, vtxShaders);
+		// read vertex shader sources
+		std::list<std::string> sourceBuf;
+		if (!ReadSources(vertexShaderFiles, sourceBuf)){
+			glDeleteProgram(progObj);
+			return false;
+		}
+		// create vertex shader
+		ObjectHandle vtxObj = CreateShader(GL_VERTEX_SHADER, version, sourceBuf);
 		if (vtxObj == 0){
 			glDeleteProgram(progObj);
 			return false;
 		}
-		ObjectHandle fragObj = CreateShader(GL_FRAGMENT_SHADER, fragShaders);
+
+		// read fragment shader sources
+		sourceBuf.clear();
+		if (!ReadSources(fragmentShaderFiles, sourceBuf)){
+			glDeleteShader(vtxObj);
+			glDeleteProgram(progObj);
+			return false;
+		}
+		// create fragment shader
+		ObjectHandle fragObj = CreateShader(GL_FRAGMENT_SHADER, version, sourceBuf);
 		if (fragObj == 0){
 			glDeleteShader(vtxObj);
 			glDeleteProgram(progObj);
@@ -65,6 +84,70 @@ namespace sark{
 		return true;
 	}
 
+	// register shader program with full-dependent string sources.
+	// it must be preceded before getting shader program.
+	// shaders are compiled as 'version' and other version notations
+	// of each shader sources are ignored.
+	bool ShaderDictionary::RegisterProgramFromSources(const std::string& programName,
+		const std::vector<const char*>& vertexShaderSources,
+		const std::vector<const char*>& fragmentShaderSources,
+		CompileVersion version)
+	{
+		Dictionary::iterator find = mProgramDict.find(programName);
+		if (find != mProgramDict.end())
+			return false;
+
+		ObjectHandle progObj = glCreateProgram();
+		if (progObj == 0)
+			return false;
+
+		// create vertex shader
+		std::list<std::string> sourceBuf(vertexShaderSources.begin(), vertexShaderSources.end());
+		ObjectHandle vtxObj = CreateShader(GL_VERTEX_SHADER, version, sourceBuf);
+		if (vtxObj == 0){
+			glDeleteProgram(progObj);
+			return false;
+		}
+
+		// create fragment shader
+		sourceBuf.clear();
+		sourceBuf.assign(fragmentShaderSources.begin(), fragmentShaderSources.end());
+		ObjectHandle fragObj = CreateShader(GL_FRAGMENT_SHADER, version, sourceBuf);
+		if (fragObj == 0){
+			glDeleteShader(vtxObj);
+			glDeleteProgram(progObj);
+			return false;
+		}
+
+		glAttachShader(progObj, vtxObj);
+		glAttachShader(progObj, fragObj);
+
+		// bind pre-defined attribute semantics
+		for (int attrLoca = 0; attrLoca < ShaderProgram::ATTR_COUNT; attrLoca++){
+			glBindAttribLocation(progObj, attrLoca, ShaderProgram::AttribVarNames[attrLoca]);
+		}
+
+		glLinkProgram(progObj);
+
+		if (!CheckProgram(progObj)){
+			glDeleteShader(vtxObj);
+			glDeleteShader(fragObj);
+			glDeleteProgram(progObj);
+			return false;
+		}
+
+		glDetachShader(progObj, vtxObj);
+		glDetachShader(progObj, fragObj);
+
+		glDeleteShader(vtxObj);
+		glDeleteShader(fragObj);
+
+		ShaderProgram* program = new ShaderProgram(progObj);
+		mProgramDict[programName] = program;
+		return true;
+	}
+
+
 	// get registered shader program.
 	// if there does not exist a matched shader program of given name,
 	// it'll return the NULL.
@@ -85,39 +168,38 @@ namespace sark{
 	}
 
 	// create shader object
-	ShaderDictionary::ObjectHandle ShaderDictionary::CreateShader(GLenum shaderType, const std::vector<const char*>& shaders){
+	ShaderDictionary::ObjectHandle ShaderDictionary::CreateShader(GLenum shaderType,
+		CompileVersion version, std::list<std::string>& sources)
+	{
+		switch (version){
+		case VERSION_330:
+			sources.push_front("#version 330\r\n");
+			break;
+		case VERSION_400:
+			sources.push_front("#version 400\r\n");
+			break;
+		case VERSION_410:
+			sources.push_front("#version 410\r\n");
+			break;
+		case VERSION_420:
+			sources.push_front("#version 420\r\n");
+			break;
+		case VERSION_430:
+			sources.push_front("#version 430\r\n");
+			break;
+		default:
+			return 0;
+		}
+
 		ObjectHandle newShaderHandle = glCreateShader(shaderType);
 		if (newShaderHandle == 0)
 			return 0;
 
-		uinteger count = shaders.size();
-		std::ifstream fin;
-		char** sources = new char*[count];
-		for (uinteger i = 0; i < count; i++){
-			fin.open(shaders[i], std::ios::beg);
-			if (!fin.is_open()){
-				for (uinteger k = 0; k < i; k++){
-					delete[] sources[k];
-				}
-				delete[] sources;
-				return 0;
-			}
-
-			fin.seekg(0, std::ios::end);
-			uinteger length = (uinteger)fin.tellg();
-			fin.seekg(0, std::ios::beg);
-
-			sources[i] = new char[length + 1];
-			memset(sources[i], NULL, length + 1);
-			fin.read(sources[i], length);
-			fin.close();
+		std::vector<const char*> raw_vec;
+		for (std::list<std::string>::iterator itr = sources.begin(); itr != sources.end(); itr++){
+			raw_vec.push_back(itr->c_str());
 		}
-
-		glShaderSource(newShaderHandle, count, (const char**)(sources), NULL);
-		for (uinteger i = 0; i < count; i++){
-			delete[] sources[i];
-		}
-		delete[] sources;
+		glShaderSource(newShaderHandle, raw_vec.size(), (const char**)(&raw_vec[0]), NULL);
 
 		glCompileShader(newShaderHandle);
 
@@ -128,6 +210,27 @@ namespace sark{
 		return newShaderHandle;
 	}
 
+	// read shader string sources from files
+	bool ShaderDictionary::ReadSources(const std::vector<const char*>& files,
+		std::list<std::string>& buffer)
+	{
+		std::ifstream fin;
+		uinteger count = files.size();
+		for (uinteger i = 0; i < count; i++){
+			fin.open(files[i], std::ios::beg);
+			if (!fin.is_open()){
+				buffer.clear();
+				return false;
+			}
+
+			buffer.push_back(
+				std::string(std::istreambuf_iterator<char>(fin),
+				std::istreambuf_iterator<char>())
+				);
+		}
+		fin.close();
+		return true;
+	}
 
 	// check shader after compilation. it'll log the info if there are compilation errors.
 	bool ShaderDictionary::CheckShader(ObjectHandle obj){
