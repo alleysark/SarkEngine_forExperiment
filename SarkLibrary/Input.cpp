@@ -113,55 +113,80 @@ namespace sark{
 	}
 
 	void Input::Mouse::MovementUpdate(uint32 x, uint32 y){
-		if ((mActiveStates&STATE_LBUTTON) != 0){
-			TriggerEvent(EVENT_LBUTTON_DRAG, Position2(x, y), 0);
+		if (IsLButtonDown()){
+			StateOn(STATE_LDRAGGING);
+			TriggerEvent(EVENT_LBUTTON_DRAG, x, y, 0);
 		}
-		else if ((mActiveStates&STATE_MBUTTON) != 0){
-			TriggerEvent(EVENT_MBUTTON_DRAG, Position2(x, y), 0);
+		else if (IsMButtonDown()){
+			StateOn(STATE_MDRAGGING);
+			TriggerEvent(EVENT_MBUTTON_DRAG, x, y, 0);
 		}
-		else if ((mActiveStates&STATE_RBUTTON) != 0){
-			TriggerEvent(EVENT_RBUTTON_DRAG, Position2(x, y), 0);
+		else if (IsRButtonDown()){
+			StateOn(STATE_RDRAGGING);
+			TriggerEvent(EVENT_RBUTTON_DRAG, x, y, 0);
 		}
 		else{
-			TriggerEvent(EVENT_MOVE, Position2(x, y), 0);
+			TriggerEvent(EVENT_MOVE, x, y, 0);
 		}
 	}
 
 	void Input::Mouse::LButtonUpdate(uint32 x, uint32 y){
-		if ((mActiveStates&STATE_LBUTTON) == 0){// down
-			mActiveStates |= STATE_LBUTTON;
+		if (!IsLButtonDown()){
+			StateOn(STATE_LBUTTON);
+			TriggerEvent(EVENT_LBUTTON_DOWN, x, y, 0);
 		}
-		else{// up
-			mActiveStates ^= STATE_LBUTTON;
-			TriggerEvent(EVENT_LBUTTON_CLICK, Position2(x, y), 0);
+		else{
+			StateOff(STATE_LBUTTON);
+			if (IsLDragging()){
+				TriggerEvent(EVENT_LBUTTON_UP, x, y, 0);
+				StateOff(STATE_LDRAGGING);
+			}
+			else{
+				TriggerEvent(EVENT_LBUTTON_CLICK, x, y, 0);
+			}
 		}
 	}
 
 	void Input::Mouse::MButtonUpdate(uint32 x, uint32 y){
-		if ((mActiveStates&STATE_MBUTTON) == 0){// down
-			mActiveStates |= STATE_MBUTTON;
+		if (!IsMButtonDown()){
+			StateOn(STATE_MBUTTON);
+			TriggerEvent(EVENT_MBUTTON_DOWN, x, y, 0);
 		}
-		else{// up
-			mActiveStates ^= STATE_MBUTTON;
-			TriggerEvent(EVENT_MBUTTON_CLICK, Position2(x, y), 0);
+		else{
+			StateOff(STATE_MBUTTON);
+			if (IsMDragging()){
+				TriggerEvent(EVENT_MBUTTON_UP, x, y, 0);
+				StateOff(STATE_MDRAGGING);
+			}
+			else{
+				TriggerEvent(EVENT_MBUTTON_CLICK, x, y, 0);
+			}
 		}
 	}
 
 	void Input::Mouse::RButtonUpdate(uint32 x, uint32 y){
-		if ((mActiveStates&STATE_RBUTTON) == 0){// down
-			mActiveStates |= STATE_RBUTTON;
+		if (!IsRButtonDown()){
+			StateOn(STATE_RBUTTON);
+			TriggerEvent(EVENT_RBUTTON_DOWN, x, y, 0);
 		}
-		else{// up
-			mActiveStates ^= STATE_RBUTTON;
-			TriggerEvent(EVENT_RBUTTON_CLICK, Position2(x, y), 0);
+		else{
+			StateOff(STATE_RBUTTON);
+			if (IsRDragging()){
+				TriggerEvent(EVENT_RBUTTON_UP, x, y, 0);
+				StateOff(STATE_RDRAGGING);
+			}
+			else{
+				TriggerEvent(EVENT_RBUTTON_CLICK, x, y, 0);
+			}
 		}
 	}
 
 	void Input::Mouse::WheelUpdate(uint32 x, uint32 y, real delta){
 		if ((mActiveStates&STATE_MBUTTON) != 0)
 			return;
-		TriggerEvent(EVENT_WHEEL, Position2(x, y), delta);
+		TriggerEvent(EVENT_WHEEL, x, y, delta);
 	}
+
 
 	bool Input::Mouse::IsLButtonDown() const{
 		return ((mActiveStates&STATE_LBUTTON) != 0);
@@ -173,6 +198,15 @@ namespace sark{
 		return ((mActiveStates&STATE_RBUTTON) != 0);
 	}
 
+	bool Input::Mouse::IsLDragging() const{
+		return ((mActiveStates&STATE_LDRAGGING) != 0);
+	}
+	bool Input::Mouse::IsMDragging() const{
+		return ((mActiveStates&STATE_MDRAGGING) != 0);
+	}
+	bool Input::Mouse::IsRDragging() const{
+		return ((mActiveStates&STATE_RDRAGGING) != 0);
+	}
 
 	Input::Keyboard Input::keyboard;
 	Input::Mouse Input::mouse;

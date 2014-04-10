@@ -155,7 +155,11 @@ namespace sark{
 				STATE_MBUTTON = 1 << 2,
 				STATE_RBUTTON = 1 << 3,
 
-				STATE_WHEEL = 1 << 4,
+				STATE_LDRAGGING = 1 << 4,
+				STATE_MDRAGGING = 1 << 5,
+				STATE_RDRAGGING = 1 << 6,
+
+				STATE_WHEEL = 1 << 7,
 			};
 
 			enum MouseEvent{
@@ -165,6 +169,16 @@ namespace sark{
 				EVENT_LBUTTON_DRAG,
 				EVENT_MBUTTON_DRAG,
 				EVENT_RBUTTON_DRAG,
+
+				// button down
+				EVENT_LBUTTON_DOWN,
+				EVENT_MBUTTON_DOWN,
+				EVENT_RBUTTON_DOWN,
+
+				// button up
+				EVENT_LBUTTON_UP,
+				EVENT_MBUTTON_UP,
+				EVENT_RBUTTON_UP,
 
 				// click: button down and up
 				EVENT_LBUTTON_CLICK,
@@ -200,10 +214,21 @@ namespace sark{
 			bool IsMButtonDown() const;
 			bool IsRButtonDown() const;
 
+			bool IsLDragging() const;
+			bool IsMDragging() const;
+			bool IsRDragging() const;
+
 		private:
-			inline void TriggerEvent(MouseEvent evt, const Position2& pos, real extra){
+			inline void StateOn(const MouseState& state){
+				mActiveStates |= state;
+			}
+			inline void StateOff(const MouseState& state){
+				mActiveStates ^= state;
+			}
+
+			inline void TriggerEvent(MouseEvent evt, const uint32& x, const uint32& y, const real& extra){
 				if (mEventHandlers[evt])
-					mEventHandlers[evt](pos, extra);
+					mEventHandlers[evt](Position2(x, y), extra);
 			}
 		};
 
