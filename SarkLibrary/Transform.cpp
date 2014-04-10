@@ -4,7 +4,8 @@
 namespace sark{
 
 	Transform::Transform(ASceneComponent* reference)
-		: mReference(reference), mScale(1.f), mLocalTM(true), mAbsoluteTM(true)
+		: mReference(reference), mTranslation(0), mRotator(0, 0, 0, 1), mScale(1.f),
+		mLocalTM(true), mAbsoluteTM(true)
 	{}
 	Transform::~Transform(){}
 
@@ -37,15 +38,13 @@ namespace sark{
 			mLocalTM.m[1][3] = mTranslation.y;
 			mLocalTM.m[2][3] = mTranslation.z;
 
-			if (mScale != Vector3(1.f, 1.f, 1.f)){
-				Matrix4 sMat;
-				sMat.m[0][0] = mScale.x;
-				sMat.m[1][1] = mScale.y;
-				sMat.m[2][2] = mScale.z;
-				sMat.m[3][3] = 1.f;
-
+			if (mScale.x!=1 || mScale.y!=1 || mScale.z!=1){
 				// mLocalTM = (T*R) * sMat
-				mLocalTM *= sMat;
+				for (integer i = 0; i < 3; i++){
+					mLocalTM.row[i].x *= mScale.x;
+					mLocalTM.row[i].y *= mScale.y;
+					mLocalTM.row[i].z *= mScale.z;
+				}
 			}
 		}
 		return mLocalTM;
@@ -58,17 +57,17 @@ namespace sark{
 	}
 
 	// get world space direction.
-	// formal direction vector is (0,0,-1)
+	// formal direction vector is Vector3::Forward
 	const Vector3 Transform::GetDirection(){
 		const Matrix4& myAbsMat = GetMatrix();
 
 		if (myAbsMat.IsIdentity()){
-			return Vector3(0, 0, -1);
+			return Vector3::Forward;
 		}
 		else{
 			// getting rotation factor
 			Matrix3 rotMat(myAbsMat.row[0].xyz, myAbsMat.row[1].xyz, myAbsMat.row[2].xyz);
-			return rotMat * Vector3(0, 0, -1);
+			return rotMat * Vector3::Forward;
 		}
 	}
 
@@ -111,13 +110,28 @@ namespace sark{
 	}
 
 	// rotate it from given axis and theta
-	void Transform::Rotate(const Vector3& axis, real theta){
-		mRotator.MakeRotatingQuat(axis, theta);
+	void Transform::Rotate(const Vector3& axis, real theta, bool axis_normalized){
+		mRotator.MakeRotatingQuat(axis, theta, axis_normalized);
 		TransformStained();
 	}
 	// rotate it from given rotating factor roll(z-axis), pitch(x-axis) and yaw(y-axis)
 	void Transform::Rotate(real roll, real pitch, real yaw){
 		mRotator.MakeRotatingQuat(roll, pitch, yaw);
+		TransformStained();
+	}
+
+	// rotate it additionally from given axis and theta
+	void Transform::RotateMore(const Vector3& axis, real theta, bool axis_normalized){
+		Quaternion q;
+		q.MakeRotatingQuat(axis, theta, axis_normalized);
+		mRotator *= q;
+		TransformStained();
+	}
+	// rotate it additionally from given rotating factor roll(z-axis), pitch(x-axis) and yaw(y-axis)
+	void Transform::RotateMore(real roll, real pitch, real yaw){
+		Quaternion q;
+		q.MakeRotatingQuat(roll, pitch, yaw);
+		mRotator *= q;
 		TransformStained();
 	}
 
@@ -137,21 +151,24 @@ namespace sark{
 	// when the properties (translation and rotator quaternion) are changed.
 	// if there is reference scene component, it sets the changed flag of absolute 
 	// transform of reference scene component.
+	// it also sets the 'is transformed' factors of reference scene component
+	// and its offspring's.
 	void Transform::TransformStained(bool callOnLocal){
 		if (callOnLocal){
 			STAIN_TRANSMATRIX(mLocalTM);
+			mReference->mIsTransformed = true;
 		}
 		STAIN_TRANSMATRIX(mAbsoluteTM);
 
 		if (mReference != NULL){
-			
 			ASceneComponent::ChildComponentContainer::iterator itr
 				= mReference->GetChildren().begin();
 			ASceneComponent::ChildComponentContainer::iterator end
 				= mReference->GetChildren().end();
 
 			for (; itr != end; itr++){
-				(*itr)->GetTransform().TransformStained(false);
+				(*itr)->mIsTransformed = true;
+				(*itr)->mTransform.TransformStained(false);
 			}
 		}
 	}

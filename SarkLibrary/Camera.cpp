@@ -56,7 +56,6 @@ namespace sark{
 		zNear = _znear;
 		zFar = _zfar;
 
-
 		// calculate projection matrix
 		projMatrix.MakeZero();
 		projMatrix.m[0][0] = zNear / width;
@@ -71,13 +70,6 @@ namespace sark{
 	//=============================================
 	//		Camera class implementation
 	//=============================================
-
-	Camera::Camera()
-		: mVolume(90.f, 1.f, 0.1f, 100.f),
-		mEye(0.f), mLookat(0.f, 0.f, -1.f), mUp(0.f, 1.f, 0.f)
-	{
-		mViewMatrix.MakeIdentity();
-	}
 
 	Camera::Camera(const Vector3& eye, const Vector3& lookat, const Vector3& up)
 		: mVolume(90.f, 1.f, 0.1f, 100.f),
@@ -101,7 +93,6 @@ namespace sark{
 
 		Vector3& v = mViewMatrix.row[1].xyz;
 		v = n.Cross(u);
-		v.Normalize();
 
 		mViewMatrix.m[0][3] = -mEye.Dot(u);
 		mViewMatrix.m[1][3] = -mEye.Dot(v);
@@ -264,26 +255,43 @@ namespace sark{
 
 	// basic functions
 
+	// move camera into direction, fix lookat or not
+	void Camera::MoveTo(const Vector3& direction, real distance, bool fixLookat, bool dir_normalized){
+		if (dir_normalized)
+			mEye = mEye + distance * direction;
+		else
+			mEye = mEye + distance * direction.Normal();
+
+		if (!fixLookat){
+			if (dir_normalized)
+				mLookat = mLookat + distance * direction;
+			else
+				mLookat = mLookat + distance * direction.Normal();
+		}
+
+		UpdateViewMatrix();
+	}
+
 	// move camera into forward direction (positive distance goes to forward)
 	void Camera::MoveForward(real distance){
-		mEye = mEye - distance*mViewMatrix.row[2].xyz;
-		mLookat = mLookat - distance*mViewMatrix.row[2].xyz;
+		mEye = mEye - distance*GetBasisN();
+		mLookat = mLookat - distance*GetBasisN();
 
 		UpdateViewMatrix();
 	}
 
 	// move camera into sideward direction (positive distance goes to right)
 	void Camera::MoveSideward(real distance){
-		mEye = mEye + distance*mViewMatrix.row[0].xyz;
-		mLookat = mLookat + distance*mViewMatrix.row[0].xyz;
+		mEye = mEye + distance*GetBasisU();
+		mLookat = mLookat + distance*GetBasisU();
 
 		UpdateViewMatrix();
 	}
 
 	// move camera into upward direction (positive distance goes to up)
 	void Camera::MoveUpward(real distance){
-		mEye = mEye + distance*mViewMatrix.row[1].xyz;
-		mLookat = mLookat + distance*mViewMatrix.row[1].xyz;
+		mEye = mEye + distance*GetBasisV();
+		mLookat = mLookat + distance*GetBasisV();
 
 		UpdateViewMatrix();
 	}
@@ -292,8 +300,8 @@ namespace sark{
 	// it nod its sight (positive radian makes it to see up)
 	void Camera::Pitch(real rad){
 		Vector3 lookDirection = mLookat - mEye;
-		Quaternion::Rotate(lookDirection, mViewMatrix.row[0].xyz, rad);
-		Quaternion::Rotate(mUp, mViewMatrix.row[0].xyz, rad);
+		Quaternion::Rotate(lookDirection, GetBasisU(), rad, true);
+		Quaternion::Rotate(mUp, GetBasisU(), rad, true);
 		mLookat = mEye + lookDirection;
 
 		UpdateViewMatrix();
@@ -303,7 +311,8 @@ namespace sark{
 	// it shakes its sight (positive radian makes it to see left)
 	void Camera::Yaw(real rad){
 		Vector3 lookDirection = mLookat - mEye;
-		Quaternion::Rotate(lookDirection, mViewMatrix.row[1].xyz, rad);
+		Quaternion::Rotate(lookDirection, GetBasisV(), rad, true);
+		Quaternion::Rotate(mUp, GetBasisV(), rad, true);
 		mLookat = mEye + lookDirection;
 
 		UpdateViewMatrix();
@@ -312,7 +321,7 @@ namespace sark{
 	// turn camera on an axis of n (likes z)
 	// it tilt its sight (positive radian makes it to see left-tilting)
 	void Camera::Roll(real rad){
-		Quaternion::Rotate(mUp, mViewMatrix.row[2].xyz, rad);
+		Quaternion::Rotate(mUp, GetBasisN(), rad, true);
 		UpdateViewMatrix();
 	}
 

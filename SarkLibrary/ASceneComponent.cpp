@@ -149,6 +149,11 @@ namespace sark{
 		return mTransform;
 	}
 
+	// is this scene component transformed?
+	bool ASceneComponent::IsTransformed() const{
+		return mIsTransformed;
+	}
+
 	// is this component activated?
 	bool ASceneComponent::IsActive() const{
 		return mActivated;

@@ -52,7 +52,7 @@ namespace sark{
 		const Position3 GetPosition();
 
 		// get world space direction.
-		// formal direction vector is (0,0,-1)
+		// formal direction vector is Vector3::Forward
 		const Vector3 GetDirection();
 
 		// get local position (translation) 
@@ -76,9 +76,14 @@ namespace sark{
 		void TranslateMore(real add_x, real add_y, real add_z);
 
 		// rotate it from given axis and theta
-		void Rotate(const Vector3& axis, real theta);
+		void Rotate(const Vector3& axis, real theta, bool axis_normalized = false);
 		// rotate it from given rotating factor roll(z-axis), pitch(x-axis) and yaw(y-axis)
 		void Rotate(real roll, real pitch, real yaw);
+
+		// rotate it additionally from given axis and theta
+		void RotateMore(const Vector3& axis, real theta, bool axis_normalized = false);
+		// rotate it additionally from given rotating factor roll(z-axis), pitch(x-axis) and yaw(y-axis)
+		void RotateMore(real roll, real pitch, real yaw);
 
 		// scale it by given scaling factor
 		void Scale(const Vector3& scaleAs);
@@ -90,6 +95,8 @@ namespace sark{
 		// when the properties (translation and rotator quaternion) are changed.
 		// if there is reference scene component, it sets the stained flag of absolute 
 		// transform of reference scene component.
+		// it also sets the 'is transformed' factors of reference scene component
+		// and its offspring's.
 		void TransformStained(bool callOnLocal = true);
 	};
 

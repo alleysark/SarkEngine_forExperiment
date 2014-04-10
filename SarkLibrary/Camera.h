@@ -91,8 +91,7 @@ namespace sark{
 		ViewVolume mVolume;
 
 	public:
-		Camera();
-		Camera(const Vector3& eye, const Vector3& lookat, const Vector3& up = Vector3(0.f, 1.f, 0.f));
+		Camera(const Vector3& eye = Vector3(0), const Vector3& lookat = Vector3::Forward, const Vector3& up = Vector3::Up);
 		virtual ~Camera();
 
 	private:
@@ -167,6 +166,9 @@ namespace sark{
 
 
 		// basic camera functions
+
+		// move camera into direction, fix lookat or not
+		void MoveTo(const Vector3& direction, real distance, bool fixLookat = false, bool dir_normalized = false);
 
 		// move camera into forward direction (positive distance goes to forward)
 		void MoveForward(real distance);
