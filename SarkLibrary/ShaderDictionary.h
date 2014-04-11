@@ -65,12 +65,13 @@ namespace sark{
 
 	private:
 		// create shader object
-		ObjectHandle CreateShader(GLenum shaderType, CompileVersion version,
-			std::list<std::string>& sources);
+		ObjectHandle CreateShader(GLenum shaderType, const std::vector<const char*>& sources);
 
 		// read shader string sources from files.
-		bool ReadSources(const std::vector<const char*>& files,
-			std::list<std::string>& buffer);
+		bool ReadSources(const std::vector<const char*>& files, std::vector<std::string>& buffer);
+
+		// get version string
+		const char* GetVersionString(CompileVersion version);
 
 		// check shader after compil. it'll log the info if there are compilation errors.
 		bool CheckShader(ObjectHandle obj);

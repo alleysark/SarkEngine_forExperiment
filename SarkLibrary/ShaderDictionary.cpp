@@ -28,14 +28,21 @@ namespace sark{
 		if (progObj == 0)
 			return false;
 
+		std::vector<std::string> sourceBuf;
+		std::vector<const char*> sources;
+
 		// read vertex shader sources
-		std::list<std::string> sourceBuf;
 		if (!ReadSources(vertexShaderFiles, sourceBuf)){
 			glDeleteProgram(progObj);
 			return false;
 		}
 		// create vertex shader
-		ObjectHandle vtxObj = CreateShader(GL_VERTEX_SHADER, version, sourceBuf);
+		sources.push_back(GetVersionString(version));
+		for (std::vector<std::string>::iterator itr = sourceBuf.begin();
+			itr != sourceBuf.end(); itr++){
+			sources.push_back(itr->c_str());
+		}
+		ObjectHandle vtxObj = CreateShader(GL_VERTEX_SHADER, sources);
 		if (vtxObj == 0){
 			glDeleteProgram(progObj);
 			return false;
@@ -49,7 +56,13 @@ namespace sark{
 			return false;
 		}
 		// create fragment shader
-		ObjectHandle fragObj = CreateShader(GL_FRAGMENT_SHADER, version, sourceBuf);
+		sources.clear();
+		sources.push_back(GetVersionString(version));
+		for (std::vector<std::string>::iterator itr = sourceBuf.begin();
+			itr != sourceBuf.end(); itr++){
+			sources.push_back(itr->c_str());
+		}
+		ObjectHandle fragObj = CreateShader(GL_FRAGMENT_SHADER, sources);
 		if (fragObj == 0){
 			glDeleteShader(vtxObj);
 			glDeleteProgram(progObj);
@@ -101,18 +114,28 @@ namespace sark{
 		if (progObj == 0)
 			return false;
 
+		std::vector<const char*> sources;
+
 		// create vertex shader
-		std::list<std::string> sourceBuf(vertexShaderSources.begin(), vertexShaderSources.end());
-		ObjectHandle vtxObj = CreateShader(GL_VERTEX_SHADER, version, sourceBuf);
+		sources.push_back(GetVersionString(version));
+		for (std::vector<const char*>::const_iterator itr = vertexShaderSources.cbegin();
+			itr != vertexShaderSources.cend(); itr++){
+			sources.push_back(*itr);
+		}
+		ObjectHandle vtxObj = CreateShader(GL_VERTEX_SHADER, sources);
 		if (vtxObj == 0){
 			glDeleteProgram(progObj);
 			return false;
 		}
 
 		// create fragment shader
-		sourceBuf.clear();
-		sourceBuf.assign(fragmentShaderSources.begin(), fragmentShaderSources.end());
-		ObjectHandle fragObj = CreateShader(GL_FRAGMENT_SHADER, version, sourceBuf);
+		sources.clear();
+		sources.push_back(GetVersionString(version));
+		for (std::vector<const char*>::const_iterator itr = fragmentShaderSources.cbegin();
+			itr != fragmentShaderSources.cend(); itr++){
+			sources.push_back(*itr);
+		}
+		ObjectHandle fragObj = CreateShader(GL_FRAGMENT_SHADER, sources);
 		if (fragObj == 0){
 			glDeleteShader(vtxObj);
 			glDeleteProgram(progObj);
@@ -169,37 +192,13 @@ namespace sark{
 
 	// create shader object
 	ShaderDictionary::ObjectHandle ShaderDictionary::CreateShader(GLenum shaderType,
-		CompileVersion version, std::list<std::string>& sources)
+		const std::vector<const char*>& sources)
 	{
-		switch (version){
-		case VERSION_330:
-			sources.push_front("#version 330\r\n");
-			break;
-		case VERSION_400:
-			sources.push_front("#version 400\r\n");
-			break;
-		case VERSION_410:
-			sources.push_front("#version 410\r\n");
-			break;
-		case VERSION_420:
-			sources.push_front("#version 420\r\n");
-			break;
-		case VERSION_430:
-			sources.push_front("#version 430\r\n");
-			break;
-		default:
-			return 0;
-		}
-
 		ObjectHandle newShaderHandle = glCreateShader(shaderType);
 		if (newShaderHandle == 0)
 			return 0;
 
-		std::vector<const char*> raw_vec;
-		for (std::list<std::string>::iterator itr = sources.begin(); itr != sources.end(); itr++){
-			raw_vec.push_back(itr->c_str());
-		}
-		glShaderSource(newShaderHandle, raw_vec.size(), (const char**)(&raw_vec[0]), NULL);
+		glShaderSource(newShaderHandle, sources.size(), (const char**)(&sources[0]), NULL);
 
 		glCompileShader(newShaderHandle);
 
@@ -212,7 +211,7 @@ namespace sark{
 
 	// read shader string sources from files
 	bool ShaderDictionary::ReadSources(const std::vector<const char*>& files,
-		std::list<std::string>& buffer)
+		std::vector<std::string>& buffer)
 	{
 		std::ifstream fin;
 		uinteger count = files.size();
@@ -230,6 +229,24 @@ namespace sark{
 		}
 		fin.close();
 		return true;
+	}
+
+	// get version string
+	const char* ShaderDictionary::GetVersionString(CompileVersion version){
+		switch (version){
+		case VERSION_330:
+		default:
+			return "#version 330\r\n";
+
+		case VERSION_400:
+			return "#version 400\r\n";
+		case VERSION_410:
+			return "#version 410\r\n";
+		case VERSION_420:
+			return "#version 420\r\n";
+		case VERSION_430:
+			return "#version 430\r\n";
+		}
 	}
 
 	// check shader after compilation. it'll log the info if there are compilation errors.
