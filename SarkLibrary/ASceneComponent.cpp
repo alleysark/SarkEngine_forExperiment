@@ -19,6 +19,9 @@ namespace sark{
 			mComponentName = std::to_string(mComponentId);
 		else
 			mComponentName = name;
+
+		if (parent != NULL)
+			parent->PushChild(this);
 	}
 
 	// every derived class have to ensure release of your resources.
