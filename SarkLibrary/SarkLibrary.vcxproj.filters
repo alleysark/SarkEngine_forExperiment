@@ -84,6 +84,9 @@
     <ClCompile Include="ALight.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
+    <ClCompile Include="RigidSphere.cpp">
+      <Filter>Header Files\core-util\scene components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -142,6 +145,9 @@
     </ClInclude>
     <ClInclude Include="ALight.h">
       <Filter>Header Files\core-system</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidSphere.h">
+      <Filter>Header Files\core-util\scene components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
