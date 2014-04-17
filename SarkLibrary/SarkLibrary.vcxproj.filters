@@ -87,6 +87,9 @@
     <ClCompile Include="RigidSphere.cpp">
       <Filter>Header Files\core-util\scene components</Filter>
     </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Header Files\core-util\scene components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -147,6 +150,9 @@
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
     <ClInclude Include="RigidSphere.h">
+      <Filter>Header Files\core-util\scene components</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
       <Filter>Header Files\core-util\scene components</Filter>
     </ClInclude>
   </ItemGroup>
