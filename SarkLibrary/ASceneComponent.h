@@ -42,16 +42,6 @@ namespace sark{
 		// local scene component transform object
 		Transform mTransform;
 
-	private:
-		// is this scene component transformed in world space?
-		// it is useful to check whether the transformation-dependent factors
-		// like bounding shapes, positional light are needed to be updated.
-		//
-		// *note: Transform will automatically change this factor
-		// and all offspring's factors when it is transformed.
-		// so it can't guarantee the only local transformation.
-		bool mIsTransformed;
-
 	public:
 		// component activation indicator
 		bool mActivated;
@@ -121,9 +111,6 @@ namespace sark{
 
 		// get transform object of this component. it is local transform object.
 		Transform& GetTransform();
-
-		// is this scene component transformed?
-		bool IsTransformed() const;
 
 		// get bounding shape. it is Nullable pointer.
 		virtual const IShape* GetBoundingShape() const = 0;

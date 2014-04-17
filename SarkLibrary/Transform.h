@@ -33,6 +33,13 @@ namespace sark{
 		// combined transform matrix of all ancestors
 		Matrix4 mAbsoluteTM;
 
+		// absolute position vector.
+		Position3 mAbsolutePosition;
+
+		// absolute direction vector. default Vector3::Forward
+		Vector3 mAbsoluteDirection;
+
+
 		// it can access the scene component object by this property
 		// (ASceneComponent regard this as friend)
 		ASceneComponent* mReference;
@@ -49,11 +56,11 @@ namespace sark{
 
 
 		// get world space position
-		const Position3 GetPosition();
+		const Position3& GetPosition();
 
 		// get world space direction.
 		// formal direction vector is Vector3::Forward
-		const Vector3 GetDirection();
+		const Vector3& GetDirection();
 
 		// get local position (translation) 
 		const Position3& GetLocalPosition() const;
@@ -98,6 +105,9 @@ namespace sark{
 		// it also sets the 'is transformed' factors of reference scene component
 		// and its offspring's.
 		void TransformStained(bool callOnLocal = true);
+
+		// apply whole transformation factors onto its matrices.
+		void UpdateTransform();
 	};
 
 }

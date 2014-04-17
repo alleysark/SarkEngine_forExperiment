@@ -79,9 +79,7 @@ namespace sark{
 	}
 
 	void RigidSphere::Update(){
-		if (IsTransformed()){
-			mSphere.pos = mTransform.GetPosition();
-		}
+		mSphere.pos = mTransform.GetPosition();
 	}
 
 	void RigidSphere::Render(){

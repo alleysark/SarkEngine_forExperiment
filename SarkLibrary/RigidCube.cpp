@@ -86,14 +86,12 @@ namespace sark{
 	}
 
 	void RigidCube::Update(){
-		if (IsTransformed()){
-			mUpdatedObox.pos = mTransform.GetPosition();
-			const Matrix4& mat = mTransform.GetMatrix();
-			Matrix3 rotmat(mat.row[0].xyz, mat.row[1].xyz, mat.row[2].xyz);
-			for (integer i = 0; i < 3; i++){
-				mUpdatedObox.axis[i].xyz = rotmat * mOBox.axis[i].xyz;
-				mUpdatedObox.axis[i].w = mOBox.axis[i].w;
-			}
+		mUpdatedObox.pos = mTransform.GetPosition();
+		const Matrix4& mat = mTransform.GetMatrix();
+		Matrix3 rotmat(mat.row[0].xyz, mat.row[1].xyz, mat.row[2].xyz);
+		for (integer i = 0; i < 3; i++){
+			mUpdatedObox.axis[i].xyz = rotmat * mOBox.axis[i].xyz;
+			mUpdatedObox.axis[i].w = mOBox.axis[i].w;
 		}
 	}
 
