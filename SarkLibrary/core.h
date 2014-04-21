@@ -780,6 +780,11 @@ namespace sark{
 		// convert quaternion to matrix 4D (only for rotation quaternion)
 		const Matrix4 ToMatrix4(bool isNormalized = false);
 
+		// convert from matrix 3D (only for rotation matrix)
+		void FromMatrix3(const Matrix3& mat);
+
+		// convert from matrix 4D (only for rotation matrix)
+		void FromMatrix4(const Matrix4& mat);
 
 		// rotate input vector from given axis vector and theta
 		static void Rotate(Vector3& v, const Vector3& axis, real theta, bool axis_normalized = false);

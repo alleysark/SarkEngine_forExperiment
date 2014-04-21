@@ -1350,6 +1350,77 @@ namespace sark{
 			0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
+	// convert from matrix 3D (only for rotation matrix)
+	void Quaternion::FromMatrix3(const Matrix3& mat){
+		// implementation from:
+		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+		real tr = mat.m[0][0] + mat.m[1][1] + mat.m[2][2];
+
+		if (tr > 0) {
+			real S = math::sqrt(tr + 1.f) * 2.f; // S=4*qw 
+			s = 0.25f * S;
+			x = (mat.m[2][1] - mat.m[1][2]) / S;
+			y = (mat.m[0][2] - mat.m[2][0]) / S;
+			z = (mat.m[1][0] - mat.m[0][1]) / S;
+		}
+		else if ((mat.m[0][0] > mat.m[1][1])&(mat.m[0][0] > mat.m[2][2])) {
+			real S = math::sqrt(1.f + mat.m[0][0] - mat.m[1][1] - mat.m[2][2]) * 2.f; // S=4*qx 
+			s = (mat.m[2][1] - mat.m[1][2]) / S;
+			x = 0.25f * S;
+			y = (mat.m[0][1] + mat.m[1][0]) / S;
+			z = (mat.m[0][2] + mat.m[2][0]) / S;
+		}
+		else if (mat.m[1][1] > mat.m[2][2]) {
+			real S = math::sqrt(1.f + mat.m[1][1] - mat.m[0][0] - mat.m[2][2]) * 2.f; // S=4*qy
+			s = (mat.m[0][2] - mat.m[2][0]) / S;
+			x = (mat.m[0][1] + mat.m[1][0]) / S;
+			y = 0.25f * S;
+			z = (mat.m[1][2] + mat.m[2][1]) / S;
+		}
+		else {
+			real S = math::sqrt(1.f + mat.m[2][2] - mat.m[0][0] - mat.m[1][1]) * 2.f; // S=4*qz
+			s = (mat.m[1][0] - mat.m[0][1]) / S;
+			x = (mat.m[0][2] + mat.m[2][0]) / S;
+			y = (mat.m[1][2] + mat.m[2][1]) / S;
+			z = 0.25f * S;
+		}
+	}
+
+	// convert from matrix 4D (only for rotation matrix)
+	void Quaternion::FromMatrix4(const Matrix4& mat){
+		// implementation from:
+		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+		real tr = mat.m[0][0] + mat.m[1][1] + mat.m[2][2];
+
+		if (tr > 0) {
+			real S = math::sqrt(tr + 1.f) * 2.f; // S=4*qw 
+			s = 0.25f * S;
+			x = (mat.m[2][1] - mat.m[1][2]) / S;
+			y = (mat.m[0][2] - mat.m[2][0]) / S;
+			z = (mat.m[1][0] - mat.m[0][1]) / S;
+		}
+		else if ((mat.m[0][0] > mat.m[1][1])&(mat.m[0][0] > mat.m[2][2])) {
+			real S = math::sqrt(1.f + mat.m[0][0] - mat.m[1][1] - mat.m[2][2]) * 2.f; // S=4*qx 
+			s = (mat.m[2][1] - mat.m[1][2]) / S;
+			x = 0.25f * S;
+			y = (mat.m[0][1] + mat.m[1][0]) / S;
+			z = (mat.m[0][2] + mat.m[2][0]) / S;
+		}
+		else if (mat.m[1][1] > mat.m[2][2]) {
+			real S = math::sqrt(1.f + mat.m[1][1] - mat.m[0][0] - mat.m[2][2]) * 2.f; // S=4*qy
+			s = (mat.m[0][2] - mat.m[2][0]) / S;
+			x = (mat.m[0][1] + mat.m[1][0]) / S;
+			y = 0.25f * S;
+			z = (mat.m[1][2] + mat.m[2][1]) / S;
+		}
+		else {
+			real S = math::sqrt(1.f + mat.m[2][2] - mat.m[0][0] - mat.m[1][1]) * 2.f; // S=4*qz
+			s = (mat.m[1][0] - mat.m[0][1]) / S;
+			x = (mat.m[0][2] + mat.m[2][0]) / S;
+			y = (mat.m[1][2] + mat.m[2][1]) / S;
+			z = 0.25f * S;
+		}
+	}
 
 	// rotate input vector from given axis vector and theta
 	void Quaternion::Rotate(Vector3& v, const Vector3& axis, real theta, bool axis_normalized){
