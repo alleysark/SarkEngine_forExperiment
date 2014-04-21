@@ -1363,7 +1363,7 @@ namespace sark{
 			y = (mat.m[0][2] - mat.m[2][0]) / S;
 			z = (mat.m[1][0] - mat.m[0][1]) / S;
 		}
-		else if ((mat.m[0][0] > mat.m[1][1])&(mat.m[0][0] > mat.m[2][2])) {
+		else if ((mat.m[0][0] > mat.m[1][1]) && (mat.m[0][0] > mat.m[2][2])) {
 			real S = math::sqrt(1.f + mat.m[0][0] - mat.m[1][1] - mat.m[2][2]) * 2.f; // S=4*qx 
 			s = (mat.m[2][1] - mat.m[1][2]) / S;
 			x = 0.25f * S;
@@ -1399,7 +1399,7 @@ namespace sark{
 			y = (mat.m[0][2] - mat.m[2][0]) / S;
 			z = (mat.m[1][0] - mat.m[0][1]) / S;
 		}
-		else if ((mat.m[0][0] > mat.m[1][1])&(mat.m[0][0] > mat.m[2][2])) {
+		else if ((mat.m[0][0] > mat.m[1][1]) && (mat.m[0][0] > mat.m[2][2])) {
 			real S = math::sqrt(1.f + mat.m[0][0] - mat.m[1][1] - mat.m[2][2]) * 2.f; // S=4*qx 
 			s = (mat.m[2][1] - mat.m[1][2]) / S;
 			x = 0.25f * S;
