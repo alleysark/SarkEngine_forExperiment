@@ -222,17 +222,33 @@ namespace sark{
 	const Ray Camera::ScreenToWorldRay(const Position2& screenCoord){
 		// from viewport transform,
 		// projection coord(px, py) can be calculated.
+		// px = (2/vp.W)(sx - vp.x) - 1
+		// py = -(2/vp.H)(sy - vp.y) + 1
 		real px = (2.f / mViewport.width) * (screenCoord.x - mViewport.x) - 1.f;
 		real py = -(2.f / mViewport.height) * (screenCoord.y - mViewport.y) + 1.f;
 
-		real cx, cy; // coord in camera near plane
+		Vector4 CS_dir; // camera space ray direction
 		if (mVolume.ortho){
 		}
 		else{
-			// cx = px * (zn*aspectr/cot(fovy/2))
-			// cy = py * (zn/cot(fovy/2))
-			cx = px * mVolume.zNear / mVolume.projMatrix.m[0][0];
-			cy = py * mVolume.zNear / mVolume.projMatrix.m[1][1];
+			// camera space to clip space
+			// C = (cx, cy, -n, 1)
+			//      [cx]   [m00*cx]   [(m00/n)cx]   [px]
+			// PT x [cy] = [m11*cy] > [(m11/n)cy] = [py]
+			//      [-n]   [   ?  ]   [    0    ]   [ 0]
+			//      [ 1]   [   n  ]   [    1    ]   [ 1]
+			// 
+			// cx = px * (n/m00)   px/m00
+			// cy = py * (n/m11) > py/m11
+			// cz = -n             -1
+			//
+			// CS_dir = C - EYE
+			// *note: CS_dir is not normalized, it just divided by 'n'
+			//        for convenience of computing.
+			CS_dir.x = px / mVolume.projMatrix.m[0][0];
+			CS_dir.y = py / mVolume.projMatrix.m[1][1];
+			CS_dir.z = -1.0f;
+			CS_dir.w = 0.0f;
 		}
 
 		// W = inv(VT) x C
@@ -240,16 +256,20 @@ namespace sark{
 		//   = inv(T) x inv(R) x C
 		//   = inv(T) x transp(R) x C.
 		// and inv(T) is translation into Eye
+		// but, CS_dir's w factor is zero. so,
 		const Vector3& u = GetBasisU();
 		const Vector3& v = GetBasisV();
 		const Vector3& n = GetBasisN();
-		Matrix4 invVT(
-			u.x, v.x, n.x, mEye.x,
-			u.y, v.y, n.y, mEye.y,
-			u.z, v.z, n.z, mEye.z,
-			0.f, 0.f, 0.f, 1.f);
-		Vector4 worldCoord = invVT * Vector4(cx, cy, -mVolume.zNear, 1);
-		return Ray(worldCoord.xyz, (worldCoord.xyz - mEye));
+		Vector3 WS_dir( // world space ray direction
+			u.x*CS_dir.x + v.x*CS_dir.y + n.x*CS_dir.z,
+			u.y*CS_dir.x + v.y*CS_dir.y + n.y*CS_dir.z,
+			u.z*CS_dir.x + v.z*CS_dir.y + n.z*CS_dir.z);
+
+		return Ray(
+			mEye + mVolume.zNear*WS_dir, // ray starts from zn plane
+			WS_dir, true, // actually, WS_dir doesn't normalized.
+			mVolume.zFar - mVolume.zNear // to zf plane
+			);
 	}
 
 
