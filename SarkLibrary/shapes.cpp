@@ -177,10 +177,16 @@ namespace sark{
 	}
 
 
-	// polyhedron
-	Polyhedron::Polyhedron(const Mesh& mesh, Transform& transform)
-		: IShape(IShape::POLYHEDRON), refMesh(mesh), refTransform(transform)
+	Polyhedron::Polyhedron() : IShape(IShape::POLYHEDRON){}
+
+	Polyhedron::Polyhedron(Mesh* referenceMesh, Transform* referenceTransform)
+		: IShape(IShape::POLYHEDRON), refMesh(referenceMesh), refTransform(referenceTransform)
 	{}
+
+	void Polyhedron::Set(Mesh* referenceMesh, Transform* referenceTransform){
+		refMesh = referenceMesh;
+		refTransform = referenceTransform;
+	}
 
 	bool Polyhedron::IsIntersectedWith(const IShape* shape) const{
 		switch (shape->GetType()){
@@ -295,20 +301,30 @@ namespace sark{
 	
 	// ray - polyhedron intersection
 	bool IsIntersected(const Ray* ray, const Polyhedron* poly){
-		const std::vector<Position3>& vertices = poly->refMesh.GetPositions();
-		const std::vector<Mesh::Face>& faces = poly->refMesh.GetFaces();
-		const Matrix4& transMat = poly->refTransform.GetMatrix();
+		const std::vector<Position3>& vertices = poly->refMesh->GetPositions();
+		const std::vector<Mesh::Face>& faces = poly->refMesh->GetFaces();
+
+		// transform ray into object space.
+		const Matrix4& TM = poly->refTransform->GetMatrix();
+		Matrix4 invTRS = TM.Inverse();
+		Matrix3 invRS = Matrix3(
+			TM.row[0].xyz,
+			TM.row[1].xyz,
+			TM.row[2].xyz).Inverse();
+		Ray os_ray(
+			(invTRS * Vector4(ray->pos, 1)).xyz,
+			invRS * ray->dir, true,
+			ray->limit);
 
 		std::vector<Mesh::Face>::const_iterator itr = faces.begin();
 		std::vector<Mesh::Face>::const_iterator end = faces.end();
 		for (; itr != end; itr++){
-			// calculate transformed vertices of indices a,b and c of current face.
-			Vector3 A = (transMat*Vector4(vertices[itr->a], 1)).xyz;
-			Vector3 B = (transMat*Vector4(vertices[itr->b], 1)).xyz;
-			Vector3 C = (transMat*Vector4(vertices[itr->c], 1)).xyz;
+			const Vector3& A = vertices[itr->a];
+			const Vector3& B = vertices[itr->b];
+			const Vector3& C = vertices[itr->c];
 			
 			// barycentric form of triangle plane =>
-			// P(v,w) = (1 - v - w)A + vB + wC; {0<=v<=1, 0<=w<=1}
+			// P(v,w) = (1 - v - w)A + vB + wC; {0<=v<=1, 0<=w<=1, 0<=v+w<=1}
 
 			// parametric equation of ray =>
 			// r(t) = o + t*d;
@@ -321,7 +337,7 @@ namespace sark{
 			// let these to be represented as follows,
 			Vector3 e1 = B - A;
 			Vector3 e2 = C - A;
-			Vector3 s = ray->pos - A;
+			Vector3 s = os_ray.pos - A;
 
 			// and it is linear equation with three variables.
 			//                [t]
@@ -341,7 +357,7 @@ namespace sark{
 			// [w]  det(A)  [(-d)¡¤(e1 X s)]  det(A)  [(s x e1)¡¤d ]
 			// , where det(A) is (e2 x e1)¡¤d
 
-			Vector3 p = ray->dir.Cross(e2);
+			Vector3 p = os_ray.dir.Cross(e2);
 			Vector3 q = s.Cross(e1);
 
 			real det = p.Dot(e1);
@@ -351,14 +367,14 @@ namespace sark{
 
 			real t = det * q.Dot(e2);
 			real v = det * p.Dot(s);
-			real w = det * q.Dot(ray->dir);
+			real w = det * q.Dot(os_ray.dir);
 
 			// from t,v and w, it can be tested whether ray intersects with triangle or not
-			if ((v < 0 || 1 < v) || (w < 0 || 1 < w))
-				continue;
-			if (t < 0 || ray->limit < t)
-				continue;
-			return true;
+			if (0 <= t && t <= os_ray.limit){
+				if ((0 <= v && v <= 1) && (0 <= w && w <= 1)
+					&& (0 <= v + w && v + w <= 1))
+					return true;
+			}
 		}
 		return false;
 	}

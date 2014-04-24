@@ -132,14 +132,17 @@ namespace sark{
 	// it has the reference of mesh and relation transform
 	class Polyhedron : public IShape{
 	public:
-		// const reference of mesh.
-		const Mesh& refMesh;
+		// reference of mesh.
+		Mesh* refMesh;
 
-		// const reference of transform
-		// (paradoxically, it can't be const for GetMatrix()..)
-		Transform& refTransform;
+		// reference of transform.
+		// it can't be const for calling GetMatrix()
+		Transform* refTransform;
 
-		Polyhedron(const Mesh& mesh, Transform& transform);
+		Polyhedron();
+		Polyhedron(Mesh* referenceMesh, Transform* referenceTransform);
+
+		void Set(Mesh* referenceMesh, Transform* referenceTransform);
 
 		bool IsIntersectedWith(const IShape* shape) const override;
 	};
