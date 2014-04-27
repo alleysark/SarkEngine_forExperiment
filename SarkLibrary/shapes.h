@@ -84,18 +84,20 @@ namespace sark{
 
 
 	// box that its faces are aligned by coordinate axis orientation.
-	// it is represented by two cater-cornered positions.
+	// it is represented by center position of box and extensions.
 	class AxisAlignedBox : public IShape{
 	public:
-		// cater-cornered minimum position.
-		Position3 min;
+		// center position of box.
+		Position3 pos;
 
-		// cater-cornered maximum position.
-		Position3 max;
+		// half-length of extention
+		Vector3 ext;
 
 		AxisAlignedBox();
+		AxisAlignedBox(const Position3& position, real extention[3]);
 		AxisAlignedBox(const Position3& posMin, const Position3& posMax);
 
+		void Set(const Position3& position, real extention[3]);
 		void Set(const Position3& posMin, const Position3& posMax);
 
 		bool IsIntersectedWith(const IShape* shape) const override;
@@ -197,10 +199,11 @@ namespace sark{
 
 	// is aabb contains the given position?
 	inline bool ContainsIn(const AxisAlignedBox* aabox, const Position3& pos){
-		if ((pos.x < aabox->min.x || aabox->max.x < pos.x) ||
-			(pos.y < aabox->min.y || aabox->max.y < pos.y) ||
-			(pos.z < aabox->min.z || aabox->max.z < pos.z)){
-			return false;
+		for (integer i = 0; i < 3; i++){
+			if (pos.v[i] < (aabox->pos.v[i] - aabox->ext.v[i]) ||
+				(aabox->pos.v[i] + aabox->ext.v[i]) < pos.v[i]){
+				return false;
+			}
 		}
 		return true;
 	}

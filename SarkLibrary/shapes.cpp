@@ -97,13 +97,24 @@ namespace sark{
 
 	AxisAlignedBox::AxisAlignedBox() : IShape(IShape::AABOX){}
 
-	AxisAlignedBox::AxisAlignedBox(const Point3& posMin, const Point3& posMax)
-		: IShape(IShape::AABOX), min(posMin), max(posMax)
+	AxisAlignedBox::AxisAlignedBox(const Position3& position, real extention[3])
+		: IShape(IShape::AABOX), pos(position), ext(extention[0], extention[1], extention[2])
 	{}
 
+	AxisAlignedBox::AxisAlignedBox(const Point3& posMin, const Point3& posMax)
+		: IShape(IShape::AABOX)
+	{
+		pos = (posMin + posMax) / 2.f;
+		ext = (posMax - posMin) / 2.f;
+	}
+
+	void AxisAlignedBox::Set(const Position3& position, real extention[3]){
+		pos = position;
+		ext = { extention[0], extention[1], extention[2] };
+	}
 	void AxisAlignedBox::Set(const Point3& posMin, const Point3& posMax){
-		min = posMin;
-		max = posMax;
+		pos = (posMin + posMax) / 2.f;
+		ext = (posMax - posMin) / 2.f;
 	}
 
 	bool AxisAlignedBox::IsIntersectedWith(const IShape* shape) const{
@@ -259,13 +270,13 @@ namespace sark{
 
 		for (int i = 0; i<3; i++){
 			if (math::real_equal(ray->dir.v[i], 0.f)){
-				if (ray->pos.v[i] < aabox->min.v[i] ||
-					ray->pos.v[i] > aabox->max.v[i])
+				if (ray->pos.v[i] < (aabox->pos.v[i] - aabox->ext.v[i]) ||
+					ray->pos.v[i] > (aabox->pos.v[i] + aabox->ext.v[i]))
 					return false;
 			}
 			else{
-				float t1 = (-ray->pos.v[i] - aabox->min.v[i]) / ray->dir.v[i];
-				float t2 = (-ray->pos.v[i] - aabox->max.v[i]) / ray->dir.v[i];
+				float t1 = (-ray->pos.v[i] - (aabox->pos.v[i] - aabox->ext.v[i])) / ray->dir.v[i];
+				float t2 = (-ray->pos.v[i] - (aabox->pos.v[i] + aabox->ext.v[i])) / ray->dir.v[i];
 				if (t1 > t2){
 					std::swap(t1, t2);
 				}
@@ -371,8 +382,7 @@ namespace sark{
 
 			// from t,v and w, it can be tested whether ray intersects with triangle or not
 			if (0 <= t && t <= os_ray.limit){
-				if ((0 <= v && v <= 1) && (0 <= w && w <= 1)
-					&& (0 <= v + w && v + w <= 1))
+				if ((v >= 0) && (w >= 0) && (v + w <= 1))
 					return true;
 			}
 		}
