@@ -408,7 +408,19 @@ namespace sark{
 	bool IsIntersected(const Sphere* sphere, const Polyhedron* poly){ return false; }
 
 	// axis aligned box - axis aligned box intersection
-	bool IsIntersected(const AxisAlignedBox* aabox1, const AxisAlignedBox* aabox2){ return false; }
+	bool IsIntersected(const AxisAlignedBox* aabox1, const AxisAlignedBox* aabox2){
+		#define AABOX_MIN(paabox, ax) (paabox->pos.v[ax] - paabox->ext.v[ax])
+		#define AABOX_MAX(paabox, ax) (paabox->pos.v[ax] + paabox->ext.v[ax])
+		for (integer i = 0; i < 3; i++){
+			if (AABOX_MIN(aabox1, i) > AABOX_MAX(aabox2, i) ||
+				AABOX_MAX(aabox1, i) < AABOX_MIN(aabox2, i)){
+				return false;
+			}
+		}
+		return true;
+		#undef AABOX_MIN
+		#undef AABOX_MAX
+	}
 	
 	// axis aligned box - oriented box intersection
 	bool IsIntersected(const AxisAlignedBox* aabox, const OrientedBox* obox){ return false; }
