@@ -18,7 +18,7 @@ namespace sark{
 
 	// shader program is created from ShaderDictionary
 	// with full liked shaders.
-	ShaderProgram::ShaderProgram(ProgramHandle hProgram)
+	ShaderProgram::ShaderProgram(ObjectHandle hProgram)
 		: mhProgram(hProgram)
 	{}
 

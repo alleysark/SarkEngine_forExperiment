@@ -27,7 +27,6 @@ namespace sark{
 			VERSION_440
 		};
 
-		typedef GLuint ObjectHandle;
 		typedef std::hash_map<const std::string, ShaderProgram*> Dictionary;
 	private:
 		Dictionary mProgramDict;

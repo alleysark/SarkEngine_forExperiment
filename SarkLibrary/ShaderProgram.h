@@ -17,7 +17,6 @@ namespace sark{
 	// it'll be created by ShaderDictionary 
 	class ShaderProgram{
 	public:	
-		typedef GLuint ProgramHandle;
 		typedef GLint Location;
 		typedef std::map<const std::string, Location> LocationDictionary;
 
@@ -38,7 +37,7 @@ namespace sark{
 
 	private:
 		// program handler
-		ProgramHandle mhProgram;
+		ObjectHandle mhProgram;
 
 		// locations of uniform/attribute variable are cached in this container
 		LocationDictionary mLocationDict;
@@ -46,7 +45,7 @@ namespace sark{
 	public:
 		// shader program is created from ShaderDictionary
 		// with full liked shaders.
-		ShaderProgram(ProgramHandle hProgram);
+		ShaderProgram(ObjectHandle hProgram);
 
 		~ShaderProgram();
 

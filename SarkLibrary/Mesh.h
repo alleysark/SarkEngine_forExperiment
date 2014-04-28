@@ -34,8 +34,6 @@ namespace sark{
 		};
 		#pragma pack(pop)
 
-		typedef GLuint ObjectHandle;
-
 	private:
 		// variable vertex buffer object pair.
 		struct VBOPair{

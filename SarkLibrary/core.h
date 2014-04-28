@@ -10,6 +10,7 @@ and declare useful functions additionally which are not included in 'math.h'
 #include <float.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <GL/glew.h>
 
 namespace sark{
 
@@ -48,6 +49,7 @@ namespace sark{
 	typedef int32		integer;
 #endif
 
+	typedef GLuint ObjectHandle;
 
 
 	// namespace of math library

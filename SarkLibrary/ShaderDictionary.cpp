@@ -191,7 +191,7 @@ namespace sark{
 	}
 
 	// create shader object
-	ShaderDictionary::ObjectHandle ShaderDictionary::CreateShader(GLenum shaderType,
+	ObjectHandle ShaderDictionary::CreateShader(GLenum shaderType,
 		const std::vector<const char*>& sources)
 	{
 		ObjectHandle newShaderHandle = glCreateShader(shaderType);

@@ -58,7 +58,7 @@ namespace sark{
 	}
 
 	// get texture handle id
-	const Texture::TextureHandle Texture::GetHandleID() const{
+	const ObjectHandle Texture::GetHandleID() const{
 		return mTexId;
 	}
 

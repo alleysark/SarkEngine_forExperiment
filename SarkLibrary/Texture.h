@@ -50,11 +50,9 @@ namespace sark{
 			RGB10_A2 = GL_RGB10_A2, RGB5_A1 = GL_RGB5_A1
 		};
 
-		typedef GLuint TextureHandle;
-
 	private:
 		// texture object id
-		TextureHandle mTexId;
+		ObjectHandle mTexId;
 
 		// dimension
 		Dimension mDimension;
@@ -80,7 +78,7 @@ namespace sark{
 		~Texture();
 
 		// get texture handle id
-		const TextureHandle GetHandleID() const;
+		const ObjectHandle GetHandleID() const;
 
 		// bind texture
 		void Bind();
