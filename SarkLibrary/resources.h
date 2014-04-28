@@ -5,6 +5,7 @@
 #include <map>
 #include <GL/glew.h>
 #include "core.h"
+#include "Texture.h"
 
 namespace sark{
 
@@ -77,41 +78,8 @@ namespace sark{
 		// static ImpResourceType* LoadImp(const std::string& path) = 0;
 	};
 
-
 	// texture resource interface
 	class ITextureResource : public IResource{
-	public:
-		enum Format{
-			// most common formats
-			RGB = GL_RGB,
-			RGBA = GL_RGBA,
-
-			// other optional allowed formats
-			COLOR_INDEX = GL_COLOR_INDEX,
-			RED = GL_RED,
-			GREEN = GL_GREEN,
-			BLUE = GL_BLUE,
-			ALPHA = GL_ALPHA,
-			BGR_EXT = GL_BGR_EXT,
-			BGRA_EXT = GL_BGRA_EXT,
-			LUMINANCE = GL_LUMINANCE,
-			LUMINANCE_ALPHA = GL_LUMINANCE_ALPHA
-		};
-
-		enum PixelType{
-			// most common pixel type
-			UINT8 = GL_UNSIGNED_BYTE,
-
-			// other optional allowed pixel types
-			INT8 = GL_BYTE,
-			BITMAP = GL_BITMAP,
-			UINT16 = GL_UNSIGNED_SHORT,
-			INT16 = GL_SHORT,
-			UINT32 = GL_UNSIGNED_INT,
-			INT32 = GL_INT,
-			FLOAT32 = GL_FLOAT
-		};
-
 	public:
 		ITextureResource(){}
 		virtual ~ITextureResource(){}
@@ -126,10 +94,10 @@ namespace sark{
 		virtual const integer GetDepth() const = 0;
 
 		// get format of pixel
-		virtual Format GetPixelFormat() const = 0;
+		virtual Texture::Format GetPixelFormat() const = 0;
 
 		// get type of pixel
-		virtual PixelType GetPixelType() const = 0;
+		virtual Texture::PixelType GetPixelType() const = 0;
 
 		// get raw data of pixels
 		virtual const void* GetPixels() const = 0;

@@ -54,9 +54,9 @@ namespace sark{
 
 		const integer GetDepth() const override;
 
-		Format GetPixelFormat() const override;
+		Texture::Format GetPixelFormat() const override;
 
-		PixelType GetPixelType() const override;
+		Texture::PixelType GetPixelType() const override;
 
 		const void* GetPixels() const override;
 

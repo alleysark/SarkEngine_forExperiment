@@ -1,4 +1,5 @@
 #include "Texture.h"
+#include "resources.h"
 #include "Debug.h"
 
 namespace sark{
@@ -7,7 +8,7 @@ namespace sark{
 	// height for 2D, depth for 3D texture only.
 	Texture::Texture(Dimension dimension, uint32 mipmapLevel, InternalFormat internalFormat,
 		integer width, integer height, integer depth, bool border,
-		ITextureResource::Format pixelFormat, ITextureResource::PixelType pixelType,
+		Format pixelFormat, PixelType pixelType,
 		const void* pixels, bool genMipMap)
 	{
 		mDimension = dimension;

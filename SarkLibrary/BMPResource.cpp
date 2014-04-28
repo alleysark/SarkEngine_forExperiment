@@ -34,12 +34,12 @@ namespace sark{
 		return 0;
 	}
 
-	ITextureResource::Format BMPResource::GetPixelFormat() const{
-		return ITextureResource::Format::RGB;
+	Texture::Format BMPResource::GetPixelFormat() const{
+		return Texture::Format::RGB;
 	}
 
-	ITextureResource::PixelType BMPResource::GetPixelType() const{
-		return ITextureResource::PixelType::UINT8;
+	Texture::PixelType BMPResource::GetPixelType() const{
+		return Texture::PixelType::UNSIGNED_BYTE;
 	}
 
 	const void* BMPResource::GetPixels() const{
