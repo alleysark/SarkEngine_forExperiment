@@ -59,15 +59,28 @@ namespace sark{
 		// dimension
 		Dimension mDimension;
 
+	private:
+		Texture();
+
 	public:
-		// generate texture from given parameters.
-		// please ensure that it is called with proper dimensional texture resource.
+		// generate texture from fully given texture properties.
+		// height for 2D, depth for 3D texture only.
+		Texture(Dimension dimension, uint32 mipmapLevel, InternalFormat internalFormat,
+			integer width, integer height, integer depth, bool border,
+			ITextureResource::Format pixelFormat, ITextureResource::PixelType pixelType,
+			const void* pixels, bool genMipMap = false);
+
+		// generate texture from given texture resource with other properties.
+		// please ensure that it should be called with proper dimensional texture resource.
 		Texture(Dimension dimension, const ITextureResource* texResource,
 			InternalFormat internalFormat = InternalFormat::FOUR,
 			bool border = false, uint32 mipmapLevel = 0, bool genMipMap = false);
 
 		// delete texture object
 		~Texture();
+
+		// get texture handle id
+		const TextureHandle GetHandleID() const;
 
 		// bind texture
 		void Bind();
