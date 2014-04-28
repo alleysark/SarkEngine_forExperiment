@@ -14,7 +14,7 @@ namespace sark{
 	}
 
 	// bind this sampler 
-	void Sampler::Bind(uint16 activeTex){
+	void Sampler::Bind(uint16 activeTex) const{
 		glBindSampler(activeTex, mSamplerId);
 	}
 

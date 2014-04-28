@@ -50,11 +50,11 @@ namespace sark{
 		~ShaderProgram();
 
 		// before rendering, user should've Use() to use shader program.
-		void Use();
+		void Use() const;
 
 		// after using shader program, user should've Unuse()
 		// to disable this shader program.
-		void Unuse();
+		void Unuse() const;
 
 	private:
 		// get uniform location by variable name
@@ -75,7 +75,7 @@ namespace sark{
 		// set sampler with texture into the uniform sampler 'name'
 		// as active texture unit 'activeTex'
 		void SetSampler(const std::string& name,
-			Sampler* sampler, Texture* texture, uint16 activeTex = 0);
+			const Sampler* sampler, const Texture* texture, uint16 activeTex = 0);
 
 
 		//---------------------

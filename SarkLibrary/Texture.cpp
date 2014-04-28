@@ -64,12 +64,12 @@ namespace sark{
 	}
 
 	// bind texture
-	void Texture::Bind(){
+	void Texture::Bind() const{
 		glBindTexture(mDimension, mTexId);
 	}
 
 	// unbind texture
-	void Texture::Unbind(){
+	void Texture::Unbind() const{
 		glBindTexture(mDimension, 0);
 	}
 

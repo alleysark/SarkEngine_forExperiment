@@ -147,10 +147,10 @@ namespace sark{
 		const ObjectHandle GetHandleID() const;
 
 		// bind texture
-		void Bind();
+		void Bind() const;
 
 		// unbind texture
-		void Unbind();
+		void Unbind() const;
 	};
 
 }

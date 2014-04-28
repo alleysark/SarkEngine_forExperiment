@@ -29,13 +29,13 @@ namespace sark{
 	}
 
 	// before rendering, user should've Use() to use shader program.
-	void ShaderProgram::Use(){
+	void ShaderProgram::Use() const{
 		glUseProgram(mhProgram);
 	}
 
 	// after using shader program, user should've Unuse()
 	// to disable this shader program.
-	void ShaderProgram::Unuse(){
+	void ShaderProgram::Unuse() const{
 		glUseProgram(0);
 	}
 
@@ -82,7 +82,7 @@ namespace sark{
 	// set sampler with texture into the uniform sampler 'name'
 	// as active texture unit 'activeTex'
 	void ShaderProgram::SetSampler(const std::string& name,
-		Sampler* sampler, Texture* texture, uint16 activeTex){
+		const Sampler* sampler, const Texture* texture, uint16 activeTex){
 		glActiveTexture(GL_TEXTURE0 + activeTex);
 		texture->Bind();
 		SetUniform(name, activeTex);

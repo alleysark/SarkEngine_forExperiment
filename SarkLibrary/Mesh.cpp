@@ -204,7 +204,7 @@ namespace sark{
 
 
 	// draw this mesh
-	void Mesh::Draw(){
+	void Mesh::Draw() const{
 		glBindVertexArray(mhVertexArray);
 		glDrawElements(GL_TRIANGLES, mFaces.size() * 3, GL_UNSIGNED_SHORT, 0);
 		glBindVertexArray(0);

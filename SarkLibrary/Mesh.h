@@ -112,7 +112,7 @@ namespace sark{
 
 
 		// draw this mesh
-		void Draw();
+		void Draw() const;
 
 
 		// get position data

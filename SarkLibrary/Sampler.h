@@ -65,7 +65,7 @@ namespace sark{
 		~Sampler();
 
 		// bind this sampler
-		void Bind(uint16 activeTex = 0);
+		void Bind(uint16 activeTex = 0) const;
 
 
 		// set sampler parameter state
