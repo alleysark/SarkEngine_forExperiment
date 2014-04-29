@@ -29,7 +29,9 @@ namespace sark{
 
 			real minZ, maxZ;
 
-			Viewport();
+		public:
+			Viewport(real _x, real _y, real _width, real _height,
+				real _minz = 0, real _maxz = 1);
 		};
 
 
@@ -41,11 +43,11 @@ namespace sark{
 			// it is true when if it is orthographic view
 			bool ortho;
 
-			// half factor of height. it defines the range as [-H, H]
-			real height;
+			// x-axis factor. it defines the range [left, right]
+			real left, right;
 
-			// half factor of width. it defines the range as [-W, W]
-			real width;
+			// y-axis factor. it defines the range [bottom, top]
+			real bottom, top;
 
 			// positive value of z-distance from cop to nearest plane.
 			real zNear;
@@ -57,31 +59,25 @@ namespace sark{
 			Matrix4 projMatrix;
 
 		public:
-			ViewVolume(real _width, real _height, real _depth);
+			ViewVolume(real _left, real _right,
+				real _bottom, real _top, real _znear, real _zfar);
 			ViewVolume(real _fovy, real _aspect, real _znear, real _zfar);
 			~ViewVolume();
 
 			// set view as orthographically
-			void SetOrthographic(real _width, real _height, real _depth);
+			void SetOrthographic(real _left, real _right,
+				real _bottom, real _top, real _znear, real _zfar);
 
 			// set view as perspectively
 			void SetPerspective(real _fovy, real _aspect, real _znear, real _zfar);
 		};
 
 	protected:
-		//origin of camera space
+		// origin of camera coordination in world space.
 		Position3 mEye;
-
-		//focusing target
-		Position3 mLookat;
-
-		//camera's standing axis
-		Vector3 mUp;
-
 
 		// view transform matrix for transforming into camera space.
 		Matrix4 mViewMatrix;
-
 
 		// viewport definition
 		Viewport mViewport;
@@ -91,12 +87,10 @@ namespace sark{
 		ViewVolume mVolume;
 
 	public:
-		Camera(const Vector3& eye = Vector3(0), const Vector3& lookat = Vector3::Forward, const Vector3& up = Vector3::Up);
-		virtual ~Camera();
+		Camera(const Vector3& eye = Vector3(0),
+			const Vector3& lookat = Vector3::Forward, const Vector3& up = Vector3::Up);
 
-	private:
-		// update view matrix from camera properties(eye,at,up)
-		void UpdateViewMatrix();
+		virtual ~Camera();
 
 	public:
 		// get view transformation matrix
@@ -110,10 +104,8 @@ namespace sark{
 		bool IsOrthoView() const;
 
 		// make camera view volume as orthographic-view.
-		// it defines cube-like view volume
-		// which range of [-width/2, width/2] for x, [-height/2, height/2] for y
-		// and [0, depth] for z.
-		void Orthographic(real width, real height, real depth);
+		// it defines cube-like view volume from given properties.
+		void Orthographic(real left, real right, real bottom, real top, real znear, real zfar);
 
 		// make camera view volume as perspective-view.
 		// it defines truncated quadrangular pyramid volume called 'frustum'.
@@ -127,6 +119,8 @@ namespace sark{
 
 		// get viewport
 		const Viewport& GetViewport() const;
+		// set viewport again. it just calls graphic api with its properties
+		void SetViewport();
 		// set viewport
 		void SetViewport(integer x, integer y, integer width, integer height);
 		// set viewport with depth range.
@@ -143,22 +137,14 @@ namespace sark{
 		// get n-axis basis of view space (it'll be the z-axis). n is the opposite view-direction
 		const Vector3& GetBasisN();
 
-
 		// get eye position
 		const Position3& GetEye() const;
-		// get lookat position
-		const Position3& GetLookat() const;
-		// get up vector
-		const Vector3& GetUp() const;
 
 		// set camera
-		void Set(const Position3& eye, const Position3& lookat, const Vector3& up = Vector3(0.f, 1.f, 0.f));
+		void Set(const Position3& eye, const Position3& lookat,
+			const Vector3& up = Vector3(0.f, 1.f, 0.f));
 		// set eye position
 		void SetEye(const Position3& eye);
-		// set lookat position
-		void SetLookat(const Position3& lookat);
-		// set up vector
-		void SetUp(const Vector3& up = Vector3(0.f, 1.f, 0.f));
 
 
 		// generate ray from screen coordinates
@@ -167,8 +153,8 @@ namespace sark{
 
 		// basic camera functions
 
-		// move camera into direction, fix lookat or not
-		void MoveTo(const Vector3& direction, real distance, bool fixLookat = false, bool dir_normalized = false);
+		// move camera into direction
+		void MoveTo(const Vector3& direction, real distance, bool dir_normalized = false);
 
 		// move camera into forward direction (positive distance goes to forward)
 		void MoveForward(real distance);

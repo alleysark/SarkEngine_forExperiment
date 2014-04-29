@@ -81,7 +81,8 @@ namespace sark{
 				BGR_EXT = GL_BGR_EXT,
 				BGRA_EXT = GL_BGRA_EXT,
 				LUMINANCE = GL_LUMINANCE,
-				LUMINANCE_ALPHA = GL_LUMINANCE_ALPHA
+				LUMINANCE_ALPHA = GL_LUMINANCE_ALPHA,
+				DEPTH_COMPONENT = GL_DEPTH_COMPONENT
 			};
 		};
 		typedef enum _FormatWrapper::Format Format;

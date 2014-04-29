@@ -718,6 +718,10 @@ namespace sark{
 
 		Quaternion();
 		Quaternion(real _x, real _y, real _z, real _s = 0.0f);
+
+		Quaternion(const Vector3& rotationAxis, real theta, bool axis_normalized = false);
+		Quaternion(const real roll, real pitch, real yaw);
+
 		Quaternion(const Quaternion& q);
 		void operator=(const Quaternion& q);
 

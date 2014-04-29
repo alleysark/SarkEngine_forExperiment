@@ -1127,6 +1127,14 @@ namespace sark{
 		s = _s;
 		x = _x; y = _y; z = _z;
 	}
+
+	Quaternion::Quaternion(const Vector3& rotationAxis, real theta, bool axis_normalized){
+		MakeRotatingQuat(rotationAxis, theta, axis_normalized);
+	}
+	Quaternion::Quaternion(const real roll, real pitch, real yaw){
+		MakeRotatingQuat(roll, pitch, yaw);
+	}
+
 	Quaternion::Quaternion(const Quaternion& q){
 		s = q.s; x = q.x; y = q.y; z = q.z;
 	}
