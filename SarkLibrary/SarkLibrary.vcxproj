@@ -92,7 +92,7 @@
     <ClCompile Include="RigidCube.cpp" />
     <ClCompile Include="RigidSphere.cpp" />
     <ClCompile Include="Sampler.cpp" />
-    <ClCompile Include="ShaderDictionary.cpp" />
+    <ClCompile Include="ShaderChef.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="shapes.cpp" />
     <ClCompile Include="test_main.cpp" />
@@ -117,7 +117,7 @@
     <ClInclude Include="RigidCube.h" />
     <ClInclude Include="RigidSphere.h" />
     <ClInclude Include="Sampler.h" />
-    <ClInclude Include="ShaderDictionary.h" />
+    <ClInclude Include="ShaderChef.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="shapes.h" />
     <ClInclude Include="Texture.h" />

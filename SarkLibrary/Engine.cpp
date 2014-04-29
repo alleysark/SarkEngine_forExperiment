@@ -83,11 +83,6 @@ namespace sark{
 		}
 	}
 
-	// get shader dictionary
-	ShaderDictionary& Engine::GetShaderDict(){
-		return mShDict;
-	}
-
 	// get resource manager
 	ResourceManager& Engine::GetResourceManager(){
 		return mResourceMgr;

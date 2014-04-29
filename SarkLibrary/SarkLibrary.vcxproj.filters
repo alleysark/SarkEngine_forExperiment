@@ -66,9 +66,6 @@
     <ClCompile Include="RigidCube.cpp">
       <Filter>Header Files\core-util\scene components</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderDictionary.cpp">
-      <Filter>Header Files\core-system</Filter>
-    </ClCompile>
     <ClCompile Include="ShaderProgram.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
@@ -91,6 +88,9 @@
       <Filter>Header Files\core-util\scene components</Filter>
     </ClCompile>
     <ClCompile Include="FrameBuffer.cpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderChef.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
   </ItemGroup>
@@ -134,9 +134,6 @@
     <ClInclude Include="RigidCube.h">
       <Filter>Header Files\core-util\scene components</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderDictionary.h">
-      <Filter>Header Files\core-system</Filter>
-    </ClInclude>
     <ClInclude Include="ShaderProgram.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
@@ -159,6 +156,9 @@
       <Filter>Header Files\core-util\scene components</Filter>
     </ClInclude>
     <ClInclude Include="FrameBuffer.h">
+      <Filter>Header Files\core-system</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderChef.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
   </ItemGroup>

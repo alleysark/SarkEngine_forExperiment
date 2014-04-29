@@ -15,7 +15,6 @@
 #include <map>
 #include "core.h"
 #include "AScene.h"
-#include "ShaderDictionary.h"
 #include "ShaderProgram.h"
 #include "resources.h"
 #include "Timer.h"
@@ -44,9 +43,6 @@ namespace sark{
 		HGLRC mhRC;
 
 		// ----------- engine properties -------------
-
-		// shader dictionary of sark engine
-		ShaderDictionary mShDict;
 
 		// resource manager
 		ResourceManager mResourceMgr;
@@ -86,9 +82,6 @@ namespace sark{
 
 		// run engine loop
 		void Run();
-
-		// get shader dictionary
-		ShaderDictionary& GetShaderDict();
 
 		// get resource manager
 		ResourceManager& GetResourceManager();

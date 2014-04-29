@@ -8,8 +8,6 @@
 
 namespace sark{
 
-	class ShaderDictionary;
-
 	class Sampler;
 	class Texture;
 
