@@ -32,6 +32,7 @@ namespace sark{
 		
 		// allowed wrapping mode
 		enum WrapMode{
+			CLAMP = GL_CLAMP,
 			CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
 			CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER,
 			REPEAT = GL_REPEAT,
