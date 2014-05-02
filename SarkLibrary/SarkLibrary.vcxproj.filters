@@ -93,6 +93,9 @@
     <ClCompile Include="ShaderChef.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
+    <ClCompile Include="PNGResource.cpp">
+      <Filter>Header Files\core-util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -160,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="ShaderChef.h">
       <Filter>Header Files\core-system</Filter>
+    </ClInclude>
+    <ClInclude Include="PNGResource.h">
+      <Filter>Header Files\core-util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

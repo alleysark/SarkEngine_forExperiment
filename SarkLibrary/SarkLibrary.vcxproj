@@ -41,6 +41,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SolutionDir)library\libpng\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)library\libpng\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -87,6 +89,7 @@
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="PNGResource.cpp" />
     <ClCompile Include="resources.cpp" />
     <ClCompile Include="AScene.cpp" />
     <ClCompile Include="RigidCube.cpp" />
@@ -112,6 +115,7 @@
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="PNGResource.h" />
     <ClInclude Include="resources.h" />
     <ClInclude Include="AScene.h" />
     <ClInclude Include="RigidCube.h" />
