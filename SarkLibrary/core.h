@@ -252,7 +252,6 @@ namespace sark{
 		// general gravity force. 9.8 m/s^2 of negative y-axis
 		static const Vector2 Gravity;
 	};
-	typedef Vector2 Vertex2;
 	typedef Vector2 Position2;
 	typedef Vector2 Point2;
 	typedef Vector2 Texcoord;
@@ -375,7 +374,6 @@ namespace sark{
 		// general gravity force. 9.8 m/s^2 of negative y-axis
 		static const Vector3 Gravity;
 	};
-	typedef Vector3 Vertex3;
 	typedef Vector3 Position3;
 	typedef Vector3 Point3;
 	typedef Vector3 Normal;
@@ -489,7 +487,6 @@ namespace sark{
 		// calculate Euclidean distance of given two vectors
 		static real Distance(const Vector4& v1, const Vector4& v2);
 	};
-	typedef Vector4 Vertex4;
 	typedef Vector4 Position4;
 	typedef Vector4 Point4;
 	typedef Vector4 ColorRGBA;
