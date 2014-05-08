@@ -18,7 +18,7 @@ namespace sark{
 		typedef GLint Location;
 		typedef std::map<const std::string, Location> LocationDictionary;
 
-		enum AttribVarSemantic{
+		enum AttributeSemantic{
 			ATTR_POSITION=0,
 			ATTR_NORMAL,
 			ATTR_COLOR,
@@ -31,7 +31,7 @@ namespace sark{
 			//for counting semantic.
 			ATTR_COUNT
 		};
-		static const char* const AttribVarNames[];
+		static const char* const AttributeNames[];
 
 	private:
 		// program handler

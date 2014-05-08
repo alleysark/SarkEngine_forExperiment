@@ -5,7 +5,7 @@
 
 namespace sark{
 
-	const char* const ShaderProgram::AttribVarNames[] = {
+	const char* const ShaderProgram::AttributeNames[] = {
 		"position",
 		"normal",
 		"color",

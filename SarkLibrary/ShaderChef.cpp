@@ -88,7 +88,7 @@ namespace sark{
 
 		// bind pre-defined attribute semantics
 		for (int attrLoca = 0; attrLoca < ShaderProgram::ATTR_COUNT; attrLoca++){
-			glBindAttribLocation(progObj, attrLoca, ShaderProgram::AttribVarNames[attrLoca]);
+			glBindAttribLocation(progObj, attrLoca, ShaderProgram::AttributeNames[attrLoca]);
 		}
 
 		// link program and check link error
@@ -157,7 +157,7 @@ namespace sark{
 
 		// bind pre-defined attribute semantics
 		for (int attrLoca = 0; attrLoca < ShaderProgram::ATTR_COUNT; attrLoca++){
-			glBindAttribLocation(progObj, attrLoca, ShaderProgram::AttribVarNames[attrLoca]);
+			glBindAttribLocation(progObj, attrLoca, ShaderProgram::AttributeNames[attrLoca]);
 		}
 
 		// link program and check link error
