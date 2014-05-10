@@ -99,6 +99,12 @@
     <ClCompile Include="ArrayBuffer.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
+    <ClCompile Include="VertexBuffer.cpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClCompile>
+    <ClCompile Include="IndexBuffer.cpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -171,6 +177,12 @@
       <Filter>Header Files\core-util</Filter>
     </ClInclude>
     <ClInclude Include="ArrayBuffer.h">
+      <Filter>Header Files\core-system</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexBuffer.h">
+      <Filter>Header Files\core-system</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexBuffer.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
   </ItemGroup>

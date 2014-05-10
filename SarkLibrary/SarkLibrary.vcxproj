@@ -88,6 +88,7 @@
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="ALight.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
+    <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="PNGResource.cpp" />
@@ -103,6 +104,7 @@
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ALight.h" />
@@ -115,6 +117,7 @@
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="FrameBuffer.h" />
+    <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="PNGResource.h" />
@@ -129,6 +132,7 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="VertexBuffer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
