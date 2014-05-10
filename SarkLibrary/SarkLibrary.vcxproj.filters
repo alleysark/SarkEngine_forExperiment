@@ -96,6 +96,9 @@
     <ClCompile Include="PNGResource.cpp">
       <Filter>Header Files\core-util</Filter>
     </ClCompile>
+    <ClCompile Include="ArrayBuffer.cpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -166,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="PNGResource.h">
       <Filter>Header Files\core-util</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayBuffer.h">
+      <Filter>Header Files\core-system</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
