@@ -23,6 +23,7 @@ namespace sark{
 	// unbind currently bound index buffer object.
 	void IndexBuffer::Unbind() const{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glDisableVertexAttribArray(mIndexFeat.attribTarget);
 	}
 
 	// draw elements. you should have to bind relative

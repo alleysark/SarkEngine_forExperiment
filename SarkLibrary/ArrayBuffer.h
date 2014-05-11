@@ -108,7 +108,6 @@ namespace sark{
 			const AttributeFeature* mFeatPtr;
 
 		private:
-			AttributeAccessor(const AttributeAccessor<_AttribType>&);
 			AttributeAccessor<_AttribType>& operator=(const AttributeAccessor<_AttribType>&);
 
 		public:
@@ -116,6 +115,8 @@ namespace sark{
 			AttributeAccessor();
 			// make vertex attribute accessor of given data pointer
 			AttributeAccessor(void* ptr, const AttributeFeature* featPtr);
+
+			AttributeAccessor(const AttributeAccessor<_AttribType>&);
 
 			// accessor unmap the mapped pointer when it is destructed.
 			~AttributeAccessor();
@@ -172,9 +173,6 @@ namespace sark{
 	//----- template implementation -----//
 
 	template<class _AttribType>
-	ArrayBuffer::AttributeAccessor<_AttribType>::AttributeAccessor(const AttributeAccessor<_AttribType>&){}
-
-	template<class _AttribType>
 	ArrayBuffer::AttributeAccessor<_AttribType>& 
 		ArrayBuffer::AttributeAccessor<_AttribType>::operator=(const AttributeAccessor<_AttribType>&){}
 
@@ -188,6 +186,13 @@ namespace sark{
 	ArrayBuffer::AttributeAccessor<_AttribType>::AttributeAccessor(void* ptr, const AttributeFeature* featPtr)
 		: mPtr(ptr), mFeatPtr(featPtr)
 	{}
+
+	template<class _AttribType>
+	ArrayBuffer::AttributeAccessor<_AttribType>::AttributeAccessor(const AttributeAccessor<_AttribType>& acc)
+		: mPtr(acc.mPtr), mFeatPtr(acc.mFeatPtr)
+	{
+		acc.mPtr = NULL;
+	}
 
 	// accessor unmap the mapped pointer when it is destructed.
 	template<class _AttribType>

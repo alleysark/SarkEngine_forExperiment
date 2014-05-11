@@ -55,6 +55,7 @@ namespace sark{
 			ShaderProgram::AttributeSemantic attribSemantic, AccessHint hint = AccessHint::READ_ONLY);
 
 		// bind this vertex buffer object.
+		// after using, it have to be unbinded.
 		bool Bind() const override;
 
 		// bind specific attribute buffer object.
@@ -158,9 +159,6 @@ namespace sark{
 		// set buffer data
 		glBindBuffer(GL_ARRAY_BUFFER, feat.bufId);
 		glBufferData(GL_ARRAY_BUFFER, feat.bufSize, &data[0], feat.bufHint);
-		glEnableVertexAttribArray(feat.attribTarget);
-		glVertexAttribPointer(feat.attribTarget, feat.elementCount, feat.elementType, 0, 0, NULL);
-
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		mAttribFeats.push_back(feat);

@@ -55,6 +55,11 @@ namespace sark{
 	// unbind currently bound vertex buffer object.
 	void VertexBuffer::Unbind() const{
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		AttribFeatureList::const_iterator itr = mAttribFeats.begin();
+		AttribFeatureList::const_iterator end = mAttribFeats.end();
+		for (; itr != end; itr++){
+			glDisableVertexAttribArray(itr->attribTarget);
+		}
 	}
 
 	// draw vertex array directly.

@@ -91,6 +91,7 @@ namespace sark{
 		AttributeAccessor<_PrimitiveType> GetPrimitiveAccessor(AccessHint hint = AccessHint::READ_ONLY);
 
 		// bind this index buffer object.
+		// after using, it have to be unbinded.
 		bool Bind() const override;
 
 		// unbind currently bound index buffer object.
@@ -173,8 +174,6 @@ namespace sark{
 		// set buffer data
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexFeat.bufId);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexFeat.bufSize, &data[0], mIndexFeat.bufHint);
-		glEnableVertexAttribArray(mIndexFeat.attribTarget);
-		glVertexAttribPointer(mIndexFeat.attribTarget, mIndexFeat.elementCount, mIndexFeat.elementType, 0, 0, NULL);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		return true;
 	}
