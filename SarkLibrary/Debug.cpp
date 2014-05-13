@@ -1,4 +1,5 @@
 #include "Debug.h"
+#include <GL/glew.h>
 
 namespace sark{
 
@@ -101,4 +102,10 @@ namespace sark{
 		mHaltFunc = onHalt;
 	}
 
+	const char* Debug::GetAPIError(){
+		GLenum err = glGetError();
+		if (err == 0)
+			return NULL;
+		return reinterpret_cast<const char*>(gluErrorString(err));
+	}
 }

@@ -82,6 +82,9 @@ namespace sark{
 		static LogIterator GetLogEnd();
 
 		static void SetOnHaltHandler(HaltHandler onHalt);
+
+		// get graphics api(opengl in here) error.
+		static const char* GetAPIError();
 	};
 	
 
