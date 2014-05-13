@@ -1,5 +1,4 @@
 #include "RigidSphere.h"
-#include "TriangleMesh.h"
 #include "primitives.hpp"
 
 namespace sark{
