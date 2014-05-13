@@ -23,7 +23,7 @@ namespace sark{
 				real x = math::cos(2 * math::PI * s * S) * sin(math::PI * r * R);
 				real z = math::sin(2 * math::PI * s * S) * sin(math::PI * r * R);
 
-				texcoords.push_back({ s*S, r*R });
+				texcoords.push_back({ s*S, (1 - r*R) });
 
 				positions.push_back({ x * mRadius, y * mRadius, z * mRadius });
 

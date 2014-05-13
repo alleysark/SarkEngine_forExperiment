@@ -13,53 +13,56 @@ namespace sark{
 
 		arrBuf.GenAttributeBuffer<Position3>(
 			ShaderProgram::ATTR_POSITION, {
+			//top
+			Position3(-width, height, -depth),
+			Position3(-width, height, depth),
+			Position3(width, height, depth),
+			Position3(width, height, -depth),
+			//front
+			Position3(-width, height, depth),
+			Position3(-width, -height, depth),
+			Position3(width, -height, depth),
+			Position3(width, height, depth),
+			//left-side
+			Position3(-width, height, -depth),
+			Position3(-width, -height, -depth),
+			Position3(-width, -height, depth),
+			Position3(-width, height, depth),
+			//right-side
+			Position3(width, height, depth),
+			Position3(width, -height, depth),
+			Position3(width, -height, -depth),
+			Position3(width, height, -depth),
+			//back
+			Position3(width, height, -depth),
+			Position3(width, -height, -depth),
+			Position3(-width, -height, -depth),
+			Position3(-width, height, -depth),
+			//bottom
+			Position3(-width, -height, depth),
 			Position3(-width, -height, -depth),
 			Position3(width, -height, -depth),
-			Position3(width, -height, depth),
-			Position3(-width, -height, depth),
-			Position3(-width, height, -depth),
-			Position3(width, height, -depth),
-			Position3(width, height, depth),
-			Position3(-width, height, depth)
+			Position3(width, -height, depth)
 		});
 		arrBuf.GenAttributeBuffer<Normal>(
 			ShaderProgram::ATTR_NORMAL, {
-			Normal(-1, -1, -1),
-			Normal(1, -1, -1),
-			Normal(1, -1, 1),
-			Normal(-1, -1, 1),
-			Normal(-1, 1, -1),
-			Normal(1, 1, -1),
-			Normal(1, 1, 1),
-			Normal(-1, 1, 1)
+			Normal(0, 1, 0), Normal(0, 1, 0), Normal(0, 1, 0), Normal(0, 1, 0),
+			Normal(0, 0, 1), Normal(0, 0, 1), Normal(0, 0, 1), Normal(0, 0, 1),
+			Normal(-1, 0, 0), Normal(-1, 0, 0), Normal(-1, 0, 0), Normal(-1, 0, 0),
+			Normal(1, 0, 0), Normal(1, 0, 0), Normal(1, 0, 0), Normal(1, 0, 0),
+			Normal(0, 0, -1), Normal(0, 0, -1), Normal(0, 0, -1), Normal(0, 0, -1),
+			Normal(0, -1, 0), Normal(0, -1, 0), Normal(0, -1, 0), Normal(0, -1, 0)
 		});
 		arrBuf.GenAttributeBuffer<Texcoord>(
 			ShaderProgram::ATTR_TEX_COORD0, {
-			Texcoord(0, 1),
-			Texcoord(1, 1),
-			Texcoord(1, 0),
-			Texcoord(0, 0),
-			Texcoord(0, 1),
-			Texcoord(1, 1),
-			Texcoord(1, 0),
-			Texcoord(0, 0)
+			Texcoord(0, 0), Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0),
+			Texcoord(0, 0), Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0),
+			Texcoord(0, 0), Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0),
+			Texcoord(0, 0), Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0),
+			Texcoord(0, 0), Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0),
+			Texcoord(0, 0), Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0),
 		});
-		
-		arrBuf.GenPrimitiveBuffer<TriangleFace16>({
-			TriangleFace16(0, 1, 2),
-			TriangleFace16(0, 2, 3),
-			TriangleFace16(0, 4, 1),
-			TriangleFace16(1, 4, 5),
-			TriangleFace16(3, 4, 0),
-			TriangleFace16(4, 3, 7),
-			TriangleFace16(1, 5, 6),
-			TriangleFace16(6, 2, 1),
-			TriangleFace16(3, 2, 6),
-			TriangleFace16(3, 6, 7),
-			TriangleFace16(4, 6, 5),
-			TriangleFace16(7, 6, 4)
-		});
-		arrBuf.SetDrawMode(ArrayBuffer::DrawMode::TRIANGLES);
+		arrBuf.SetDrawMode(ArrayBuffer::DrawMode::QUADS);
 
 		mOBox.Set(Position3(0, 0, 0), Vector4(1, 0, 0, width), Vector4(0, 1, 0, height), Vector4(0, 0, 1, depth), true);
 	}

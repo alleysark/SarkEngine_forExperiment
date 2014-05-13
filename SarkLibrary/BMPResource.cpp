@@ -91,7 +91,7 @@ namespace sark{
 			for (i = 0; i < bmp->mHeight; i++){
 				for (k = 0; k < bmp->mWidth; k++){
 					// read bgr order
-					int64 pix_idx = i*bmp->mWidth * 3 + k*3;
+					int64 pix_idx = (bmp->mHeight - i - 1)*bmp->mWidth * 3 + k * 3;
 					stream.read((char*)&bmp->mPixels[pix_idx], 3);
 
 					uint8 t = bmp->mPixels[pix_idx];
@@ -109,7 +109,7 @@ namespace sark{
 					// read rgba order
 					stream.read((char*)rgba, 4);
 
-					int64 pix_idx = i*bmp->mWidth * 3 + k * 3;
+					int64 pix_idx = (bmp->mHeight - i - 1)*bmp->mWidth * 3 + k * 3;
 					bmp->mPixels[pix_idx] = rgba[0];
 					bmp->mPixels[pix_idx+1] = rgba[1];
 					bmp->mPixels[pix_idx+2] = rgba[2];
