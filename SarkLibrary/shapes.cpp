@@ -54,8 +54,8 @@ namespace sark{
 			return IsIntersected(this, dynamic_cast<const AxisAlignedBox*>(shape));
 		case IShape::OBOX:
 			return IsIntersected(this, dynamic_cast<const OrientedBox*>(shape));
-		case IShape::POLYHEDRON:
-			return IsIntersected(this, dynamic_cast<const Polyhedron*>(shape));
+		case IShape::CONVEXHULL:
+			return IsIntersected(this, dynamic_cast<const ConvexHull*>(shape));
 		default:
 			if (extChecker != NULL)
 				return extChecker(this, shape);
@@ -85,8 +85,8 @@ namespace sark{
 			return IsIntersected(this, dynamic_cast<const AxisAlignedBox*>(shape));
 		case IShape::OBOX:
 			return IsIntersected(this, dynamic_cast<const OrientedBox*>(shape));
-		case IShape::POLYHEDRON:
-			return IsIntersected(this, dynamic_cast<const Polyhedron*>(shape));
+		case IShape::CONVEXHULL:
+			return IsIntersected(this, dynamic_cast<const ConvexHull*>(shape));
 		default:
 			if (extChecker != NULL)
 				return extChecker(this, shape);
@@ -127,8 +127,8 @@ namespace sark{
 			return IsIntersected(this, dynamic_cast<const AxisAlignedBox*>(shape));
 		case IShape::OBOX:
 			return IsIntersected(this, dynamic_cast<const OrientedBox*>(shape));
-		case IShape::POLYHEDRON:
-			return IsIntersected(this, dynamic_cast<const Polyhedron*>(shape));
+		case IShape::CONVEXHULL:
+			return IsIntersected(this, dynamic_cast<const ConvexHull*>(shape));
 		default:
 			if (extChecker != NULL)
 				return extChecker(this, shape);
@@ -178,8 +178,8 @@ namespace sark{
 			return IsIntersected(dynamic_cast<const AxisAlignedBox*>(shape), this);
 		case IShape::OBOX:
 			return IsIntersected(this, dynamic_cast<const OrientedBox*>(shape));
-		case IShape::POLYHEDRON:
-			return IsIntersected(this, dynamic_cast<const Polyhedron*>(shape));
+		case IShape::CONVEXHULL:
+			return IsIntersected(this, dynamic_cast<const ConvexHull*>(shape));
 		default:
 			if (extChecker != NULL)
 				return extChecker(this, shape);
@@ -188,18 +188,9 @@ namespace sark{
 	}
 
 
-	Polyhedron::Polyhedron() : IShape(IShape::POLYHEDRON){}
+	ConvexHull::ConvexHull() : IShape(IShape::CONVEXHULL){}
 
-	Polyhedron::Polyhedron(Mesh* referenceMesh, Transform* referenceTransform)
-		: IShape(IShape::POLYHEDRON), refMesh(referenceMesh), refTransform(referenceTransform)
-	{}
-
-	void Polyhedron::Set(Mesh* referenceMesh, Transform* referenceTransform){
-		refMesh = referenceMesh;
-		refTransform = referenceTransform;
-	}
-
-	bool Polyhedron::IsIntersectedWith(const IShape* shape) const{
+	bool ConvexHull::IsIntersectedWith(const IShape* shape) const{
 		switch (shape->GetType()){
 		case IShape::RAY:
 			return IsIntersected(dynamic_cast<const Ray*>(shape), this);
@@ -209,8 +200,8 @@ namespace sark{
 			return IsIntersected(dynamic_cast<const AxisAlignedBox*>(shape), this);
 		case IShape::OBOX:
 			return IsIntersected(dynamic_cast<const OrientedBox*>(shape), this);
-		case IShape::POLYHEDRON:
-			return IsIntersected(this, dynamic_cast<const Polyhedron*>(shape));
+		case IShape::CONVEXHULL:
+			return IsIntersected(this, dynamic_cast<const ConvexHull*>(shape));
 		default:
 			if (extChecker != NULL)
 				return extChecker(this, shape);
@@ -310,13 +301,11 @@ namespace sark{
 		return IsIntersected(&transRay, &aabox);
 	}
 	
-	// ray - polyhedron intersection
-	bool IsIntersected(const Ray* ray, const Polyhedron* poly){
-		const std::vector<Position3>& vertices = poly->refMesh->GetPositions();
-		const std::vector<Mesh::Face>& faces = poly->refMesh->GetFaces();
-
+	// ray - convex hull intersection
+	bool IsIntersected(const Ray* ray, const ConvexHull* convex){
 		// transform ray into object space.
-		const Matrix4& TM = poly->refTransform->GetMatrix();
+		//const Matrix4& TM = convex->refTransform->GetMatrix();
+		Matrix4 TM;
 		Matrix4 invTRS = TM.Inverse();
 		Matrix3 invRS = Matrix3(
 			TM.row[0].xyz,
@@ -327,65 +316,10 @@ namespace sark{
 			invRS * ray->dir, true,
 			ray->limit);
 
-		std::vector<Mesh::Face>::const_iterator itr = faces.begin();
-		std::vector<Mesh::Face>::const_iterator end = faces.end();
-		for (; itr != end; itr++){
-			const Vector3& A = vertices[itr->a];
-			const Vector3& B = vertices[itr->b];
-			const Vector3& C = vertices[itr->c];
-			
-			// barycentric form of triangle plane =>
-			// P(v,w) = (1 - v - w)A + vB + wC; {0<=v<=1, 0<=w<=1, 0<=v+w<=1}
-
-			// parametric equation of ray =>
-			// r(t) = o + t*d;
-			// 'o' is start position vector, 'd' is normalized direction vector
-
-			// if the ray intersects with triangle, it'll satisfy the equations below.
-			// P(v,w)=r(t)
-			// => (1 - v - w)A + vB + wC = o + t*d
-			// => (-d)t + (B-A)v + (C-A)w = o - A;
-			// let these to be represented as follows,
-			Vector3 e1 = B - A;
-			Vector3 e2 = C - A;
-			Vector3 s = os_ray.pos - A;
-
-			// and it is linear equation with three variables.
-			//                [t]
-			// [(-d) e1 e2] x [v] = s;
-			//                [w]
-			
-			// from Cramer's rule -
-			// "Ax = b  =>  x_i = det(A_i)/det(A),
-			//  where A_i  is the matrix formed by replacing
-			//  the ith column of A  by the column vector b" -
-			// ,we can get the results.
-			// (well,, it's little hard to express whole equations)
-
-			// result can be summarized by some cross-product rules.
-			// [t]    1     [s ， (e1 x e2)]    1     [(s x e1)，e2]
-			// [v] = ---  x [(-d)，(s X e2)] = ---  x [(d x e2)，s ]
-			// [w]  det(A)  [(-d)，(e1 X s)]  det(A)  [(s x e1)，d ]
-			// , where det(A) is (e2 x e1)，d
-
-			Vector3 p = os_ray.dir.Cross(e2);
-			Vector3 q = s.Cross(e1);
-
-			real det = p.Dot(e1);
-			if (math::real_equal(det, 0))
-				continue;
-			det = 1.f / det;
-
-			real t = det * q.Dot(e2);
-			real v = det * p.Dot(s);
-			real w = det * q.Dot(os_ray.dir);
-
-			// from t,v and w, it can be tested whether ray intersects with triangle or not
-			if (0 <= t && t <= os_ray.limit){
-				if ((v >= 0) && (w >= 0) && (v + w <= 1))
-					return true;
-			}
-		}
+		// for each triangles:
+		//   if Triangle_RayIntersection is true then,
+		//     return true
+		
 		return false;
 	}
 
@@ -404,8 +338,8 @@ namespace sark{
 	// sphere - oriented box intersection
 	bool IsIntersected(const Sphere* sphere, const OrientedBox* obox){ return false; }
 	
-	// sphere - polyhedron intersection
-	bool IsIntersected(const Sphere* sphere, const Polyhedron* poly){ return false; }
+	// sphere - convex hull intersection
+	bool IsIntersected(const Sphere* sphere, const ConvexHull* convex){ return false; }
 
 	// axis aligned box - axis aligned box intersection
 	bool IsIntersected(const AxisAlignedBox* aabox1, const AxisAlignedBox* aabox2){
@@ -425,20 +359,81 @@ namespace sark{
 	// axis aligned box - oriented box intersection
 	bool IsIntersected(const AxisAlignedBox* aabox, const OrientedBox* obox){ return false; }
 	
-	// axis aligned box - polyhedron intersection
-	bool IsIntersected(const AxisAlignedBox* aabox, const Polyhedron* poly){ return false; }
+	// axis aligned box - convex hull intersection
+	bool IsIntersected(const AxisAlignedBox* aabox, const ConvexHull* convex){ return false; }
 
 	// oriented box - oriented box intersection
 	bool IsIntersected(const OrientedBox* obox1, const OrientedBox* obox2){ return false; }
 	
-	// oriented box - polyhedron intersection
-	bool IsIntersected(const OrientedBox* obox, const Polyhedron* poly){ return false; }
+	// oriented box - convex hull intersection
+	bool IsIntersected(const OrientedBox* obox, const ConvexHull* convex){ return false; }
 
-	// polyhedron - polyhedron intersection
-	bool IsIntersected(const Polyhedron* poly1, const Polyhedron* poly2){ return false; }
+	// convex hull - convex hull intersection
+	bool IsIntersected(const ConvexHull* convex1, const ConvexHull* convex2){ return false; }
 
 
 
 	// assistance functions
+
+	// triangle - ray intersection test.
+	bool Triangle_RayIntersection(const Vector3& A, const Vector3& B, const Vector3& C,
+		const Ray* ray, real& outParam_t, real& outParam_v, real& outParam_w)
+	{
+		// barycentric form of triangle plane =>
+		// P(v,w) = (1 - v - w)A + vB + wC; {0<=v<=1, 0<=w<=1, 0<=v+w<=1}
+
+		// parametric equation of ray =>
+		// r(t) = o + t*d;
+		// 'o' is start position vector, 'd' is normalized direction vector
+
+		// if the ray intersects with triangle, it'll satisfy the equations below.
+		// P(v,w)=r(t)
+		// => (1 - v - w)A + vB + wC = o + t*d
+		// => (-d)t + (B-A)v + (C-A)w = o - A;
+		// let these to be represented as follows,
+		Vector3 e1 = B - A;
+		Vector3 e2 = C - A;
+		Vector3 s = ray->pos - A;
+
+		// and it is linear equation with three variables.
+		//                [t]
+		// [(-d) e1 e2] x [v] = s;
+		//                [w]
+
+		// from Cramer's rule -
+		// "Ax = b  =>  x_i = det(A_i)/det(A),
+		//  where A_i  is the matrix formed by replacing
+		//  the ith column of A  by the column vector b" -
+		// ,we can get the results.
+		// (well,, it's little hard to express whole equations)
+
+		// result can be summarized by some cross-product rules.
+		// [t]    1     [s ， (e1 x e2)]    1     [(s x e1)，e2]
+		// [v] = ---  x [(-d)，(s X e2)] = ---  x [(d x e2)，s ]
+		// [w]  det(A)  [(-d)，(e1 X s)]  det(A)  [(s x e1)，d ]
+		// , where det(A) is (e2 x e1)，d
+
+		Vector3 p = ray->dir.Cross(e2);
+		Vector3 q = s.Cross(e1);
+
+		real det = p.Dot(e1);
+		if (math::real_equal(det, 0))
+			return false;
+		det = 1.f / det;
+
+		outParam_t = det * q.Dot(e2);
+		outParam_v = det * p.Dot(s);
+		outParam_w = det * q.Dot(ray->dir);
+
+		// from t,v and w, it can be tested whether ray intersects with triangle or not
+		if (0 <= outParam_t && outParam_t <= ray->limit){
+			if ((outParam_v >= 0) && (outParam_w >= 0)
+				&& (outParam_v + outParam_w <= 1))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 
 }

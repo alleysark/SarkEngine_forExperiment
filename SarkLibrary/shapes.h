@@ -12,14 +12,14 @@ namespace sark{
 	class Sphere;
 	class AxisAlignedBox;
 	class OrientedBox;
-	class Polyhedron;
+	class ConvexHull;
 
 	
 	// interface of shape things.
 	// shape can be intersected with each others.
 	class IShape{
 	public:
-		enum Type{ RAY, SPHERE, AABOX, OBOX, POLYHEDRON, EXTENSION };
+		enum Type{ RAY, SPHERE, AABOX, OBOX, CONVEXHULL, EXTENSION };
 		typedef bool(*ExtShapeIntersectionChecker)(const IShape* shape1, const IShape* shape2);
 
 	protected:
@@ -127,24 +127,10 @@ namespace sark{
 	};
 
 
-	class Mesh;
-	class Transform;
-
-	// polyhedron of triangle set.
-	// it has the reference of mesh and relation transform
-	class Polyhedron : public IShape{
+	// convex hull of vertice data.
+	class ConvexHull : public IShape{
 	public:
-		// reference of mesh.
-		Mesh* refMesh;
-
-		// reference of transform.
-		// it can't be const for calling GetMatrix()
-		Transform* refTransform;
-
-		Polyhedron();
-		Polyhedron(Mesh* referenceMesh, Transform* referenceTransform);
-
-		void Set(Mesh* referenceMesh, Transform* referenceTransform);
+		ConvexHull();
 
 		bool IsIntersectedWith(const IShape* shape) const override;
 	};
@@ -159,8 +145,8 @@ namespace sark{
 	bool IsIntersected(const Ray* ray, const AxisAlignedBox* aabox);
 	// ray - oriented box intersection
 	bool IsIntersected(const Ray* ray, const OrientedBox* obox);
-	// ray - polyhedron intersection
-	bool IsIntersected(const Ray* ray, const Polyhedron* poly);
+	// ray - convex hull intersection
+	bool IsIntersected(const Ray* ray, const ConvexHull* convex);
 
 	// sphere - sphere intersection
 	bool IsIntersected(const Sphere* sphere1, const Sphere* sphere2);
@@ -168,23 +154,23 @@ namespace sark{
 	bool IsIntersected(const Sphere* sphere, const AxisAlignedBox* aabox);
 	// sphere - oriented box intersection
 	bool IsIntersected(const Sphere* sphere, const OrientedBox* obox);
-	// sphere - polyhedron intersection
-	bool IsIntersected(const Sphere* sphere, const Polyhedron* poly);
+	// sphere - convex hull intersection
+	bool IsIntersected(const Sphere* sphere, const ConvexHull* convex);
 
 	// axis aligned box - axis aligned box intersection
 	bool IsIntersected(const AxisAlignedBox* aabox1, const AxisAlignedBox* aabox2);
 	// axis aligned box - oriented box intersection
 	bool IsIntersected(const AxisAlignedBox* aabox, const OrientedBox* obox);
-	// axis aligned box - polyhedron intersection
-	bool IsIntersected(const AxisAlignedBox* aabox, const Polyhedron* poly);
+	// axis aligned box - convex hull intersection
+	bool IsIntersected(const AxisAlignedBox* aabox, const ConvexHull* convex);
 
 	// oriented box - oriented box intersection
 	bool IsIntersected(const OrientedBox* obox1, const OrientedBox* obox2);
-	// oriented box - polyhedron intersection
-	bool IsIntersected(const OrientedBox* obox, const Polyhedron* poly);
+	// oriented box - convex hull intersection
+	bool IsIntersected(const OrientedBox* obox, const ConvexHull* convex);
 
-	// polyhedron - polyhedron intersection
-	bool IsIntersected(const Polyhedron* poly1, const Polyhedron* poly2);
+	// convex hull - convex hull intersection
+	bool IsIntersected(const ConvexHull* convex1, const ConvexHull* convex2);
 
 
 
@@ -207,6 +193,10 @@ namespace sark{
 		}
 		return true;
 	}
+
+	// triangle - ray intersection test.
+	bool Triangle_RayIntersection(const Vector3& A, const Vector3& B, const Vector3& C, 
+		const Ray* ray, real& outParam_t, real& outParam_v, real& outParam_w);
 
 }
 #endif

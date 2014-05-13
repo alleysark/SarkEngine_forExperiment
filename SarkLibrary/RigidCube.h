@@ -10,7 +10,7 @@ namespace sark{
 	// simple rigid cube scene component.
 	class RigidCube : public ASceneComponent{
 	private:
-		// static mesh object
+		// mesh object
 		Mesh* mMesh;
 
 		// bounding box
@@ -28,6 +28,13 @@ namespace sark{
 			real width, real height, real depth);
 		
 		~RigidCube();
+
+		// get width of cube.
+		const real& GetWidth() const;
+		// get height of cube.
+		const real& GetHeight() const;
+		// get depth of cube.
+		const real& GetDepth() const;
 
 		const IShape* GetBoundingShape() const override;
 

@@ -1,4 +1,6 @@
 #include "RigidCube.h"
+#include "TriangleMesh.h"
+#include "primitives.hpp"
 
 namespace sark{
 
@@ -8,7 +10,10 @@ namespace sark{
 		real depth = mDepth / 2.f;
 
 		mMesh = new Mesh();
-		mMesh->SetPositions({
+		ArrayBuffer& arrBuf = mMesh->GetArrayBuffer();
+
+		arrBuf.GenAttributeBuffer<Position3>(
+			ShaderProgram::ATTR_POSITION, {
 			Position3(-width, -height, -depth),
 			Position3(width, -height, -depth),
 			Position3(width, -height, depth),
@@ -16,9 +21,10 @@ namespace sark{
 			Position3(-width, height, -depth),
 			Position3(width, height, -depth),
 			Position3(width, height, depth),
-			Position3(-width, height, depth),
+			Position3(-width, height, depth)
 		});
-		mMesh->SetNormals({
+		arrBuf.GenAttributeBuffer<Normal>(
+			ShaderProgram::ATTR_NORMAL, {
 			Normal(-1, -1, -1),
 			Normal(1, -1, -1),
 			Normal(1, -1, 1),
@@ -28,7 +34,8 @@ namespace sark{
 			Normal(1, 1, 1),
 			Normal(-1, 1, 1)
 		});
-		mMesh->SetTexcoord0s({
+		arrBuf.GenAttributeBuffer<Texcoord>(
+			ShaderProgram::ATTR_TEX_COORD0, {
 			Texcoord(0, 1),
 			Texcoord(1, 1),
 			Texcoord(1, 0),
@@ -38,23 +45,22 @@ namespace sark{
 			Texcoord(1, 0),
 			Texcoord(0, 0)
 		});
-
-		mMesh->SetFaces({
-			Mesh::Face(0, 1, 2),
-			Mesh::Face(0, 2, 3),
-			Mesh::Face(0, 4, 1),
-			Mesh::Face(1, 4, 5),
-			Mesh::Face(3, 4, 0),
-			Mesh::Face(4, 3, 7),
-			Mesh::Face(1, 5, 6),
-			Mesh::Face(6, 2, 1),
-			Mesh::Face(3, 2, 6),
-			Mesh::Face(3, 6, 7),
-			Mesh::Face(4, 6, 5),
-			Mesh::Face(7, 6, 4)
+		
+		arrBuf.GenPrimitiveBuffer<TriangleFace16>({
+			TriangleFace16(0, 1, 2),
+			TriangleFace16(0, 2, 3),
+			TriangleFace16(0, 4, 1),
+			TriangleFace16(1, 4, 5),
+			TriangleFace16(3, 4, 0),
+			TriangleFace16(4, 3, 7),
+			TriangleFace16(1, 5, 6),
+			TriangleFace16(6, 2, 1),
+			TriangleFace16(3, 2, 6),
+			TriangleFace16(3, 6, 7),
+			TriangleFace16(4, 6, 5),
+			TriangleFace16(7, 6, 4)
 		});
-
-		mMesh->BindDatas();
+		arrBuf.SetDrawMode(ArrayBuffer::DrawMode::TRIANGLES);
 
 		mOBox.Set(Position3(0, 0, 0), Vector4(1, 0, 0, width), Vector4(0, 1, 0, height), Vector4(0, 0, 1, depth), true);
 	}
@@ -79,6 +85,19 @@ namespace sark{
 	RigidCube::~RigidCube(){
 		if (mMesh != NULL)
 			delete mMesh;
+	}
+
+	// get width of cube.
+	const real& RigidCube::GetWidth() const{
+		return mWidth;
+	}
+	// get height of cube.
+	const real& RigidCube::GetHeight() const{
+		return mHeight;
+	}
+	// get depth of cube.
+	const real& RigidCube::GetDepth() const{
+		return mDepth;
 	}
 
 	const IShape* RigidCube::GetBoundingShape() const{

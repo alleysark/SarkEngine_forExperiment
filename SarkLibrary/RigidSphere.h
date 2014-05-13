@@ -10,7 +10,7 @@ namespace sark{
 	// simple rigid sphere scene component.
 	class RigidSphere : public ASceneComponent{
 	private:
-		// static mesh object
+		// mesh object
 		Mesh* mMesh;
 
 		// bounding sphere
@@ -29,6 +29,9 @@ namespace sark{
 			real radius, uinteger slice, uinteger stack);
 
 		~RigidSphere();
+
+		// get radius of sphere.
+		const real& GetRadius() const;
 
 		const IShape* GetBoundingShape() const override;
 
