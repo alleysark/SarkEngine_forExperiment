@@ -119,16 +119,11 @@ namespace sark{
 			// const reference of attribute feature.
 			const AttributeFeature* mFeatPtr;
 
-		private:
-			AttributeAccessor<_AttribType>& operator=(const AttributeAccessor<_AttribType>&);
-
 		public:
 			// make empty accessor
 			AttributeAccessor();
 			// make vertex attribute accessor of given data pointer
 			AttributeAccessor(void* ptr, const AttributeFeature* featPtr);
-
-			AttributeAccessor(const AttributeAccessor<_AttribType>&);
 
 			// accessor unmap the mapped pointer when it is destructed.
 			~AttributeAccessor();
@@ -279,21 +274,13 @@ namespace sark{
 		// unbind currently bound primitive buffer object.
 		void UnbindPrimitiveBuffer() const;
 
-		// draw elements. you should have to bind relative
-		// vertex buffer and this index buffer.
+		// draw primitives. you should have to bind relative
+		// vertex buffer and primitive buffer.
 		void DrawPrimitives() const;
 	};
 
 
-
-
-
 	//----- template implementation -----//
-
-	template<class _AttribType>
-	ArrayBuffer::AttributeAccessor<_AttribType>& 
-		ArrayBuffer::AttributeAccessor<_AttribType>::operator=(
-		const AttributeAccessor<_AttribType>&){}
 
 	template<class _AttribType>
 	ArrayBuffer::AttributeAccessor<_AttribType>::AttributeAccessor()
@@ -307,21 +294,13 @@ namespace sark{
 		: mPtr(ptr), mFeatPtr(featPtr)
 	{}
 
-	template<class _AttribType>
-	ArrayBuffer::AttributeAccessor<_AttribType>::AttributeAccessor(
-		const AttributeAccessor<_AttribType>& acc)
-		: mPtr(acc.mPtr), mFeatPtr(acc.mFeatPtr)
-	{
-		acc.mPtr = NULL;
-	}
-
 	// accessor unmap the mapped pointer when it is destructed.
 	template<class _AttribType>
 	ArrayBuffer::AttributeAccessor<_AttribType>::~AttributeAccessor(){
 		if (mPtr != NULL){
-			glBindBuffer(GL_VERTEX_ARRAY, mFeatPtr->bufId);
-			glUnmapBuffer(GL_VERTEX_ARRAY);
-			glBindBuffer(GL_VERTEX_ARRAY, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, mFeatPtr->bufId);
+			glUnmapBuffer(GL_ARRAY_BUFFER);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			mPtr = NULL;
 		}
 	}
@@ -477,20 +456,26 @@ namespace sark{
 		const AttributeFeature& feat = *itr;
 		void* ptr = NULL;
 
+		// access hint validation check and warn.
+		if (feat.bufHint == BufferHint::STATIC){
+			if (hint != AccessHint::READ_ONLY){
+				LogWarn("you may have created the buffer as STATIC for READ_ONLY access");
+			}
+		}
+		else if (feat.bufHint == BufferHint::STREAM){
+			if (hint != AccessHint::WRITE_ONLY){
+				LogWarn("you may have created the buffer as STREAM for WRITE_ONLY access");
+			}
+		}
+
 		// bind buffer before mapping
 		glBindBuffer(GL_ARRAY_BUFFER, feat.bufId);
 
-		// access hint validation check and map buffer
-		if (feat.bufHint == BufferHint::STATIC){
-			ONLYDBG_CODEBLOCK(
-			if (hint != AccessHint::READ_ONLY){
-				LogWarn("STATIC buffer only can be accessed as READ_ONLY");
-			});
-			ptr = glMapBuffer(GL_ARRAY_BUFFER, AccessHint::READ_ONLY);
-		}
-		else{
-			ptr = glMapBuffer(GL_ARRAY_BUFFER, hint);
-		}
+		// map the buffer
+		ptr = glMapBuffer(GL_ARRAY_BUFFER, hint);
+
+		// unbind buffer after mapping
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		// mapping correction check
 		if (ptr == NULL){
