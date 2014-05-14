@@ -14,23 +14,22 @@ namespace sark{
 	ArrayBuffer& ArrayBuffer::operator=(const ArrayBuffer&){ return *this; }
 
 	ArrayBuffer::ArrayBuffer()
-		: mDrawMode(DrawMode::NONE), mDataCount(0), mPrimitiveCount(0)
-	{}
+		: mDrawMode(DrawMode::NONE)
+	{
+		memset(mAttribFeats, NULL, sizeof(mAttribFeats));
+	}
 
 	// delete all generated buffers.
 	ArrayBuffer::~ArrayBuffer(){
 		// delete all attribute buffers.
-		AttribFeatureList::iterator itr = mAttribFeats.begin();
-		AttribFeatureList::iterator end = mAttribFeats.end();
-		for (; itr != end; itr++){
-			if (itr->bufId != 0){
-				glDeleteBuffers(1, &itr->bufId);
+		for (integer i = 0; i < ShaderProgram::ATTR_COUNT; i++){
+			if (mAttribFeats[i] != NULL){
+				if (mAttribFeats[i]->bufId != 0){
+					glDeleteBuffers(1, &mAttribFeats[i]->bufId);
+				}
 			}
+			delete mAttribFeats[i];
 		}
-
-		// delete primitive buffer.
-		if (mPrimitiveFeat.bufId != 0)
-			glDeleteBuffers(1, &mPrimitiveFeat.bufId);
 	}
 
 	// get draw mode.
@@ -43,101 +42,109 @@ namespace sark{
 		mDrawMode = drawMode;
 	}
 
-	// get data count.
-	// as for vertex buffer, it assumes that the data counts
-	// of each attribute buffers are same.
-	const uinteger& ArrayBuffer::GetDataCount() const{
-		return mDataCount;
+	// get data count of specific attribute.
+	// it'll return 0 if given attribute buffer is not exists.
+	const uinteger ArrayBuffer::GetDataCount(ShaderProgram::AttributeSemantic attribSemantic) const{
+		if (mAttribFeats[attribSemantic] == NULL)
+			return 0;
+		return mAttribFeats[attribSemantic]->dataCount;
 	}
-
-	// get primitive data count.
-	const uinteger& ArrayBuffer::GetPrimitiveCount() const{
-		return mPrimitiveCount;
-	}
-
-	// whether it has primitive buffer or not.
-	bool ArrayBuffer::HasPrimitiveBuffer() const{
-		return (mPrimitiveFeat.bufId != 0);
-	}
-
-
-	// ----- vertex attribute array buffer methods -----
 
 	
 	// bind this vertex buffer object.
-	bool ArrayBuffer::BindAttribBuffers() const{
-		if (mAttribFeats.empty())
-			return false;
-
-		AttribFeatureList::const_iterator itr = mAttribFeats.begin();
-		AttribFeatureList::const_iterator end = mAttribFeats.end();
-		for (; itr != end; itr++){
-			glBindBuffer(GL_ARRAY_BUFFER, itr->bufId);
-			glEnableVertexAttribArray(itr->attribTarget);
-			glVertexAttribPointer(itr->attribTarget, itr->elementCount,
-				itr->elementType, 0, 0, NULL);
+	void ArrayBuffer::BindAttribBuffers() const{
+		for (integer i = 0; i < ShaderProgram::ATTR_COUNT; i++){
+			if (mAttribFeats[i] == NULL)
+				continue;
+			
+			glBindBuffer(mAttribFeats[i]->bufTarget, mAttribFeats[i]->bufId);
+			glEnableVertexAttribArray(mAttribFeats[i]->attribTarget);
+			glVertexAttribPointer(
+				mAttribFeats[i]->attribTarget, 
+				mAttribFeats[i]->elementCount,
+				mAttribFeats[i]->elementType, 
+				0, 0, NULL);
 		}
+	}
 
-		return true;
+	// unbind currently bound vertex buffer object 
+	// and disable the enabled vertex attribute arrays.
+	void ArrayBuffer::UnbindAttribBuffers() const{
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		for (integer i = 0; i < ShaderProgram::ATTR_COUNT; i++){
+			if (mAttribFeats[i] == NULL)
+				continue;
+
+			glDisableVertexAttribArray(mAttribFeats[i]->attribTarget);
+		}
 	}
 
 	// bind specific attribute buffer object.
 	bool ArrayBuffer::BindAttribBuffer(ShaderProgram::AttributeSemantic attribSemantic) const{
-		AttribFeatureList::const_iterator itr = mAttribFeats.begin();
-		AttribFeatureList::const_iterator end = mAttribFeats.end();
-		for (; itr != end; itr++){
-			if (itr->attribTarget == attribSemantic){
-				glBindBuffer(GL_ARRAY_BUFFER, itr->bufId);
-				glEnableVertexAttribArray(itr->attribTarget);
-				glVertexAttribPointer(itr->attribTarget, itr->elementCount,
-					itr->elementType, 0, 0, NULL);
-				return true;
-			}
-		}
-		return false;
+		if (mAttribFeats[attribSemantic] == NULL)
+			return false;
+
+		glBindBuffer(mAttribFeats[attribSemantic]->bufTarget, mAttribFeats[attribSemantic]->bufId);
+		glEnableVertexAttribArray(mAttribFeats[attribSemantic]->attribTarget);
+		glVertexAttribPointer(
+			mAttribFeats[attribSemantic]->attribTarget,
+			mAttribFeats[attribSemantic]->elementCount,
+			mAttribFeats[attribSemantic]->elementType, 
+			0, 0, NULL);
+		return true;
 	}
 
-	// unbind currently bound vertex buffer object.
-	void ArrayBuffer::UnbindAttribBuffers() const{
+	// unbind currently bound vertex buffer object 
+	// and disable specific vertex attribute array.
+	bool ArrayBuffer::UnbindAttribBuffer(ShaderProgram::AttributeSemantic attribSemantic) const{
+		if (mAttribFeats[attribSemantic] == NULL)
+			return false;
+
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		AttribFeatureList::const_iterator itr = mAttribFeats.begin();
-		AttribFeatureList::const_iterator end = mAttribFeats.end();
-		for (; itr != end; itr++){
-			glDisableVertexAttribArray(itr->attribTarget);
-		}
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		glDisableVertexAttribArray(mAttribFeats[attribSemantic]->attribTarget);
+		return true;
 	}
+
+	
 
 	// draw vertex array directly.
 	// you should have to bind this buffer.
 	void ArrayBuffer::DrawArrays() const{
-		if (mDrawMode != DrawMode::NONE)
-			glDrawArrays(mDrawMode, 0, mDataCount);
-	}
+		ONLYDBG_CODEBLOCK(
+		if (mAttribFeats[ShaderProgram::ATTR_POSITION] == NULL){
+			LogWarn("positions are the essential attribute to draw");
+			return;
+		}
+		if (mDrawMode == DrawMode::NONE){
+			LogWarn("you should have set the draw mode to draw");
+			return;
+		});
 
-
-	// ----- primitive array buffer methods -----
-
-	// bind primitive buffer object.
-	bool ArrayBuffer::BindPrimitiveBuffer() const{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mPrimitiveFeat.bufId);
-		glEnableVertexAttribArray(mPrimitiveFeat.attribTarget);
-		glVertexAttribPointer(mPrimitiveFeat.attribTarget,
-			mPrimitiveFeat.elementCount, mPrimitiveFeat.elementType, 0, 0, NULL);
-
-		return true;
-	}
-
-	// unbind currently bound primitive buffer object.
-	void ArrayBuffer::UnbindPrimitiveBuffer() const{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glDisableVertexAttribArray(mPrimitiveFeat.attribTarget);
+		glDrawArrays(mDrawMode, 0, mAttribFeats[ShaderProgram::ATTR_POSITION]->dataCount);
 	}
 
 	// draw elements. you should have to bind relative
 	// vertex buffer and this index buffer.
 	void ArrayBuffer::DrawPrimitives() const{
+		ONLYDBG_CODEBLOCK(
+		if (mAttribFeats[ShaderProgram::ATTR_POSITION] == NULL){
+			LogWarn("positions are the essential attribute to draw");
+			return;
+		}
+		if (mAttribFeats[ShaderProgram::ATTR_INDICES] == NULL){
+			LogWarn("indices are required to draw arrays as 'element'");
+		}
+		if (mDrawMode == DrawMode::NONE){
+			LogWarn("you should have set the draw mode to draw");
+			return;
+		});
+
 		glDrawElements(mDrawMode,
-			mPrimitiveCount * mPrimitiveFeat.elementCount,
-			mPrimitiveFeat.elementType, NULL);
+			mAttribFeats[ShaderProgram::ATTR_INDICES]->dataCount * mAttribFeats[ShaderProgram::ATTR_INDICES]->elementCount,
+			mAttribFeats[ShaderProgram::ATTR_INDICES]->elementType, NULL);
 	}
 }

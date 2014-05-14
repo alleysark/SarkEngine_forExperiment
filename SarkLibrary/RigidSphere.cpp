@@ -53,7 +53,9 @@ namespace sark{
 		arrBuf.GenAttributeBuffer<Texcoord>(
 			ShaderProgram::ATTR_TEX_COORD0, texcoords);
 
-		arrBuf.GenPrimitiveBuffer<TriangleFace16>(indices);
+		arrBuf.GenAttributeBuffer<TriangleFace16>(
+			ShaderProgram::ATTR_INDICES, indices);
+
 		arrBuf.SetDrawMode(ArrayBuffer::DrawMode::TRIANGLES);
 
 		mSphere.Set(Position3(0, 0, 0), mRadius);

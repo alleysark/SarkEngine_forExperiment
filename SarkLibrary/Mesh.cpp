@@ -25,10 +25,8 @@ namespace sark{
 	// *note: this method is fully overridable.
 	void Mesh::Draw() const{
 		mArrayBuf.BindAttribBuffers();
-		if (mArrayBuf.HasPrimitiveBuffer()){
-			mArrayBuf.BindPrimitiveBuffer();
+		if (mArrayBuf.GetDataCount(ShaderProgram::ATTR_INDICES)!=0){
 			mArrayBuf.DrawPrimitives();
-			mArrayBuf.UnbindPrimitiveBuffer();
 		}
 		else{
 			mArrayBuf.DrawArrays();

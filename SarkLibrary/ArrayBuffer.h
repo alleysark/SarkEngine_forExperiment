@@ -5,16 +5,16 @@
 #include <list>
 #include "core.h"
 #include "ShaderProgram.h"
+#include "primitives.hpp"
 #include "Debug.h"
 
 namespace sark{
 
-	// array buffer object for mesh.
-	// it defines vertex buffers of user-defined attribute
-	// type and also can define primitive buffer of user-defined
-	// primitive types. 
-	// it offers you the methods of accessing mapped buffer
-	// as attribute accessor.
+	// array buffer object for mesh data.
+	// it offers you the function to generate vertex attribute
+	// array buffer with user-defined attribute type.
+	// it also offers you the accessor of mapped attribute array
+	// buffer which is the random-accessible memory.
 	class ArrayBuffer{
 	public:
 		// buffer storage hint
@@ -85,11 +85,15 @@ namespace sark{
 			// attribute target, e.g. ShaderProgram::ATTR_POSITION.
 			ShaderProgram::AttributeSemantic attribTarget;
 
-			// attribute element count, e.g. 3 for Position3 (x, y and z).
+			// the number of attribute element,
+			// e.g. 3 for Position3 (x, y and z).
 			uinteger elementCount;
 
 			// element type of attribute.
 			ElementType elementType;
+
+			// buffer target.
+			uinteger bufTarget;
 
 			// attribute vertex buffer object.
 			ObjectHandle bufId;
@@ -99,6 +103,9 @@ namespace sark{
 
 			// buffer data storage hint
 			BufferHint bufHint;
+
+			// the number of data.
+			uinteger dataCount;
 
 		public:
 			AttributeFeature();
@@ -134,6 +141,12 @@ namespace sark{
 			// get the number of attribute elements
 			uinteger Count() const;
 
+			// destroy this attribute accessor explicitly.
+			// it unmap the mapped buffer and make accessor empty.
+			// *note: even though you didn't destroy accessor by
+			// calling this, its destructor will destroy implicitly.
+			void Destroy() const;
+
 			// get the reference of attribute value at 'index'.
 			//
 			// *note: it's better to indicate the result to
@@ -145,24 +158,12 @@ namespace sark{
 			const _AttribType& operator[](uinteger index) const;
 		};
 
-		// type of attribute feature list.
-		typedef std::list<AttributeFeature> AttribFeatureList;
-
 	private:
 		// primitive draw mode.
 		DrawMode mDrawMode;
 
-		// attribute data count.
-		uinteger mDataCount;
-
-		// primitive data count.
-		uinteger mPrimitiveCount;
-
 		// attribute buffer feature list
-		AttribFeatureList mAttribFeats;
-
-		// primitive buffer feature.
-		AttributeFeature mPrimitiveFeat;
+		AttributeFeature* mAttribFeats[ShaderProgram::ATTR_COUNT];
 
 	private:
 		ArrayBuffer(const ArrayBuffer&);
@@ -180,19 +181,10 @@ namespace sark{
 		// set draw mode.
 		void SetDrawMode(DrawMode drawMode);
 
-		// get attribute data count.
-		// as for vertex buffer, it assumes that the data counts
-		// of each attribute buffers are same.
-		const uinteger& GetDataCount() const;
+		// get data count of specific attribute.
+		// it'll return 0 if given attribute buffer is not exists.
+		const uinteger GetDataCount(ShaderProgram::AttributeSemantic attribSemantic) const;
 
-		// get primitive data count.
-		const uinteger& GetPrimitiveCount() const;
-
-		// whether it has primitive buffer or not.
-		bool HasPrimitiveBuffer() const;
-
-
-		// ----- vertex attribute array buffer methods -----
 
 		// generate attribute buffer with relative informations.
 		//
@@ -208,7 +200,7 @@ namespace sark{
 			const std::vector<_AttribType>& data,
 			BufferHint storageHint = BufferHint::STATIC);
 
-		// get mapped vertices attribute accessor.
+		// get mapped attribute buffer accessor.
 		//
 		// *note: you don't need to bind buffer before calling this.
 		// it bind buffer automatically in here.
@@ -225,54 +217,23 @@ namespace sark{
 
 		// bind this vertex attribute buffer object.
 		// after using, it have to be unbinded.
-		bool BindAttribBuffers() const;
+		void BindAttribBuffers() const;
+
+		// unbind currently bound vertex buffer object 
+		// and disable the enabled vertex attribute arrays.
+		void UnbindAttribBuffers() const;
 
 		// bind specific attribute buffer object.
 		bool BindAttribBuffer(ShaderProgram::AttributeSemantic attribSemantic) const;
 
-		// unbind currently bound vertex buffer object.
-		void UnbindAttribBuffers() const;
+		// unbind currently bound vertex buffer object 
+		// and disable specific vertex attribute array.
+		bool UnbindAttribBuffer(ShaderProgram::AttributeSemantic attribSemantic) const;
+		
 
 		// draw vertex array directly.
 		// you should have to bind this buffer.
 		void DrawArrays() const;
-
-
-		// ----- primitive array buffer methods -----
-
-		// generate primitive array buffer with relative informations.
-		//
-		// *details:
-		// _PrimitiveType - type of primitive, e.g. TriangleFace16.
-		// _ElemType      - type of element of attribute.
-		// drawMode       - how to draw the given primitive data.
-		// data           - array data of primitives.
-		// storageHint    - buffer object storage hint.
-		template<class _PrimitiveType, ElementType _ElemType = ElementType::NONE>
-		bool GenPrimitiveBuffer(
-			const std::vector<_PrimitiveType>& data,
-			BufferHint storageHint = BufferHint::STATIC);
-
-		// get mapped primitive attribute accessor.
-		//
-		// *note: you don't need to bind buffer before calling this.
-		// it bind buffer automatically in here.
-		// *note: attribute accessor will unmap the mapped buffer pointer
-		// automatically when it is destructed. so please do not store
-		// returned accessor at your scope(e.g. member variable).
-		// *note: if your buffer storage mode was STATIC then the access
-		// mode only going to be the READ_ONLY even though you were passing
-		// the other access hint.
-		template<class _PrimitiveType>
-		AttributeAccessor<_PrimitiveType> GetPrimitiveAccessor(
-			AccessHint hint = AccessHint::READ_ONLY);
-
-		// bind primitive buffer object.
-		// after using, it have to be unbinded.
-		bool BindPrimitiveBuffer() const;
-
-		// unbind currently bound primitive buffer object.
-		void UnbindPrimitiveBuffer() const;
 
 		// draw primitives. you should have to bind relative
 		// vertex buffer and primitive buffer.
@@ -280,7 +241,7 @@ namespace sark{
 	};
 
 
-	//----- template implementation -----//
+	//----- template implementation of ArrayBuffer::AttributeAccessor -----//
 
 	template<class _AttribType>
 	ArrayBuffer::AttributeAccessor<_AttribType>::AttributeAccessor()
@@ -297,12 +258,8 @@ namespace sark{
 	// accessor unmap the mapped pointer when it is destructed.
 	template<class _AttribType>
 	ArrayBuffer::AttributeAccessor<_AttribType>::~AttributeAccessor(){
-		if (mPtr != NULL){
-			glBindBuffer(GL_ARRAY_BUFFER, mFeatPtr->bufId);
-			glUnmapBuffer(GL_ARRAY_BUFFER);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			mPtr = NULL;
-		}
+		if (mPtr != NULL)
+			Destroy();
 	}
 
 	// is this accessor empty?
@@ -315,6 +272,17 @@ namespace sark{
 	template<class _AttribType>
 	uinteger ArrayBuffer::AttributeAccessor<_AttribType>::Count() const{
 		return mFeatPtr->bufSize / sizeof(_AttribType);
+	}
+
+	// destroy this attribute accessor explicitly.
+	template<class _AttribType>
+	void ArrayBuffer::AttributeAccessor<_AttribType>::Destroy() const{
+		if (mPtr != NULL){
+			glBindBuffer(mFeatPtr->bufTarget, mFeatPtr->bufId);
+			glUnmapBuffer(mFeatPtr->bufTarget);
+			glBindBuffer(mFeatPtr->bufTarget, 0);
+			mPtr = NULL;
+		}
 	}
 
 	// get the reference of attribute value at 'index'.
@@ -341,7 +309,7 @@ namespace sark{
 	}
 
 
-	// ----- implementation of vertex attribute array buffer methods -----
+	//----- template implementation of ArrayBuffer -----//
 
 	// generate attribute buffer with relative informations.
 	template<class _AttribType, ArrayBuffer::ElementType _ElemType>
@@ -349,51 +317,59 @@ namespace sark{
 		ShaderProgram::AttributeSemantic attribSemantic,
 		const std::vector<_AttribType>& data, BufferHint storageHint)
 	{
-		if (attribSemantic == ShaderProgram::ATTR_INDICES){
-			LogWarn("use GenPrimitiveBuffer to generate the primitive indices");
+		// check uniqueness of attribute type.
+		if (mAttribFeats[attribSemantic] != NULL){
+			LogWarn("there is the buffer generation request of "
+				"existent attribute type");
 			return false;
 		}
 
-		// check uniqueness of attribute type.
-		AttribFeatureList::iterator itr = mAttribFeats.begin();
-		AttribFeatureList::iterator end = mAttribFeats.end();
-		for (; itr != end; itr++){
-			if (itr->attribTarget == attribSemantic){
-				LogWarn("there is the buffer generation request of "
-					"existent attribute type");
-				return false;
-			}
-		}
-
-		// check data count appropriacy.
-		if (mDataCount == 0)
-			mDataCount = data.size();
-		else{
-			if (mDataCount != data.size()){
-				LogWarn("the number of requested attribute data is "
-					"not equal to previous things");
-			}
-		}
-
+		// declare temporary attribute feature data.
 		AttributeFeature feat;
 
 		// check and fill element type and element count.
 		if (_ElemType == ElementType::NONE){
-			feat.elementType = ElementType::REAL;
-
 			const std::type_info& attr_type = typeid(_AttribType);
-			if (attr_type == typeid(real))
-				feat.elementCount = 1;
-			else if (attr_type == typeid(Vector2))
-				feat.elementCount = 2;
-			else if (attr_type == typeid(Vector3))
-				feat.elementCount = 3;
-			else if (attr_type == typeid(Vector4))
-				feat.elementCount = 4;
+
+			if (attribSemantic != ShaderProgram::ATTR_INDICES){				
+				feat.elementType = ElementType::REAL;
+				if (attr_type == typeid(real))
+					feat.elementCount = 1;
+				else if (attr_type == typeid(Vector2))
+					feat.elementCount = 2;
+				else if (attr_type == typeid(Vector3))
+					feat.elementCount = 3;
+				else if (attr_type == typeid(Vector4))
+					feat.elementCount = 4;
+				else{
+					LogWarn("auto-detection of element properties only supports for "
+						"_AttribType of [real | Vector2 | Vector3 | Vector4]");
+					return false;
+				}
+			}
 			else{
-				LogWarn("auto-detection of element properties only supports for "
-					"_AttribType of [real | Vector2 | Vector3 | Vector4]");
-				return false;
+				if (attr_type == typeid(TriangleFace16)){
+					feat.elementType = ElementType::UNSIGNED_SHORT;
+					feat.elementCount = 3;
+				}
+				else if (attr_type == typeid(TriangleFace32)){
+					feat.elementType = ElementType::UNSIGNED_INT;
+					feat.elementCount = 3;
+				}
+				else if (attr_type == typeid(QuadFace16)){
+					feat.elementType = ElementType::UNSIGNED_SHORT;
+					feat.elementCount = 4;
+				}
+				else if (attr_type == typeid(QuadFace32)){
+					feat.elementType = ElementType::UNSIGNED_INT;
+					feat.elementCount = 4;
+				}
+				else{
+					LogWarn("auto-detection of element properties "
+						"only supports for _PrimitiveType of "
+						"[TriangleFace16 | TriangleFace32 | QuadFace16 | QuadFace32]");
+					return false;
+				}
 			}
 		}
 		else{
@@ -415,8 +391,17 @@ namespace sark{
 			}
 		}
 
-		// set other attribute features
+		// set other attribute features.
 		feat.attribTarget = attribSemantic;
+
+		// set data count
+		feat.dataCount = data.size();
+
+		// set buffer features.
+		feat.bufTarget
+			= (attribSemantic == ShaderProgram::ATTR_INDICES
+			? GL_ELEMENT_ARRAY_BUFFER
+			: GL_ARRAY_BUFFER);
 		feat.bufSize = sizeof(_AttribType)*data.size();
 		feat.bufHint = storageHint;
 
@@ -428,54 +413,55 @@ namespace sark{
 		}
 
 		// set buffer data
-		glBindBuffer(GL_ARRAY_BUFFER, feat.bufId);
-		glBufferData(GL_ARRAY_BUFFER, feat.bufSize, &data[0], feat.bufHint);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(feat.bufTarget, feat.bufId);
+		glBufferData(feat.bufTarget, feat.bufSize, &data[0], feat.bufHint);
+		glBindBuffer(feat.bufTarget, 0);
 
-		mAttribFeats.push_back(feat);
+		// create attribute feature and copy data
+		mAttribFeats[attribSemantic] = new AttributeFeature(feat);
+		if (mAttribFeats[attribSemantic] == NULL){
+			LogError("failed to allocate attribute feature");
+			return false;
+		}
 		return true;
 	}
 
-	// get mapped vertices attribute accessor.
+	// get mapped attribute buffer accessor.
 	template<class _AttribType>
 	ArrayBuffer::AttributeAccessor<_AttribType> ArrayBuffer::GetAttributeAccessor(
 		ShaderProgram::AttributeSemantic attribSemantic, AccessHint hint)
 	{
-		// find required attribute in feature list and check.
-		AttribFeatureList::iterator itr = mAttribFeats.begin();
-		AttribFeatureList::iterator end = mAttribFeats.end();
-		for (; itr != end; itr++){
-			if (itr->attribTarget == attribSemantic)
-				break;
-		}
-		if (itr == end){
-			LogWarn("there is no matched attribute in attribute feature list");
+		// existence check
+		if (mAttribFeats[attribSemantic] == NULL){
+			std::string err_str = "there is no buffer for the attribute '" +
+				ShaderProgram::AttributeNames[attribSemantic] + "'";
+			LogWarn(err_str);
 			return AttributeAccessor<_AttribType>();
 		}
-
-		const AttributeFeature& feat = *itr;
+		
+		const AttributeFeature* feat = mAttribFeats[attribSemantic];
 		void* ptr = NULL;
 
 		// access hint validation check and warn.
-		if (feat.bufHint == BufferHint::STATIC){
+		if (feat->bufHint == BufferHint::STATIC){
 			if (hint != AccessHint::READ_ONLY){
 				LogWarn("you may have created the buffer as STATIC for READ_ONLY access");
 			}
 		}
-		else if (feat.bufHint == BufferHint::STREAM){
+		else if (feat->bufHint == BufferHint::STREAM){
 			if (hint != AccessHint::WRITE_ONLY){
 				LogWarn("you may have created the buffer as STREAM for WRITE_ONLY access");
 			}
 		}
 
 		// bind buffer before mapping
-		glBindBuffer(GL_ARRAY_BUFFER, feat.bufId);
+		glBindBuffer(feat->bufTarget, feat->bufId);
 
 		// map the buffer
-		ptr = glMapBuffer(GL_ARRAY_BUFFER, hint);
+		ptr = glMapBuffer(feat->bufTarget, hint);
 
 		// unbind buffer after mapping
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(feat->bufTarget, 0);
 
 		// mapping correction check
 		if (ptr == NULL){
@@ -487,123 +473,8 @@ namespace sark{
 		}
 
 		// return valid attribute accessor
-		return AttributeAccessor<_AttribType>(ptr, &feat);
+		return AttributeAccessor<_AttribType>(ptr, feat);
 	}
-
-
-	// ------ implementation of index array buffer methods -----
-
-	// generate primitive array buffer with relative informations.
-	template<class _PrimitiveType, ArrayBuffer::ElementType _ElemType>
-	bool ArrayBuffer::GenPrimitiveBuffer(
-		const std::vector<_PrimitiveType>& data, BufferHint storageHint)
-	{
-		// check whether primitive buffer is generated previously.
-		if (mPrimitiveFeat.bufId != 0)
-			return false;
-
-		// check and fill element type and element count.
-		if (_ElemType == ElementType::NONE){
-			const std::type_info& prim_type = typeid(_PrimitiveType);
-			if (prim_type == typeid(TriangleFace16)){
-				mPrimitiveFeat.elementType = ElementType::UNSIGNED_SHORT;
-				mPrimitiveFeat.elementCount = 3;
-			}
-			else if (prim_type == typeid(TriangleFace32)){
-				mPrimitiveFeat.elementType = ElementType::UNSIGNED_INT;
-				mPrimitiveFeat.elementCount = 3;
-			}
-			else if (prim_type == typeid(QuadFace16)){
-				mPrimitiveFeat.elementType = ElementType::UNSIGNED_SHORT;
-				mPrimitiveFeat.elementCount = 4;
-			}
-			else if (prim_type == typeid(QuadFace32)){
-				mPrimitiveFeat.elementType = ElementType::UNSIGNED_INT;
-				mPrimitiveFeat.elementCount = 4;
-			}
-			else{
-				LogWarn("auto-detection of element properties "
-					"only supports for _PrimitiveType of "
-					"[TriangleFace16 | TriangleFace32 | QuadFace16 | QuadFace32]");
-				return false;
-			}
-		}
-		else{
-			mPrimitiveFeat.elementType = _ElemType;
-
-			switch (_ElemType){
-			case ElementType::REAL:
-				mPrimitiveFeat.elementCount = sizeof(_PrimitiveType) / sizeof(real);
-				break;
-			case ElementType::UNSIGNED_BYTE:
-				mPrimitiveFeat.elementCount = sizeof(_PrimitiveType);
-				break;
-			case ElementType::UNSIGNED_SHORT:
-				mPrimitiveFeat.elementCount = sizeof(_PrimitiveType) / 2;
-				break;
-			case ElementType::UNSIGNED_INT:
-				mPrimitiveFeat.elementCount = sizeof(_PrimitiveType) / 4;
-				break;
-			}
-		}
-
-		// set other attribute features
-		mPrimitiveFeat.attribTarget = ShaderProgram::ATTR_INDICES;
-		mPrimitiveFeat.bufSize = sizeof(_PrimitiveType)*data.size();
-		mPrimitiveFeat.bufHint = storageHint;
-
-		// set primitive count.
-		mPrimitiveCount = data.size();
-
-		// generate buffer
-		glGenBuffers(1, &mPrimitiveFeat.bufId);
-		if (mPrimitiveFeat.bufId == 0){
-			LogError("failed to generate buffer");
-			return false;
-		}
-
-		// set buffer data
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mPrimitiveFeat.bufId);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-			mPrimitiveFeat.bufSize, &data[0], mPrimitiveFeat.bufHint);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		return true;
-	}
-
-	// get mapped primitive attribute accessor.
-	template<class _PrimitiveType>
-	ArrayBuffer::AttributeAccessor<_PrimitiveType>
-		ArrayBuffer::GetPrimitiveAccessor(AccessHint hint)
-	{
-			void* ptr = NULL;
-
-			// bind buffer before mapping
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mPrimitiveFeat.bufId);
-
-			// access hint validation check and map buffer
-			if (mPrimitiveFeat.bufHint == BufferHint::STATIC){
-				ONLYDBG_CODEBLOCK(
-				if (hint != AccessHint::READ_ONLY){
-					LogWarn("STATIC buffer only can be accessed as READ_ONLY");
-				});
-				ptr = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, AccessHint::READ_ONLY);
-			}
-			else{
-				ptr = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, hint);
-			}
-
-			// mapping correction check
-			if (ptr == NULL){
-				GLenum errcode = glGetError();
-				std::string err_str = "failed to map buffer\n";
-				err_str += reinterpret_cast<const char*>(gluErrorString(errcode));
-				LogError(err_str);
-				return AttributeAccessor<_PrimitiveType>();
-			}
-
-			// return valid primitive accessor
-			return AttributeAccessor<_PrimitiveType>(ptr, &mPrimitiveFeat);
-		}
 
 }
 #endif
