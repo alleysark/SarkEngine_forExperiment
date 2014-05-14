@@ -87,8 +87,8 @@ namespace sark{
 		glAttachShader(progObj, fragObj);
 
 		// bind pre-defined attribute semantics
-		for (int attrLoca = 0; attrLoca < ShaderProgram::ATTR_COUNT; attrLoca++){
-			glBindAttribLocation(progObj, attrLoca, ShaderProgram::AttributeNames[attrLoca]);
+		for (int attrLoca = 0; attrLoca < AttributeSemantic::COUNT; attrLoca++){
+			glBindAttribLocation(progObj, attrLoca, AttributeSemanticNames[attrLoca]);
 		}
 
 		// link program and check link error
@@ -156,8 +156,8 @@ namespace sark{
 		glAttachShader(progObj, fragObj);
 
 		// bind pre-defined attribute semantics
-		for (int attrLoca = 0; attrLoca < ShaderProgram::ATTR_COUNT; attrLoca++){
-			glBindAttribLocation(progObj, attrLoca, ShaderProgram::AttributeNames[attrLoca]);
+		for (int attrLoca = 0; attrLoca < AttributeSemantic::COUNT; attrLoca++){
+			glBindAttribLocation(progObj, attrLoca, AttributeSemanticNames[attrLoca]);
 		}
 
 		// link program and check link error

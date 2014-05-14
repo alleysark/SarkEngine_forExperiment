@@ -11,27 +11,44 @@ namespace sark{
 	class Sampler;
 	class Texture;
 
+
+	// attribute semantics for programmable pipeline.
+	struct _AttributeSemantic_wrapper{
+		enum AttributeSemantic{
+			POSITION = 0,
+			NORMAL,
+			COLOR,
+			TEXCOORD0,
+			TEXCOORD1,
+			TEXCOORD2,
+			TEXCOORD3,
+			INDICES,
+
+			//for counting semantic.
+			COUNT
+		};
+	};
+	typedef _AttributeSemantic_wrapper::AttributeSemantic AttributeSemantic;
+	
+	// attribute semantic names.
+	static const char* AttributeSemanticNames[AttributeSemantic::COUNT] = {
+		"position",
+		"normal",
+		"color",
+		"texcoord0",
+		"texcoord1",
+		"texcoord2",
+		"texcoord3",
+		"indices"
+	};
+
+
 	// programmable shader program.
 	// it'll be created by ShaderDictionary 
 	class ShaderProgram{
 	public:	
 		typedef GLint Location;
 		typedef std::map<const std::string, Location> LocationDictionary;
-
-		enum AttributeSemantic{
-			ATTR_POSITION=0,
-			ATTR_NORMAL,
-			ATTR_COLOR,
-			ATTR_TEX_COORD0,
-			ATTR_TEX_COORD1,
-			ATTR_TEX_COORD2,
-			ATTR_TEX_COORD3,
-			ATTR_INDICES,
-
-			//for counting semantic.
-			ATTR_COUNT
-		};
-		static const char* const AttributeNames[];
 
 	private:
 		// program handler

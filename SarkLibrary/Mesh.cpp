@@ -25,7 +25,7 @@ namespace sark{
 	// *note: this method is fully overridable.
 	void Mesh::Draw() const{
 		mArrayBuf.BindAttribBuffers();
-		if (mArrayBuf.GetDataCount(ShaderProgram::ATTR_INDICES)!=0){
+		if (mArrayBuf.GetDataCount(AttributeSemantic::INDICES) != 0){
 			mArrayBuf.DrawPrimitives();
 		}
 		else{

@@ -47,14 +47,14 @@ namespace sark{
 		ArrayBuffer& arrBuf = mMesh->GetArrayBuffer();
 		
 		arrBuf.GenAttributeBuffer<Position3>(
-			ShaderProgram::ATTR_POSITION, positions);
+			AttributeSemantic::POSITION, positions);
 		arrBuf.GenAttributeBuffer<Normal>(
-			ShaderProgram::ATTR_NORMAL, normals);
+			AttributeSemantic::NORMAL, normals);
 		arrBuf.GenAttributeBuffer<Texcoord>(
-			ShaderProgram::ATTR_TEX_COORD0, texcoords);
+			AttributeSemantic::TEXCOORD0, texcoords);
 
 		arrBuf.GenAttributeBuffer<TriangleFace16>(
-			ShaderProgram::ATTR_INDICES, indices);
+			AttributeSemantic::INDICES, indices);
 
 		arrBuf.SetDrawMode(ArrayBuffer::DrawMode::TRIANGLES);
 

@@ -12,7 +12,7 @@ namespace sark{
 		ArrayBuffer& arrBuf = mMesh->GetArrayBuffer();
 
 		arrBuf.GenAttributeBuffer<Position3>(
-			ShaderProgram::ATTR_POSITION, {
+			AttributeSemantic::POSITION, {
 			//top
 			Position3(-width, height, -depth),
 			Position3(-width, height, depth),
@@ -45,7 +45,7 @@ namespace sark{
 			Position3(width, -height, depth)
 		});
 		arrBuf.GenAttributeBuffer<Normal>(
-			ShaderProgram::ATTR_NORMAL, {
+			AttributeSemantic::NORMAL, {
 			Normal(0, 1, 0), Normal(0, 1, 0), Normal(0, 1, 0), Normal(0, 1, 0),
 			Normal(0, 0, 1), Normal(0, 0, 1), Normal(0, 0, 1), Normal(0, 0, 1),
 			Normal(-1, 0, 0), Normal(-1, 0, 0), Normal(-1, 0, 0), Normal(-1, 0, 0),
@@ -54,7 +54,7 @@ namespace sark{
 			Normal(0, -1, 0), Normal(0, -1, 0), Normal(0, -1, 0), Normal(0, -1, 0)
 		});
 		arrBuf.GenAttributeBuffer<Texcoord>(
-			ShaderProgram::ATTR_TEX_COORD0, {
+			AttributeSemantic::TEXCOORD0, {
 			Texcoord(0, 0), Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0),
 			Texcoord(0, 0), Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0),
 			Texcoord(0, 0), Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0),

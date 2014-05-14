@@ -83,7 +83,7 @@ namespace sark{
 		class AttributeFeature{
 		public:
 			// attribute target, e.g. ShaderProgram::ATTR_POSITION.
-			ShaderProgram::AttributeSemantic attribTarget;
+			AttributeSemantic attribTarget;
 
 			// the number of attribute element,
 			// e.g. 3 for Position3 (x, y and z).
@@ -163,7 +163,7 @@ namespace sark{
 		DrawMode mDrawMode;
 
 		// attribute buffer feature list
-		AttributeFeature* mAttribFeats[ShaderProgram::ATTR_COUNT];
+		AttributeFeature* mAttribFeats[AttributeSemantic::COUNT];
 
 	private:
 		ArrayBuffer(const ArrayBuffer&);
@@ -183,7 +183,7 @@ namespace sark{
 
 		// get data count of specific attribute.
 		// it'll return 0 if given attribute buffer is not exists.
-		const uinteger GetDataCount(ShaderProgram::AttributeSemantic attribSemantic) const;
+		const uinteger GetDataCount(AttributeSemantic attribSemantic) const;
 
 
 		// generate attribute buffer with relative informations.
@@ -196,7 +196,7 @@ namespace sark{
 		// storageHint    - buffer object storage hint.
 		template<class _AttribType, ElementType _ElemType = ElementType::NONE>
 		bool GenAttributeBuffer(
-			ShaderProgram::AttributeSemantic attribSemantic,
+			AttributeSemantic attribSemantic,
 			const std::vector<_AttribType>& data,
 			BufferHint storageHint = BufferHint::STATIC);
 
@@ -212,7 +212,7 @@ namespace sark{
 		// the other access hint.
 		template<class _AttribType>
 		AttributeAccessor<_AttribType> GetAttributeAccessor(
-			ShaderProgram::AttributeSemantic attribSemantic,
+			AttributeSemantic attribSemantic,
 			AccessHint hint = AccessHint::READ_ONLY);
 
 		// bind this vertex attribute buffer object.
@@ -224,11 +224,11 @@ namespace sark{
 		void UnbindAttribBuffers() const;
 
 		// bind specific attribute buffer object.
-		bool BindAttribBuffer(ShaderProgram::AttributeSemantic attribSemantic) const;
+		bool BindAttribBuffer(AttributeSemantic attribSemantic) const;
 
 		// unbind currently bound vertex buffer object 
 		// and disable specific vertex attribute array.
-		bool UnbindAttribBuffer(ShaderProgram::AttributeSemantic attribSemantic) const;
+		bool UnbindAttribBuffer(AttributeSemantic attribSemantic) const;
 		
 
 		// draw vertex array directly.
@@ -313,8 +313,7 @@ namespace sark{
 
 	// generate attribute buffer with relative informations.
 	template<class _AttribType, ArrayBuffer::ElementType _ElemType>
-	bool ArrayBuffer::GenAttributeBuffer(
-		ShaderProgram::AttributeSemantic attribSemantic,
+	bool ArrayBuffer::GenAttributeBuffer(AttributeSemantic attribSemantic,
 		const std::vector<_AttribType>& data, BufferHint storageHint)
 	{
 		// check uniqueness of attribute type.
@@ -331,7 +330,7 @@ namespace sark{
 		if (_ElemType == ElementType::NONE){
 			const std::type_info& attr_type = typeid(_AttribType);
 
-			if (attribSemantic != ShaderProgram::ATTR_INDICES){				
+			if (attribSemantic != AttributeSemantic::INDICES){
 				feat.elementType = ElementType::REAL;
 				if (attr_type == typeid(real))
 					feat.elementCount = 1;
@@ -399,7 +398,7 @@ namespace sark{
 
 		// set buffer features.
 		feat.bufTarget
-			= (attribSemantic == ShaderProgram::ATTR_INDICES
+			= (attribSemantic == AttributeSemantic::INDICES
 			? GL_ELEMENT_ARRAY_BUFFER
 			: GL_ARRAY_BUFFER);
 		feat.bufSize = sizeof(_AttribType)*data.size();
@@ -429,12 +428,12 @@ namespace sark{
 	// get mapped attribute buffer accessor.
 	template<class _AttribType>
 	ArrayBuffer::AttributeAccessor<_AttribType> ArrayBuffer::GetAttributeAccessor(
-		ShaderProgram::AttributeSemantic attribSemantic, AccessHint hint)
+		AttributeSemantic attribSemantic, AccessHint hint)
 	{
 		// existence check
 		if (mAttribFeats[attribSemantic] == NULL){
 			std::string err_str = "there is no buffer for the attribute '" +
-				ShaderProgram::AttributeNames[attribSemantic] + "'";
+				AttributeSemanticNames[attribSemantic] + "'";
 			LogWarn(err_str);
 			return AttributeAccessor<_AttribType>();
 		}

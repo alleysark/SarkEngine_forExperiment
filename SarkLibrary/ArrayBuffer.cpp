@@ -3,7 +3,7 @@
 namespace sark{
 
 	ArrayBuffer::AttributeFeature::AttributeFeature()
-		: attribTarget(ShaderProgram::ATTR_POSITION), elementCount(0),
+		: attribTarget(AttributeSemantic::POSITION), elementCount(0),
 		elementType(ElementType::NONE), bufId(0), 
 		bufSize(0), bufHint(BufferHint::STATIC)
 	{}
@@ -22,7 +22,7 @@ namespace sark{
 	// delete all generated buffers.
 	ArrayBuffer::~ArrayBuffer(){
 		// delete all attribute buffers.
-		for (integer i = 0; i < ShaderProgram::ATTR_COUNT; i++){
+		for (integer i = 0; i < AttributeSemantic::COUNT; i++){
 			if (mAttribFeats[i] != NULL){
 				if (mAttribFeats[i]->bufId != 0){
 					glDeleteBuffers(1, &mAttribFeats[i]->bufId);
@@ -44,7 +44,7 @@ namespace sark{
 
 	// get data count of specific attribute.
 	// it'll return 0 if given attribute buffer is not exists.
-	const uinteger ArrayBuffer::GetDataCount(ShaderProgram::AttributeSemantic attribSemantic) const{
+	const uinteger ArrayBuffer::GetDataCount(AttributeSemantic attribSemantic) const{
 		if (mAttribFeats[attribSemantic] == NULL)
 			return 0;
 		return mAttribFeats[attribSemantic]->dataCount;
@@ -53,7 +53,7 @@ namespace sark{
 	
 	// bind this vertex buffer object.
 	void ArrayBuffer::BindAttribBuffers() const{
-		for (integer i = 0; i < ShaderProgram::ATTR_COUNT; i++){
+		for (integer i = 0; i < AttributeSemantic::COUNT; i++){
 			if (mAttribFeats[i] == NULL)
 				continue;
 			
@@ -73,7 +73,7 @@ namespace sark{
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		for (integer i = 0; i < ShaderProgram::ATTR_COUNT; i++){
+		for (integer i = 0; i < AttributeSemantic::COUNT; i++){
 			if (mAttribFeats[i] == NULL)
 				continue;
 
@@ -82,7 +82,7 @@ namespace sark{
 	}
 
 	// bind specific attribute buffer object.
-	bool ArrayBuffer::BindAttribBuffer(ShaderProgram::AttributeSemantic attribSemantic) const{
+	bool ArrayBuffer::BindAttribBuffer(AttributeSemantic attribSemantic) const{
 		if (mAttribFeats[attribSemantic] == NULL)
 			return false;
 
@@ -98,7 +98,7 @@ namespace sark{
 
 	// unbind currently bound vertex buffer object 
 	// and disable specific vertex attribute array.
-	bool ArrayBuffer::UnbindAttribBuffer(ShaderProgram::AttributeSemantic attribSemantic) const{
+	bool ArrayBuffer::UnbindAttribBuffer(AttributeSemantic attribSemantic) const{
 		if (mAttribFeats[attribSemantic] == NULL)
 			return false;
 
@@ -115,7 +115,7 @@ namespace sark{
 	// you should have to bind this buffer.
 	void ArrayBuffer::DrawArrays() const{
 		ONLYDBG_CODEBLOCK(
-		if (mAttribFeats[ShaderProgram::ATTR_POSITION] == NULL){
+		if (mAttribFeats[AttributeSemantic::POSITION] == NULL){
 			LogWarn("positions are the essential attribute to draw");
 			return;
 		}
@@ -124,18 +124,18 @@ namespace sark{
 			return;
 		});
 
-		glDrawArrays(mDrawMode, 0, mAttribFeats[ShaderProgram::ATTR_POSITION]->dataCount);
+		glDrawArrays(mDrawMode, 0, mAttribFeats[AttributeSemantic::POSITION]->dataCount);
 	}
 
 	// draw elements. you should have to bind relative
 	// vertex buffer and this index buffer.
 	void ArrayBuffer::DrawPrimitives() const{
 		ONLYDBG_CODEBLOCK(
-		if (mAttribFeats[ShaderProgram::ATTR_POSITION] == NULL){
+		if (mAttribFeats[AttributeSemantic::POSITION] == NULL){
 			LogWarn("positions are the essential attribute to draw");
 			return;
 		}
-		if (mAttribFeats[ShaderProgram::ATTR_INDICES] == NULL){
+		if (mAttribFeats[AttributeSemantic::INDICES] == NULL){
 			LogWarn("indices are required to draw arrays as 'element'");
 		}
 		if (mDrawMode == DrawMode::NONE){
@@ -144,7 +144,7 @@ namespace sark{
 		});
 
 		glDrawElements(mDrawMode,
-			mAttribFeats[ShaderProgram::ATTR_INDICES]->dataCount * mAttribFeats[ShaderProgram::ATTR_INDICES]->elementCount,
-			mAttribFeats[ShaderProgram::ATTR_INDICES]->elementType, NULL);
+			mAttribFeats[AttributeSemantic::INDICES]->dataCount * mAttribFeats[AttributeSemantic::INDICES]->elementCount,
+			mAttribFeats[AttributeSemantic::INDICES]->elementType, NULL);
 	}
 }

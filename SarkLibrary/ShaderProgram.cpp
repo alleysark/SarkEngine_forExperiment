@@ -5,17 +5,6 @@
 
 namespace sark{
 
-	const char* const ShaderProgram::AttributeNames[] = {
-		"position",
-		"normal",
-		"color",
-		"texCoord0",
-		"texCoord1",
-		"texCoord2",
-		"texCoord3",
-		"indices"
-	};
-
 	// shader program is created from ShaderDictionary
 	// with full liked shaders.
 	ShaderProgram::ShaderProgram(ObjectHandle hProgram)
