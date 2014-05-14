@@ -18,9 +18,6 @@ namespace sark{
 	// it can be organized the hierarchical struct
 	class Transform{
 	private:
-		// local translation factor.
-		Position3 mTranslation;
-
 		// local rotation factor
 		Quaternion mRotator;
 		
@@ -32,12 +29,6 @@ namespace sark{
 
 		// combined transform matrix of all ancestors
 		Matrix4 mAbsoluteTM;
-
-		// absolute position vector.
-		Position3 mAbsolutePosition;
-
-		// absolute direction vector. default Vector3::Forward
-		Vector3 mAbsoluteDirection;
 
 
 		// it can access the scene component object by this property
@@ -56,14 +47,22 @@ namespace sark{
 
 
 		// get world space position
-		const Position3& GetPosition();
+		const Position3 GetPosition();
 
 		// get world space direction.
 		// formal direction vector is Vector3::Forward
-		const Vector3& GetDirection();
+		// *note: if this and its ancestors scale themselves,
+		// the returned direction cannot guarantee the correctness.
+		const Vector3 GetDirection();
+
+		// get world space rotation.
+		// *note: if this and its ancestors scale themselves,
+		// the returned rotation quaternion cannot guarantee
+		// the correctness.
+		const Quaternion GetRotation();
 
 		// get local position (translation) 
-		const Position3& GetLocalPosition() const;
+		const Position3 GetLocalPosition() const;
 
 		// get local rotator
 		const Quaternion& GetLocalRotation() const;
@@ -104,7 +103,7 @@ namespace sark{
 		// transform of reference scene component.
 		// it also sets the 'is transformed' factors of reference scene component
 		// and its offspring's.
-		void TransformStained(bool callOnLocal = true);
+		void TransformStained(bool stainLocal = true);
 
 		// apply whole transformation factors onto its matrices.
 		void UpdateTransform();

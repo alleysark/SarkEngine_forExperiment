@@ -4,8 +4,8 @@
 namespace sark{
 
 	Transform::Transform(ASceneComponent* reference)
-		: mReference(reference), mTranslation(0), mRotator(0, 0, 0, 1), mScale(1.f),
-		mLocalTM(true), mAbsoluteTM(true), mAbsolutePosition(0), mAbsoluteDirection(Vector3::Forward)
+		: mReference(reference), mRotator(0, 0, 0, 1), mScale(1.f),
+		mLocalTM(true), mAbsoluteTM(true)
 	{}
 	Transform::~Transform(){}
 
@@ -22,21 +22,39 @@ namespace sark{
 	}
 
 	// get world space position
-	const Position3& Transform::GetPosition(){
+	const Position3 Transform::GetPosition(){
 		UpdateTransform();
-		return mAbsolutePosition;
+		return Position3(mAbsoluteTM.m[0][3], mAbsoluteTM.m[1][3], mAbsoluteTM.m[2][3]);
 	}
 
 	// get world space direction.
 	// formal direction vector is Vector3::Forward
-	const Vector3& Transform::GetDirection(){
+	// *note: if this and its ancestors scale themselves,
+	// the returned direction cannot guarantee the correctness.
+	const Vector3 Transform::GetDirection(){
 		UpdateTransform();
-		return mAbsoluteDirection;
+		// updated absolute direction = [rot matrix of absMat]xVector3::Forward
+		//mAbsoluteDirection.Set(
+		//	mAbsoluteTM.row[0].xyz.Dot(Vector3::Forward),
+		//	mAbsoluteTM.row[1].xyz.Dot(Vector3::Forward),
+		//	mAbsoluteTM.row[2].xyz.Dot(Vector3::Forward));
+		// but Vector3::Forward can be assumed that value is (0,0,-1),
+		// so absolute direction should be like below.
+		return Vector3(-mAbsoluteTM.m[0][2], -mAbsoluteTM.m[1][2], -mAbsoluteTM.m[2][2]);
+	}
+
+	// get world space rotation.
+	// *note: if this and its ancestors scale themselves,
+	// the returned rotation quaternion cannot guarantee
+	// the correctness.
+	const Quaternion Transform::GetRotation(){
+		UpdateTransform();
+		return mAbsoluteTM.ToQuaternion();
 	}
 
 	// get local position (translation) 
-	const Position3& Transform::GetLocalPosition() const{
-		return mTranslation;
+	const Position3 Transform::GetLocalPosition() const{
+		return Position3(mLocalTM.m[0][3], mLocalTM.m[1][3], mLocalTM.m[2][3]);
 	}
 
 	// get local rotator
@@ -52,24 +70,32 @@ namespace sark{
 
 	// translate into the other position from given vector
 	void Transform::Translate(const Position3& position){
-		mTranslation = position;
-		TransformStained();
+		mLocalTM.m[0][3] = position.x;
+		mLocalTM.m[1][3] = position.y;
+		mLocalTM.m[2][3] = position.z;
+		TransformStained(false);
 	}
 	// translate into the other position from given vector
 	void Transform::Translate(real x, real y, real z){
-		mTranslation.Set(x, y, z);
-		TransformStained();
+		mLocalTM.m[0][3] = x;
+		mLocalTM.m[1][3] = y;
+		mLocalTM.m[2][3] = z;
+		TransformStained(false);
 	}
 
 	// translate this position additionally
 	void Transform::TranslateMore(const Position3& add){
-		mTranslation += add;
-		TransformStained();
+		mLocalTM.m[0][3] += add.x;
+		mLocalTM.m[1][3] += add.y;
+		mLocalTM.m[2][3] += add.z;
+		TransformStained(false);
 	}
 	// translate this position additionally
 	void Transform::TranslateMore(real add_x, real add_y, real add_z){
-		mTranslation += Position3(add_x, add_y, add_z);
-		TransformStained();
+		mLocalTM.m[0][3] += add_x;
+		mLocalTM.m[1][3] += add_y;
+		mLocalTM.m[2][3] += add_z;
+		TransformStained(false);
 	}
 
 	// rotate it from given axis and theta
@@ -116,8 +142,8 @@ namespace sark{
 	// transform of reference scene component.
 	// it also sets the 'is transformed' factors of reference scene component
 	// and its offspring's.
-	void Transform::TransformStained(bool callOnLocal){
-		if (callOnLocal){
+	void Transform::TransformStained(bool stainLocal){
+		if (stainLocal){
 			STAIN_TRANSMATRIX(mLocalTM);
 		}
 		STAIN_TRANSMATRIX(mAbsoluteTM);
@@ -136,19 +162,15 @@ namespace sark{
 
 	// apply whole transformation factors onto its matrices.
 	void Transform::UpdateTransform(){
-		bool isUpdated = false;
-
 		if (IS_STAINED(mLocalTM)){
-			isUpdated = true;
 			// recalculate transform matrix only when
 			// its transformation has been changed
 
 			// transformed v = TRS * v
-			// (T*R) is same as MatR with setting translation factors
-			mLocalTM = mRotator.ToMatrix4(true);
-			mLocalTM.m[0][3] = mTranslation.x;
-			mLocalTM.m[1][3] = mTranslation.y;
-			mLocalTM.m[2][3] = mTranslation.z;
+			Matrix3 matRot = mRotator.ToMatrix3(true);
+			mLocalTM.row[0].xyz = matRot.row[0];
+			mLocalTM.row[1].xyz = matRot.row[1];
+			mLocalTM.row[2].xyz = matRot.row[2];
 
 			if (mScale.x != 1 || mScale.y != 1 || mScale.z != 1){
 				// mLocalTM = (T*R) * sMat
@@ -161,7 +183,6 @@ namespace sark{
 		}
 
 		if (IS_STAINED(mAbsoluteTM)){
-			isUpdated = true;
 			// recalculate absolute transform matrix only when
 			// its or ancestor's transformation has been changed
 			if (mReference == NULL || mReference->mParent == NULL){
@@ -171,21 +192,6 @@ namespace sark{
 				mAbsoluteTM
 					= mReference->mParent->mTransform.GetMatrix() * mLocalTM;
 			}
-		}
-
-		if (isUpdated){
-			// update absolute position
-			mAbsolutePosition.Set(mAbsoluteTM.m[0][3], mAbsoluteTM.m[1][3], mAbsoluteTM.m[2][3]);
-
-			// updated absolute direction = [rot matrix of absMat]xVector3::Forward
-			//mAbsoluteDirection.Set(
-			//	mAbsoluteTM.row[0].xyz.Dot(Vector3::Forward),
-			//	mAbsoluteTM.row[1].xyz.Dot(Vector3::Forward),
-			//	mAbsoluteTM.row[2].xyz.Dot(Vector3::Forward));
-
-			// but Vector3::Forward can be assumed that value is (0,0,-1),
-			// updated absolute direction should be like below.
-			mAbsoluteDirection.Set(-mAbsoluteTM.m[0][2], -mAbsoluteTM.m[1][2], -mAbsoluteTM.m[2][2]);
 		}
 	}
 }
