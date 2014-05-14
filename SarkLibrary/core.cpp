@@ -800,6 +800,46 @@ namespace sark{
 			m[2][0], m[2][1], m[2][2]);
 	}
 
+	// to rotation quaternion
+	const Quaternion Matrix3::ToQuaternion() const{
+		// implementation from:
+		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+		real tr = m[0][0] + m[1][1] + m[2][2];
+
+		if (tr > 0) {
+			real S = math::sqrt(tr + 1.f) * 2.f; // S=4*qw 
+			return Quaternion(
+				(m[2][1] - m[1][2]) / S,
+				(m[0][2] - m[2][0]) / S,
+				(m[1][0] - m[0][1]) / S,
+				0.25f * S);
+		}
+		else if ((m[0][0] > m[1][1]) && (m[0][0] > m[2][2])) {
+			real S = math::sqrt(1.f + m[0][0] - m[1][1] - m[2][2]) * 2.f; // S=4*qx 
+			return Quaternion(
+				0.25f * S,
+				(m[0][1] + m[1][0]) / S,
+				(m[0][2] + m[2][0]) / S,
+				(m[2][1] - m[1][2]) / S);
+		}
+		else if (m[1][1] > m[2][2]) {
+			real S = math::sqrt(1.f + m[1][1] - m[0][0] - m[2][2]) * 2.f; // S=4*qy
+			return Quaternion(
+				(m[0][1] + m[1][0]) / S,
+				0.25f * S,
+				(m[1][2] + m[2][1]) / S,
+				(m[0][2] - m[2][0]) / S);
+		}
+		else {
+			real S = math::sqrt(1.f + m[2][2] - m[0][0] - m[1][1]) * 2.f; // S=4*qz
+			return Quaternion(
+				(m[0][2] + m[2][0]) / S,
+				(m[1][2] + m[2][1]) / S,
+				0.25f * S,
+				(m[1][0] - m[0][1]) / S);
+		}
+	}
+
 	const Matrix3 operator*(real fConstant, const Matrix3& mat3){
 		return Matrix3(
 			mat3.m[0][0] * fConstant, mat3.m[0][1] * fConstant, mat3.m[0][2] * fConstant,
@@ -1093,6 +1133,45 @@ namespace sark{
 			m[3][0], m[3][1], m[3][2], m[3][3]);
 	}
 
+	const Quaternion Matrix4::ToQuaternion() const{
+		// implementation from:
+		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+		real tr = m[0][0] + m[1][1] + m[2][2];
+
+		if (tr > 0) {
+			real S = math::sqrt(tr + 1.f) * 2.f; // S=4*qw 
+			return Quaternion(
+				(m[2][1] - m[1][2]) / S,
+				(m[0][2] - m[2][0]) / S,
+				(m[1][0] - m[0][1]) / S,
+				0.25f * S);
+		}
+		else if ((m[0][0] > m[1][1]) && (m[0][0] > m[2][2])) {
+			real S = math::sqrt(1.f + m[0][0] - m[1][1] - m[2][2]) * 2.f; // S=4*qx 
+			return Quaternion(
+				0.25f * S,
+				(m[0][1] + m[1][0]) / S,
+				(m[0][2] + m[2][0]) / S,
+				(m[2][1] - m[1][2]) / S);
+		}
+		else if (m[1][1] > m[2][2]) {
+			real S = math::sqrt(1.f + m[1][1] - m[0][0] - m[2][2]) * 2.f; // S=4*qy
+			return Quaternion(
+				(m[0][1] + m[1][0]) / S,
+				0.25f * S,
+				(m[1][2] + m[2][1]) / S,
+				(m[0][2] - m[2][0]) / S);
+		}
+		else {
+			real S = math::sqrt(1.f + m[2][2] - m[0][0] - m[1][1]) * 2.f; // S=4*qz
+			return Quaternion(
+				(m[0][2] + m[2][0]) / S,
+				(m[1][2] + m[2][1]) / S,
+				0.25f * S,
+				(m[1][0] - m[0][1]) / S);
+		}
+	}
+
 	const Matrix4 operator*(real fConstant, const Matrix4& mat4){
 		return Matrix4(
 			mat4.m[0][0] * fConstant, mat4.m[0][1] * fConstant, mat4.m[0][2] * fConstant, mat4.m[0][3] * fConstant,
@@ -1134,6 +1213,14 @@ namespace sark{
 	Quaternion::Quaternion(const real roll, real pitch, real yaw){
 		MakeRotatingQuat(roll, pitch, yaw);
 	}
+
+	Quaternion::Quaternion(const Matrix3& rotMat){
+		*this = rotMat.ToQuaternion();
+	}
+	Quaternion::Quaternion(const Matrix4& rotMat){
+		*this = rotMat.ToQuaternion();
+	}
+
 
 	Quaternion::Quaternion(const Quaternion& q){
 		s = q.s; x = q.x; y = q.y; z = q.z;
@@ -1356,78 +1443,6 @@ namespace sark{
 			2.0f*(xy + zs), 1.0f - 2.0f*(xx + zz), 2.0f*(yz - xs), 0.0f,
 			2.0f*(xz - ys), 2.0f*(yz + xs), 1.0f - 2.0f*(xx + yy), 0.0f,
 			0.0f, 0.0f, 0.0f, 1.0f);
-	}
-
-	// convert from matrix 3D (only for rotation matrix)
-	void Quaternion::FromMatrix3(const Matrix3& mat){
-		// implementation from:
-		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
-		real tr = mat.m[0][0] + mat.m[1][1] + mat.m[2][2];
-
-		if (tr > 0) {
-			real S = math::sqrt(tr + 1.f) * 2.f; // S=4*qw 
-			s = 0.25f * S;
-			x = (mat.m[2][1] - mat.m[1][2]) / S;
-			y = (mat.m[0][2] - mat.m[2][0]) / S;
-			z = (mat.m[1][0] - mat.m[0][1]) / S;
-		}
-		else if ((mat.m[0][0] > mat.m[1][1]) && (mat.m[0][0] > mat.m[2][2])) {
-			real S = math::sqrt(1.f + mat.m[0][0] - mat.m[1][1] - mat.m[2][2]) * 2.f; // S=4*qx 
-			s = (mat.m[2][1] - mat.m[1][2]) / S;
-			x = 0.25f * S;
-			y = (mat.m[0][1] + mat.m[1][0]) / S;
-			z = (mat.m[0][2] + mat.m[2][0]) / S;
-		}
-		else if (mat.m[1][1] > mat.m[2][2]) {
-			real S = math::sqrt(1.f + mat.m[1][1] - mat.m[0][0] - mat.m[2][2]) * 2.f; // S=4*qy
-			s = (mat.m[0][2] - mat.m[2][0]) / S;
-			x = (mat.m[0][1] + mat.m[1][0]) / S;
-			y = 0.25f * S;
-			z = (mat.m[1][2] + mat.m[2][1]) / S;
-		}
-		else {
-			real S = math::sqrt(1.f + mat.m[2][2] - mat.m[0][0] - mat.m[1][1]) * 2.f; // S=4*qz
-			s = (mat.m[1][0] - mat.m[0][1]) / S;
-			x = (mat.m[0][2] + mat.m[2][0]) / S;
-			y = (mat.m[1][2] + mat.m[2][1]) / S;
-			z = 0.25f * S;
-		}
-	}
-
-	// convert from matrix 4D (only for rotation matrix)
-	void Quaternion::FromMatrix4(const Matrix4& mat){
-		// implementation from:
-		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
-		real tr = mat.m[0][0] + mat.m[1][1] + mat.m[2][2];
-
-		if (tr > 0) {
-			real S = math::sqrt(tr + 1.f) * 2.f; // S=4*qw 
-			s = 0.25f * S;
-			x = (mat.m[2][1] - mat.m[1][2]) / S;
-			y = (mat.m[0][2] - mat.m[2][0]) / S;
-			z = (mat.m[1][0] - mat.m[0][1]) / S;
-		}
-		else if ((mat.m[0][0] > mat.m[1][1]) && (mat.m[0][0] > mat.m[2][2])) {
-			real S = math::sqrt(1.f + mat.m[0][0] - mat.m[1][1] - mat.m[2][2]) * 2.f; // S=4*qx 
-			s = (mat.m[2][1] - mat.m[1][2]) / S;
-			x = 0.25f * S;
-			y = (mat.m[0][1] + mat.m[1][0]) / S;
-			z = (mat.m[0][2] + mat.m[2][0]) / S;
-		}
-		else if (mat.m[1][1] > mat.m[2][2]) {
-			real S = math::sqrt(1.f + mat.m[1][1] - mat.m[0][0] - mat.m[2][2]) * 2.f; // S=4*qy
-			s = (mat.m[0][2] - mat.m[2][0]) / S;
-			x = (mat.m[0][1] + mat.m[1][0]) / S;
-			y = 0.25f * S;
-			z = (mat.m[1][2] + mat.m[2][1]) / S;
-		}
-		else {
-			real S = math::sqrt(1.f + mat.m[2][2] - mat.m[0][0] - mat.m[1][1]) * 2.f; // S=4*qz
-			s = (mat.m[1][0] - mat.m[0][1]) / S;
-			x = (mat.m[0][2] + mat.m[2][0]) / S;
-			y = (mat.m[1][2] + mat.m[2][1]) / S;
-			z = 0.25f * S;
-		}
 	}
 
 	// rotate input vector from given axis vector and theta

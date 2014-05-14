@@ -597,6 +597,9 @@ namespace sark{
 
 		// matrix determination
 		real Determin() const;
+
+		// to rotation quaternion
+		const Quaternion ToQuaternion() const;
 	};
 
 
@@ -694,6 +697,9 @@ namespace sark{
 
 		// matrix determination
 		real Determin() const;
+
+		// to rotation quaternion
+		const Quaternion ToQuaternion() const;
 	};
 
 
@@ -718,6 +724,9 @@ namespace sark{
 
 		Quaternion(const Vector3& rotationAxis, real theta, bool axis_normalized = false);
 		Quaternion(const real roll, real pitch, real yaw);
+
+		Quaternion(const Matrix3& rotMat);
+		Quaternion(const Matrix4& rotMat);
 
 		Quaternion(const Quaternion& q);
 		void operator=(const Quaternion& q);
@@ -782,12 +791,6 @@ namespace sark{
 
 		// convert quaternion to matrix 4D (only for rotation quaternion)
 		const Matrix4 ToMatrix4(bool isNormalized = false);
-
-		// convert from matrix 3D (only for rotation matrix)
-		void FromMatrix3(const Matrix3& mat);
-
-		// convert from matrix 4D (only for rotation matrix)
-		void FromMatrix4(const Matrix4& mat);
 
 		// rotate input vector from given axis vector and theta
 		static void Rotate(Vector3& v, const Vector3& axis, real theta, bool axis_normalized = false);
