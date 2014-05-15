@@ -22,8 +22,9 @@ namespace sark{
 	Vector2::Vector2(const Vector2& v){
 		x = v.x; y = v.y;
 	}
-	void Vector2::operator=(const Vector2& v){
+	Vector2& Vector2::operator=(const Vector2& v){
 		x = v.x; y = v.y;
+		return *this;
 	}
 
 	void Vector2::Set(real _x, real _y){
@@ -50,16 +51,16 @@ namespace sark{
 		return Vector2(x + v.x, y + v.y);
 	}
 
-	const Vector2 Vector2::operator+(real fConstant) const{
-		return Vector2(x + fConstant, y + fConstant);
-	}
-
-	const Vector2& Vector2::operator+=(const Vector2& v){
+	Vector2& Vector2::operator+=(const Vector2& v){
 		x += v.x; y += v.y;
 		return *this;
 	}
 
-	const Vector2& Vector2::operator+=(real fConstant){
+	const Vector2 Vector2::operator+(real fConstant) const{
+		return Vector2(x + fConstant, y + fConstant);
+	}
+
+	Vector2& Vector2::operator+=(real fConstant){
 		x += fConstant; y += fConstant;
 		return *this;
 	}
@@ -70,27 +71,36 @@ namespace sark{
 		return Vector2(x - v.x, y - v.y);
 	}
 
-	const Vector2 Vector2::operator-(real fConstant) const{
-		return Vector2(x - fConstant, y - fConstant);
-	}
-
-	const Vector2& Vector2::operator-=(const Vector2& v){
+	Vector2& Vector2::operator-=(const Vector2& v){
 		x -= v.x; y -= v.y;
 		return *this;
 	}
 
-	const Vector2& Vector2::operator-=(real fConstant){
+	const Vector2 Vector2::operator-(real fConstant) const{
+		return Vector2(x - fConstant, y - fConstant);
+	}
+
+	Vector2& Vector2::operator-=(real fConstant){
 		x -= fConstant; y -= fConstant;
 		return *this;
 	}
 
 
 	// vector constant multiplication operator (it is not cross operation)
+	const Vector2 Vector2::operator*(const Vector2& v) const{
+		return Vector2(x*v.x, y*v.y);
+	}
+
+	Vector2& Vector2::operator*=(const Vector2& v){
+		x *= v.x; y *= v.y;
+		return *this;
+	}
+
 	const Vector2 Vector2::operator*(real fConstant) const{
 		return Vector2(x*fConstant, y*fConstant);
 	}
 
-	const Vector2& Vector2::operator*=(real fConstant){
+	Vector2& Vector2::operator*=(real fConstant){
 		x *= fConstant; y *= fConstant;
 		return *this;
 	}
@@ -105,7 +115,7 @@ namespace sark{
 		return Vector2(x / fConstant, y / fConstant);
 	}
 
-	const Vector2& Vector2::operator/=(real fConstant){
+	Vector2& Vector2::operator/=(real fConstant){
 		ONLYDBG_CODEBLOCK(
 		if (fConstant == 0.f)
 			LogFatal("division by zero");
@@ -113,6 +123,7 @@ namespace sark{
 		x /= fConstant; y /= fConstant;
 		return *this;
 	}
+
 
 	// boolean operators
 	bool Vector2::operator==(const Vector2& v) const{
@@ -176,6 +187,10 @@ namespace sark{
 		return Vector2(fConstant + v.x, fConstant + v.y);
 	}
 
+	const Vector2 operator-(real fConstant, const Vector2& v){
+		return Vector2(fConstant - v.x, fConstant - v.y);
+	}
+
 	const Vector2 operator*(real fConstant, const Vector2& v){
 		return Vector2(fConstant * v.x, fConstant * v.y);
 	}
@@ -204,8 +219,9 @@ namespace sark{
 	Vector3::Vector3(const Vector3& v){
 		x = v.x; y = v.y; z = v.z;
 	}
-	void Vector3::operator=(const Vector3& v){
+	Vector3& Vector3::operator=(const Vector3& v){
 		x = v.x; y = v.y; z = v.z;
+		return *this;
 	}
 
 	void Vector3::Set(real _x, real _y, real _z){
@@ -238,16 +254,16 @@ namespace sark{
 		return Vector3(x + v.x, y + v.y, z + v.z);
 	}
 
-	const Vector3 Vector3::operator+(real fConstant) const{
-		return Vector3(x + fConstant, y + fConstant, z + fConstant);
-	}
-
-	const Vector3& Vector3::operator+=(const Vector3& v){
+	Vector3& Vector3::operator+=(const Vector3& v){
 		x += v.x; y += v.y; z += v.z;
 		return *this;
 	}
 
-	const Vector3& Vector3::operator+=(real fConstant){
+	const Vector3 Vector3::operator+(real fConstant) const{
+		return Vector3(x + fConstant, y + fConstant, z + fConstant);
+	}
+
+	Vector3& Vector3::operator+=(real fConstant){
 		x += fConstant; y += fConstant; z += fConstant;
 		return *this;
 	}
@@ -258,27 +274,36 @@ namespace sark{
 		return Vector3(x - v.x, y - v.y, z - v.z);
 	}
 
-	const Vector3 Vector3::operator-(real fConstant) const{
-		return Vector3(x - fConstant, y - fConstant, z - fConstant);
-	}
-
-	const Vector3& Vector3::operator-=(const Vector3& v){
+	Vector3& Vector3::operator-=(const Vector3& v){
 		x -= v.x; y -= v.y; z -= v.z;
 		return *this;
 	}
 
-	const Vector3& Vector3::operator-=(real fConstant){
+	const Vector3 Vector3::operator-(real fConstant) const{
+		return Vector3(x - fConstant, y - fConstant, z - fConstant);
+	}
+
+	Vector3& Vector3::operator-=(real fConstant){
 		x -= fConstant; y -= fConstant; z -= fConstant;
 		return *this;
 	}
 
 
 	// vector constant multiplication operator (it is not cross operation)
+	const Vector3 Vector3::operator*(const Vector3& v) const{
+		return Vector3(x*v.x, y*v.y, z*v.z);
+	}
+
+	Vector3& Vector3::operator*=(const Vector3& v){
+		x *= v.x; y *= v.y; z *= v.z;
+		return *this;
+	}
+
 	const Vector3 Vector3::operator*(real fConstant) const{
 		return Vector3(x*fConstant, y*fConstant, z*fConstant);
 	}
 
-	const Vector3& Vector3::operator*=(real fConstant){
+	Vector3& Vector3::operator*=(real fConstant){
 		x *= fConstant; y *= fConstant; z *= fConstant;
 		return *this;
 	}
@@ -293,7 +318,7 @@ namespace sark{
 	}
 
 	// vector x matrix for this
-	const Vector3& Vector3::operator*=(const Matrix3& mat3){
+	Vector3& Vector3::operator*=(const Matrix3& mat3){
 		Set(x*mat3.m[0][0] + y*mat3.m[1][0] + z*mat3.m[2][0],
 			x*mat3.m[0][1] + y*mat3.m[1][1] + z*mat3.m[2][1],
 			x*mat3.m[0][2] + y*mat3.m[1][2] + z*mat3.m[2][2]);
@@ -310,7 +335,7 @@ namespace sark{
 		return Vector3(x / fConstant, y / fConstant, z / fConstant);
 	}
 
-	const Vector3& Vector3::operator/=(real fConstant){
+	Vector3& Vector3::operator/=(real fConstant){
 		ONLYDBG_CODEBLOCK(
 		if (fConstant == 0.f)
 			LogFatal("division by zero");
@@ -318,6 +343,7 @@ namespace sark{
 		x /= fConstant; y /= fConstant; z /= fConstant;
 		return *this;
 	}
+
 
 	// boolean operators
 	bool Vector3::operator==(const Vector3& v) const{
@@ -385,6 +411,10 @@ namespace sark{
 		return Vector3(fConstant + v.x, fConstant + v.y, fConstant + v.z);
 	}
 
+	const Vector3 operator-(real fConstant, const Vector3& v){
+		return Vector3(fConstant - v.x, fConstant - v.y, fConstant - v.z);
+	}
+
 	const Vector3 operator*(real fConstant, const Vector3& v){
 		return Vector3(fConstant * v.x, fConstant * v.y, fConstant * v.z);
 	}
@@ -420,8 +450,9 @@ namespace sark{
 	Vector4::Vector4(const Vector4& v){
 		x = v.x; y = v.y; z = v.z; w = v.w;
 	}
-	void Vector4::operator=(const Vector4& v){
+	Vector4& Vector4::operator=(const Vector4& v){
 		x = v.x; y = v.y; z = v.z; w = v.w;
+		return *this;
 	}
 
 	void Vector4::Set(real _x, real _y, real _z, real _w){
@@ -457,16 +488,16 @@ namespace sark{
 		return Vector4(x + v.x, y + v.y, z + v.z, w + v.w);
 	}
 
-	const Vector4 Vector4::operator+(real fConstant) const{
-		return Vector4(x + fConstant, y + fConstant, z + fConstant, w + fConstant);
-	}
-
-	const Vector4& Vector4::operator+=(const Vector4& v){
+	Vector4& Vector4::operator+=(const Vector4& v){
 		x += v.x; y += v.y; z += v.z; w += v.w;
 		return *this;
 	}
 
-	const Vector4& Vector4::operator+=(real fConstant){
+	const Vector4 Vector4::operator+(real fConstant) const{
+		return Vector4(x + fConstant, y + fConstant, z + fConstant, w + fConstant);
+	}
+
+	Vector4& Vector4::operator+=(real fConstant){
 		x += fConstant; y += fConstant; z += fConstant; w += fConstant;
 		return *this;
 	}
@@ -477,27 +508,36 @@ namespace sark{
 		return Vector4(x - v.x, y - v.y, z - v.z, w - v.w);
 	}
 
-	const Vector4 Vector4::operator-(real fConstant) const{
-		return Vector4(x - fConstant, y - fConstant, z - fConstant, w - fConstant);
-	}
-
-	const Vector4& Vector4::operator-=(const Vector4& v){
+	Vector4& Vector4::operator-=(const Vector4& v){
 		x -= v.x; y -= v.y; z -= v.z; w -= v.w;
 		return *this;
 	}
 
-	const Vector4& Vector4::operator-=(real fConstant){
+	const Vector4 Vector4::operator-(real fConstant) const{
+		return Vector4(x - fConstant, y - fConstant, z - fConstant, w - fConstant);
+	}
+
+	Vector4& Vector4::operator-=(real fConstant){
 		x -= fConstant; y -= fConstant; z -= fConstant; w -= fConstant;
 		return *this;
 	}
 
 
 	// vector constant multiplication operator (it is not cross operation)
+	const Vector4 Vector4::operator*(const Vector4& v) const{
+		return Vector4(x*v.x, y*v.y, z*v.z, w*v.w);
+	}
+
+	Vector4& Vector4::operator*=(const Vector4& v){
+		x *= v.x; y *= v.y; z *= v.z; w *= v.w;
+		return *this;
+	}
+
 	const Vector4 Vector4::operator*(real fConstant) const{
 		return Vector4(x*fConstant, y*fConstant, z*fConstant, w*fConstant);
 	}
 
-	const Vector4& Vector4::operator*=(real fConstant){
+	Vector4& Vector4::operator*=(real fConstant){
 		x *= fConstant; y *= fConstant; z *= fConstant; w *= fConstant;
 		return *this;
 	}
@@ -513,7 +553,7 @@ namespace sark{
 	}
 
 	// vector x matrix for this
-	const Vector4& Vector4::operator*=(const Matrix4& mat4){
+	Vector4& Vector4::operator*=(const Matrix4& mat4){
 		Set(x*mat4.m[0][0] + y*mat4.m[1][0] + z*mat4.m[2][0] + w*mat4.m[3][0],
 			x*mat4.m[0][1] + y*mat4.m[1][1] + z*mat4.m[2][1] + w*mat4.m[3][1],
 			x*mat4.m[0][2] + y*mat4.m[1][2] + z*mat4.m[2][2] + w*mat4.m[3][2],
@@ -531,7 +571,7 @@ namespace sark{
 		return Vector4(x / fConstant, y / fConstant, z / fConstant, w / fConstant);
 	}
 
-	const Vector4& Vector4::operator/=(real fConstant){
+	Vector4& Vector4::operator/=(real fConstant){
 		ONLYDBG_CODEBLOCK(
 		if (fConstant == 0.f)
 			LogFatal("division by zero");
@@ -539,6 +579,7 @@ namespace sark{
 		x /= fConstant; y /= fConstant; z /= fConstant; w /= fConstant;
 		return *this;
 	}
+
 
 	// boolean operators
 	bool Vector4::operator==(const Vector4& v) const{
@@ -596,6 +637,10 @@ namespace sark{
 		return Vector4(fConstant + v.x, fConstant + v.y, fConstant + v.z, fConstant + v.w);
 	}
 
+	const Vector4 operator-(real fConstant, const Vector4& v){
+		return Vector4(fConstant - v.x, fConstant - v.y, fConstant - v.z, fConstant - v.w);
+	}
+
 	const Vector4 operator*(real fConstant, const Vector4& v){
 		return Vector4(fConstant * v.x, fConstant * v.y, fConstant * v.z, fConstant * v.w);
 	}
@@ -630,8 +675,9 @@ namespace sark{
 	Matrix3::Matrix3(const Matrix3& mat3){
 		memcpy(m, mat3.m, sizeof(real)* 9);
 	}
-	void Matrix3::operator = (const Matrix3& mat3){
+	Matrix3& Matrix3::operator=(const Matrix3& mat3){
 		memcpy(m, mat3.m, sizeof(real)* 9);
+		return *this;
 	}
 
 	// set matrix elements
@@ -653,40 +699,36 @@ namespace sark{
 		return reinterpret_cast<const real*>(m);
 	}
 
+
 	// matrix plus operator
-	const Matrix3 Matrix3::operator + (const Matrix3& mat3) const{
+	const Matrix3 Matrix3::operator+(const Matrix3& mat3) const{
 		return Matrix3(
 			m[0][0] + mat3.m[0][0], m[0][1] + mat3.m[0][1], m[0][2] + mat3.m[0][2],
 			m[1][0] + mat3.m[1][0], m[1][1] + mat3.m[1][1], m[1][2] + mat3.m[1][2],
 			m[2][0] + mat3.m[2][0], m[2][1] + mat3.m[2][1], m[2][2] + mat3.m[2][2]);
 	}
 
+	Matrix3& Matrix3::operator+=(const Matrix3& mat3){
+		row[0] += mat3.row[0];
+		row[1] += mat3.row[1];
+		row[2] += mat3.row[2];
+		return *this;
+	}
+
+
 	// matrix minus operator
-	const Matrix3 Matrix3::operator - (const Matrix3& mat3) const{
+	const Matrix3 Matrix3::operator-(const Matrix3& mat3) const{
 		return Matrix3(
 			m[0][0] - mat3.m[0][0], m[0][1] - mat3.m[0][1], m[0][2] - mat3.m[0][2],
 			m[1][0] - mat3.m[1][0], m[1][1] - mat3.m[1][1], m[1][2] - mat3.m[1][2],
 			m[2][0] - mat3.m[2][0], m[2][1] - mat3.m[2][1], m[2][2] - mat3.m[2][2]);
 	}
 
-	// matrix constant multiply operator
-	const Matrix3 Matrix3::operator*(real fConstant) const{
-		return Matrix3(
-			m[0][0] * fConstant, m[0][1] * fConstant, m[0][2] * fConstant,
-			m[1][0] * fConstant, m[1][1] * fConstant, m[1][2] * fConstant,
-			m[2][0] * fConstant, m[2][1] * fConstant, m[2][2] * fConstant);
-	}
-
-	// matrix constant division operator
-	const Matrix3 Matrix3::operator / (real fConstant) const{
-		ONLYDBG_CODEBLOCK(
-		if (fConstant == 0.f)
-			LogFatal("division by zero");
-		);
-		return Matrix3(
-			m[0][0] / fConstant, m[0][1] / fConstant, m[0][2] / fConstant,
-			m[1][0] / fConstant, m[1][1] / fConstant, m[1][2] / fConstant,
-			m[2][0] / fConstant, m[2][1] / fConstant, m[2][2] / fConstant);
+	Matrix3& Matrix3::operator-=(const Matrix3& mat3){
+		row[0] -= mat3.row[0];
+		row[1] -= mat3.row[1];
+		row[2] -= mat3.row[2];
+		return *this;
 	}
 
 	// matrix multiply operator
@@ -705,8 +747,7 @@ namespace sark{
 			m[2][0] * mat3.m[0][2] + m[2][1] * mat3.m[1][2] + m[2][2] * mat3.m[2][2]);
 	}
 
-	// matrix multiply operator of this
-	const Matrix3& Matrix3::operator*=(const Matrix3& mat3){
+	Matrix3& Matrix3::operator*=(const Matrix3& mat3){
 		Set(m[0][0] * mat3.m[0][0] + m[0][1] * mat3.m[1][0] + m[0][2] * mat3.m[2][0],
 			m[0][0] * mat3.m[0][1] + m[0][1] * mat3.m[1][1] + m[0][2] * mat3.m[2][1],
 			m[0][0] * mat3.m[0][2] + m[0][1] * mat3.m[1][2] + m[0][2] * mat3.m[2][2],
@@ -721,7 +762,6 @@ namespace sark{
 		return *this;
 	}
 
-	// matrix multiply to vector operator
 	const Vector3 Matrix3::operator*(const Vector3& vec3) const{
 		return Vector3(
 			m[0][0] * vec3.x + m[0][1] * vec3.y + m[0][2] * vec3.z,
@@ -729,6 +769,41 @@ namespace sark{
 			m[2][0] * vec3.x + m[2][1] * vec3.y + m[2][2] * vec3.z
 			);
 	}
+
+	const Matrix3 Matrix3::operator*(real fConstant) const{
+		return Matrix3(
+			m[0][0] * fConstant, m[0][1] * fConstant, m[0][2] * fConstant,
+			m[1][0] * fConstant, m[1][1] * fConstant, m[1][2] * fConstant,
+			m[2][0] * fConstant, m[2][1] * fConstant, m[2][2] * fConstant);
+	}
+
+	Matrix3& Matrix3::operator*=(real fConstant){
+		row[0] *= fConstant;
+		row[1] *= fConstant;
+		row[2] *= fConstant;
+		return *this;
+	}
+
+
+	// matrix constant division operator
+	const Matrix3 Matrix3::operator / (real fConstant) const{
+		ONLYDBG_CODEBLOCK(
+		if (fConstant == 0.f)
+			LogFatal("division by zero");
+		);
+		return Matrix3(
+			m[0][0] / fConstant, m[0][1] / fConstant, m[0][2] / fConstant,
+			m[1][0] / fConstant, m[1][1] / fConstant, m[1][2] / fConstant,
+			m[2][0] / fConstant, m[2][1] / fConstant, m[2][2] / fConstant);
+	}
+
+	Matrix3& Matrix3::operator/=(real fConstant){
+		row[0] /= fConstant;
+		row[1] /= fConstant;
+		row[2] /= fConstant;
+		return *this;
+	}
+
 
 	// check if zero matrix
 	bool Matrix3::IsZero() const{
@@ -893,8 +968,9 @@ namespace sark{
 	Matrix4::Matrix4(const Matrix4& mat4){
 		memcpy(m, mat4.m, sizeof(real)* 16);
 	}
-	void Matrix4::operator=(const Matrix4& mat4){
+	Matrix4& Matrix4::operator=(const Matrix4& mat4){
 		memcpy(m, mat4.m, sizeof(real)* 16);
+		return *this;
 	}
 
 	Matrix4::Matrix4(const Matrix3& mat3){
@@ -929,6 +1005,7 @@ namespace sark{
 		return reinterpret_cast<const real*>(m);
 	}
 
+
 	// matrix plus operator
 	const Matrix4 Matrix4::operator+(const Matrix4& mat4) const{
 		return Matrix4(
@@ -937,6 +1014,15 @@ namespace sark{
 			m[2][0] + mat4.m[2][0], m[2][1] + mat4.m[2][1], m[2][2] + mat4.m[2][2], m[2][3] + mat4.m[2][3],
 			m[3][0] + mat4.m[3][0], m[3][1] + mat4.m[3][1], m[3][2] + mat4.m[3][2], m[3][3] + mat4.m[3][3]);
 	}
+
+	Matrix4& Matrix4::operator+=(const Matrix4& mat4){
+		row[0] += mat4.row[0];
+		row[1] += mat4.row[1];
+		row[2] += mat4.row[2];
+		row[3] += mat4.row[3];
+		return *this;
+	}
+
 
 	// matrix minus operator
 	const Matrix4 Matrix4::operator-(const Matrix4& mat4) const{
@@ -947,27 +1033,14 @@ namespace sark{
 			m[3][0] - mat4.m[3][0], m[3][1] - mat4.m[3][1], m[3][2] - mat4.m[3][2], m[3][3] - mat4.m[3][3]);
 	}
 
-	// matrix constant multiply operator
-	const Matrix4 Matrix4::operator*(real fConstant) const{
-		return Matrix4(
-			m[0][0] * fConstant, m[0][1] * fConstant, m[0][2] * fConstant, m[0][3] * fConstant,
-			m[1][0] * fConstant, m[1][1] * fConstant, m[1][2] * fConstant, m[1][3] * fConstant,
-			m[2][0] * fConstant, m[2][1] * fConstant, m[2][2] * fConstant, m[2][3] * fConstant,
-			m[3][0] * fConstant, m[3][1] * fConstant, m[3][2] * fConstant, m[3][3] * fConstant);
+	Matrix4& Matrix4::operator-=(const Matrix4& mat4){
+		row[0] -= mat4.row[0];
+		row[1] -= mat4.row[1];
+		row[2] -= mat4.row[2];
+		row[3] -= mat4.row[3];
+		return *this;
 	}
 
-	// matrix constant division operator
-	const Matrix4 Matrix4::operator/(real fConstant) const{
-		ONLYDBG_CODEBLOCK(
-		if (fConstant == 0.f)
-			LogFatal("division by zero");
-		);
-		return Matrix4(
-			m[0][0] / fConstant, m[0][1] / fConstant, m[0][2] / fConstant, m[0][3] / fConstant,
-			m[1][0] / fConstant, m[1][1] / fConstant, m[1][2] / fConstant, m[1][3] / fConstant,
-			m[2][0] / fConstant, m[2][1] / fConstant, m[2][2] / fConstant, m[2][3] / fConstant,
-			m[3][0] / fConstant, m[3][1] / fConstant, m[3][2] / fConstant, m[3][3] / fConstant);
-	}
 
 	// matrix multiply operator
 	const Matrix4 Matrix4::operator*(const Matrix4& mat4) const{
@@ -993,8 +1066,7 @@ namespace sark{
 			m[3][0] * mat4.m[0][3] + m[3][1] * mat4.m[1][3] + m[3][2] * mat4.m[2][3] + m[3][3] * mat4.m[3][3]);
 	}
 
-	// matrix multiply operator of this
-	const Matrix4& Matrix4::operator*=(const Matrix4& mat4){
+	Matrix4& Matrix4::operator*=(const Matrix4& mat4){
 		Set(m[0][0] * mat4.m[0][0] + m[0][1] * mat4.m[1][0] + m[0][2] * mat4.m[2][0] + m[0][3] * mat4.m[3][0],
 			m[0][0] * mat4.m[0][1] + m[0][1] * mat4.m[1][1] + m[0][2] * mat4.m[2][1] + m[0][3] * mat4.m[3][1],
 			m[0][0] * mat4.m[0][2] + m[0][1] * mat4.m[1][2] + m[0][2] * mat4.m[2][2] + m[0][3] * mat4.m[3][2],
@@ -1017,7 +1089,6 @@ namespace sark{
 		return *this;
 	}
 
-	// matrix multiply to vector operator
 	const Vector4 Matrix4::operator*(const Vector4& vec4) const{
 		return Vector4(
 			m[0][0] * vec4.x + m[0][1] * vec4.y + m[0][2] * vec4.z + m[0][3] * vec4.w,
@@ -1026,6 +1097,45 @@ namespace sark{
 			m[3][0] * vec4.x + m[3][1] * vec4.y + m[3][2] * vec4.z + m[3][3] * vec4.w
 			);
 	}
+
+	const Matrix4 Matrix4::operator*(real fConstant) const{
+		return Matrix4(
+			m[0][0] * fConstant, m[0][1] * fConstant, m[0][2] * fConstant, m[0][3] * fConstant,
+			m[1][0] * fConstant, m[1][1] * fConstant, m[1][2] * fConstant, m[1][3] * fConstant,
+			m[2][0] * fConstant, m[2][1] * fConstant, m[2][2] * fConstant, m[2][3] * fConstant,
+			m[3][0] * fConstant, m[3][1] * fConstant, m[3][2] * fConstant, m[3][3] * fConstant);
+	}
+
+	Matrix4& Matrix4::operator*=(real fConstant){
+		row[0] *= fConstant;
+		row[1] *= fConstant;
+		row[2] *= fConstant;
+		row[3] *= fConstant;
+		return *this;
+	}
+
+
+	// matrix constant division operator
+	const Matrix4 Matrix4::operator/(real fConstant) const{
+		ONLYDBG_CODEBLOCK(
+		if (fConstant == 0.f)
+			LogFatal("division by zero");
+		);
+		return Matrix4(
+			m[0][0] / fConstant, m[0][1] / fConstant, m[0][2] / fConstant, m[0][3] / fConstant,
+			m[1][0] / fConstant, m[1][1] / fConstant, m[1][2] / fConstant, m[1][3] / fConstant,
+			m[2][0] / fConstant, m[2][1] / fConstant, m[2][2] / fConstant, m[2][3] / fConstant,
+			m[3][0] / fConstant, m[3][1] / fConstant, m[3][2] / fConstant, m[3][3] / fConstant);
+	}
+
+	Matrix4& Matrix4::operator/=(real fConstant){
+		row[0] /= fConstant;
+		row[1] /= fConstant;
+		row[2] /= fConstant;
+		row[3] /= fConstant;
+		return *this;
+	}
+
 
 	// check if zero matrix
 	bool Matrix4::IsZero() const{
@@ -1225,8 +1335,9 @@ namespace sark{
 	Quaternion::Quaternion(const Quaternion& q){
 		s = q.s; x = q.x; y = q.y; z = q.z;
 	}
-	void Quaternion::operator=(const Quaternion& q){
+	Quaternion& Quaternion::operator=(const Quaternion& q){
 		s = q.s; x = q.x; y = q.y; z = q.z;
+		return *this;
 	}
 
 	Quaternion::Quaternion(const Vector3& v, real _s){
@@ -1258,7 +1369,7 @@ namespace sark{
 	const Quaternion Quaternion::operator+(const Quaternion& q) const{
 		return Quaternion(x + q.x, y + q.y, z + q.z, s + q.s);
 	}
-	const Quaternion& Quaternion::operator+=(const Quaternion& q){
+	Quaternion& Quaternion::operator+=(const Quaternion& q){
 		s += q.s;
 		x += q.x; y += q.y; z += q.z;
 		return *this;
@@ -1268,7 +1379,7 @@ namespace sark{
 	const Quaternion Quaternion::operator-(const Quaternion& q) const{
 		return Quaternion(x - q.x, y - q.y, z - q.z, s - q.s);
 	}
-	const Quaternion& Quaternion::operator-=(const Quaternion& q){
+	Quaternion& Quaternion::operator-=(const Quaternion& q){
 		s -= q.s;
 		x -= q.x; y -= q.y; z -= q.z;
 		return *this;
@@ -1282,7 +1393,7 @@ namespace sark{
 			s*q.z + x*q.y - y*q.x + z*q.s,
 			s*q.s - x*q.x - y*q.y - z*q.z);
 	}
-	const Quaternion& Quaternion::operator*=(const Quaternion& q){
+	Quaternion& Quaternion::operator*=(const Quaternion& q){
 		Set(s*q.x + x*q.s + y*q.z - z*q.y,
 			s*q.y - x*q.z + y*q.s + z*q.x,
 			s*q.z + x*q.y - y*q.x + z*q.s,

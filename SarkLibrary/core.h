@@ -168,7 +168,7 @@ namespace sark{
 		Vector2(real val);
 		Vector2(real _x, real _y);
 		Vector2(const Vector2& v);
-		void operator=(const Vector2& v);
+		Vector2& operator=(const Vector2& v);
 
 		void Set(real _x, real _y);
 
@@ -177,48 +177,48 @@ namespace sark{
 
 		real MagnitudeSq() const;
 
+
 		// unary - operator
 		const Vector2 operator-() const;
 
 
 		// vector plus operator
 		const Vector2 operator+(const Vector2& v) const;
+		Vector2& operator+=(const Vector2& v);
 
 		const Vector2 operator+(real fConstant) const;
+		Vector2& operator+=(real fConstant);
 
 		friend const Vector2 operator+(real fConstant, const Vector2& v);
-
-		const Vector2& operator+=(const Vector2& v);
-
-		const Vector2& operator+=(real fConstant);
 
 
 		// vector minus operator
 		const Vector2 operator-(const Vector2& v) const;
-
 		const Vector2 operator-(real fConstant) const;
 
-		const Vector2& operator-=(const Vector2& v);
+		Vector2& operator-=(const Vector2& v);
+		Vector2& operator-=(real fConstant);
 
-		const Vector2& operator-=(real fConstant);
+		friend const Vector2 operator-(real fConstant, const Vector2& v);
 
 
 		// vector constant multiplication operator (it is not cross operation)
+		const Vector2 operator*(const Vector2& v) const;
+		Vector2& operator*=(const Vector2& v);
+
 		const Vector2 operator*(real fConstant) const;
+		Vector2& operator*=(real fConstant);
 
 		friend const Vector2 operator*(real fConstant, const Vector2& v);
-
-		const Vector2& operator*=(real fConstant);
 
 
 		// vector constnat division operator
 		const Vector2 operator/(real fConstant) const;
+		Vector2& operator/=(real fConstant);
 
-		const Vector2& operator/=(real fConstant);
 
 		// boolean operators
 		bool operator==(const Vector2& v) const;
-
 		bool operator!=(const Vector2& v) const;
 
 		// it consider real type equal
@@ -275,7 +275,7 @@ namespace sark{
 		Vector3(real val);
 		Vector3(real _x, real _y, real _z);
 		Vector3(const Vector3& v);
-		void operator=(const Vector3& v);
+		Vector3& operator=(const Vector3& v);
 
 		void Set(real _x, real _y, real _z);
 
@@ -288,55 +288,54 @@ namespace sark{
 
 		real MagnitudeSq() const;
 
+
 		// unary - operator
 		const Vector3 operator-() const;
 
 
 		// vector plus operator
 		const Vector3 operator+(const Vector3& v) const;
+		Vector3& operator+=(const Vector3& v);
 
 		const Vector3 operator+(real fConstant) const;
+		Vector3& operator+=(real fConstant);
 
 		friend const Vector3 operator+(real fConstant, const Vector3& v);
-
-		const Vector3& operator+=(const Vector3& v);
-
-		const Vector3& operator+=(real fConstant);
 
 
 		// vector minus operator
 		const Vector3 operator-(const Vector3& v) const;
+		Vector3& operator-=(const Vector3& v);
 
 		const Vector3 operator-(real fConstant) const;
+		Vector3& operator-=(real fConstant);
 
-		const Vector3& operator-=(const Vector3& v);
-
-		const Vector3& operator-=(real fConstant);
+		friend const Vector3 operator-(real fConstant, const Vector3& v);
 
 
 		// vector constant multiplication operator (it is not cross operation)
+		const Vector3 operator*(const Vector3& v) const;
+		Vector3& operator*=(const Vector3& v);
+
 		const Vector3 operator*(real fConstant) const;
+		Vector3& operator*=(real fConstant);
 
 		friend const Vector3 operator*(real fConstant, const Vector3& v);
-
-		const Vector3& operator*=(real fConstant);
 
 
 		// vector x matrix
 		const Vector3 operator*(const Matrix3& mat3) const;
-
 		// vector x matrix for this
-		const Vector3& operator*=(const Matrix3& mat3);
+		Vector3& operator*=(const Matrix3& mat3);
 
 
 		// vector constnat division operator
 		const Vector3 operator/(real fConstant) const;
+		Vector3& operator/=(real fConstant);
 
-		const Vector3& operator/=(real fConstant);
 
 		// boolean operators
 		bool operator==(const Vector3& v) const;
-
 		bool operator!=(const Vector3& v) const;
 
 		// it consider real type equal
@@ -405,7 +404,7 @@ namespace sark{
 		Vector4(real _x, real _y, real _z, real _w);
 		Vector4(const Vector3& vec3, real _w);
 		Vector4(const Vector4& v);
-		void operator=(const Vector4& v);
+		Vector4& operator=(const Vector4& v);
 
 		void Set(real _x, real _y, real _z, real _w);
 
@@ -419,55 +418,54 @@ namespace sark{
 
 		real MagnitudeSq() const;
 
+
 		// unary - operator
 		const Vector4 operator-() const;
 
 
 		// vector plus operator
 		const Vector4 operator+(const Vector4& v) const;
+		Vector4& operator+=(const Vector4& v);
 
 		const Vector4 operator+(real fConstant) const;
+		Vector4& operator+=(real fConstant);
 
 		friend const Vector4 operator+(real fConstant, const Vector4& v);
-
-		const Vector4& operator+=(const Vector4& v);
-
-		const Vector4& operator+=(real fConstant);
 
 
 		// vector minus operator
 		const Vector4 operator-(const Vector4& v) const;
+		Vector4& operator-=(const Vector4& v);
 
 		const Vector4 operator-(real fConstant) const;
+		Vector4& operator-=(real fConstant);
 
-		const Vector4& operator-=(const Vector4& v);
-
-		const Vector4& operator-=(real fConstant);
+		friend const Vector4 operator-(real fConstant, const Vector4& v);
 
 
 		// vector constant multiplication operator (it is not cross operation)
+		const Vector4 operator*(const Vector4& v) const;
+		Vector4& operator*=(const Vector4& v);
+
 		const Vector4 operator*(real fConstant) const;
+		Vector4& operator*=(real fConstant);
 
 		friend const Vector4 operator*(real fConstant, const Vector4& v);
-
-		const Vector4& operator*=(real fConstant);
 
 
 		// vector x matrix
 		const Vector4 operator*(const Matrix4& mat4) const;
-
 		// vector x matrix for this
-		const Vector4& operator*=(const Matrix4& mat4);
+		Vector4& operator*=(const Matrix4& mat4);
 
 
 		// vector constnat division operator
 		const Vector4 operator/(real fConstant) const;
+		Vector4& operator/=(real fConstant);
 
-		const Vector4& operator/=(real fConstant);
 
 		// boolean operators
 		bool operator==(const Vector4& v) const;
-
 		bool operator!=(const Vector4& v) const;
 
 		// it consider real type equal
@@ -534,7 +532,7 @@ namespace sark{
 		Matrix3(real** mat3);
 		Matrix3(const Vector3& row0, const Vector3& row1, const Vector3& row2);
 		Matrix3(const Matrix3& mat3);
-		void operator=(const Matrix3& mat3);
+		Matrix3& operator=(const Matrix3& mat3);
 
 		// set matrix elements
 		void Set(real _00, real _01, real _02,
@@ -546,30 +544,35 @@ namespace sark{
 		// getting matrix as GL format pointer
 		const real* GetRawMatrix() const;
 
+
 		// matrix plus operator
 		const Matrix3 operator+(const Matrix3& mat3) const;
+		Matrix3& operator+=(const Matrix3& mat3);
+
 
 		// matrix minus operator
 		const Matrix3 operator-(const Matrix3& mat3) const;
+		Matrix3& operator-=(const Matrix3& mat3);
 
-		// matrix constant multiply operator
-		const Matrix3 operator*(real fConstant) const;
-
-		friend const Matrix3 operator*(real fConstant, const Matrix3& mat3);
-
-		// matrix constant division operator
-		const Matrix3 operator/(real fConstant) const;
-
-		friend const Matrix3 operator/(real fConstant, const Matrix3& mat3);
 
 		// matrix multiply operator
 		const Matrix3 operator*(const Matrix3& mat3) const;
+		Matrix3& operator*=(const Matrix3& mat3);
 
-		// matrix multiply operator of this
-		const Matrix3& operator*=(const Matrix3& mat3);
-
-		// matrix multiply to vector operator
 		const Vector3 operator*(const Vector3& vec3) const;
+
+		const Matrix3 operator*(real fConstant) const;
+		Matrix3& operator*=(real fConstant);
+
+		friend const Matrix3 operator*(real fConstant, const Matrix3& mat3);
+
+
+		// matrix constant division operator
+		const Matrix3 operator/(real fConstant) const;
+		Matrix3& operator/=(real fConstant);
+
+		friend const Matrix3 operator/(real fConstant, const Matrix3& mat3);
+
 
 		// check if zero matrix
 		bool IsZero() const;
@@ -628,7 +631,7 @@ namespace sark{
 			const Vector4& row2, 
 			const Vector4& row3);
 		Matrix4(const Matrix4& mat4);
-		void operator=(const Matrix4& mat4);
+		Matrix4& operator=(const Matrix4& mat4);
 
 		explicit Matrix4(const Matrix3& mat3);
 
@@ -646,31 +649,36 @@ namespace sark{
 		// getting matrix as GL format pointer
 		const real* GetRawMatrix() const;
 
+
 		// matrix plus operator
 		const Matrix4 operator+(const Matrix4& mat4) const;
+		Matrix4& operator+=(const Matrix4& mat4);
+
 
 		// matrix minus operator
 		const Matrix4 operator-(const Matrix4& mat4) const;
+		Matrix4& operator-=(const Matrix4& mat4);
 
-		// matrix constant multiply operator
-		const Matrix4 operator*(real fConstant) const;
-
-		friend const Matrix4 operator*(real fConstant, const Matrix4& mat4);
-
-		// matrix constant division operator
-		const Matrix4 operator/(real fConstant) const;
-
-		friend const Matrix4 operator/(real fConstant, const Matrix4& mat4);
 
 		// matrix multiply operator
 		const Matrix4 operator*(const Matrix4& mat4) const;
+		Matrix4& operator*=(const Matrix4& mat4);
 
-		// matrix multiply operator of this
-		const Matrix4& operator*=(const Matrix4& mat4);
-
-		// matrix multiply to vector operator
 		const Vector4 operator*(const Vector4& vec4) const;
 
+		const Matrix4 operator*(real fConstant) const;
+		Matrix4& operator*=(real fConstant);
+
+		friend const Matrix4 operator*(real fConstant, const Matrix4& mat4);
+
+
+		// matrix constant division operator
+		const Matrix4 operator/(real fConstant) const;
+		Matrix4& operator/=(real fConstant);
+
+		friend const Matrix4 operator/(real fConstant, const Matrix4& mat4);
+
+		
 		// check if zero matrix
 		bool IsZero() const;
 
@@ -729,7 +737,7 @@ namespace sark{
 		Quaternion(const Matrix4& rotMat);
 
 		Quaternion(const Quaternion& q);
-		void operator=(const Quaternion& q);
+		Quaternion& operator=(const Quaternion& q);
 
 		explicit Quaternion(const Vector3& v, real _s = 0.0f);
 		explicit Quaternion(const Vector2& v);
@@ -747,17 +755,17 @@ namespace sark{
 
 		// quaternion plus operation
 		const Quaternion operator+(const Quaternion& q) const;
-		const Quaternion& operator+=(const Quaternion& q);
+		Quaternion& operator+=(const Quaternion& q);
 
 
 		// quaternion minus operation
 		const Quaternion operator-(const Quaternion& q) const;
-		const Quaternion& operator-=(const Quaternion& q);
+		Quaternion& operator-=(const Quaternion& q);
 
 
 		// Hamilton product: [s1, v1]*[s2, v2] = [s1*s2 - dot(v1,v2), s1*v2 + s2*v1 + cross(v1,v2)]
 		const Quaternion operator*(const Quaternion& q) const;
-		const Quaternion& operator*=(const Quaternion& q);
+		Quaternion& operator*=(const Quaternion& q);
 
 
 		// get conjugation and conjugate this
