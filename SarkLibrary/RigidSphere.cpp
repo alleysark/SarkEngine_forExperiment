@@ -57,14 +57,13 @@ namespace sark{
 			AttributeSemantic::INDICES, indices);
 
 		arrBuf.SetDrawMode(ArrayBuffer::DrawMode::TRIANGLES);
-
-		mSphere.Set(Position3(0, 0, 0), mRadius);
 	}
 
 	// create sphere from given properties
 	RigidSphere::RigidSphere(real radius, uinteger slice, uinteger stack)
 		: ASceneComponent("", NULL, true),
-		mRadius(radius), mSlice(slice), mStack(stack)
+		mRadius(radius), mSlice(slice), mStack(stack),
+		mSphere(Vector3(0,0,0), radius)
 	{
 		CreateSphere();
 	}
@@ -73,7 +72,8 @@ namespace sark{
 	RigidSphere::RigidSphere(const std::string& name, ASceneComponent* parent, bool activate,
 		real radius, uinteger slice, uinteger stack)
 		: ASceneComponent(name, parent, activate),
-		mRadius(radius), mSlice(slice), mStack(stack)
+		mRadius(radius), mSlice(slice), mStack(stack),
+		mSphere(Vector3(0, 0, 0), radius)
 	{
 		CreateSphere();
 	}

@@ -829,10 +829,17 @@ namespace sark{
 		m[2][0] = 0.0f; m[2][1] = 0.0f; m[2][2] = 1.0f;
 	}
 
-	// matrix transpose
-	const Matrix3 Matrix3::Transpose() const{
+	// get transposition of this matrix.
+	const Matrix3 Matrix3::Transposition() const{
 		return Matrix3(
 			m[0][0], m[1][0], m[2][0],
+			m[0][1], m[1][1], m[2][1],
+			m[0][2], m[1][2], m[2][2]);
+	}
+
+	// transpose this matrix
+	void Matrix3::Transpose(){
+		Set(m[0][0], m[1][0], m[2][0],
 			m[0][1], m[1][1], m[2][1],
 			m[0][2], m[1][2], m[2][2]);
 	}
@@ -1163,10 +1170,18 @@ namespace sark{
 		m[3][0] = 0.0f; m[3][1] = 0.0f; m[3][2] = 0.0f; m[3][3] = 1.0f;
 	}
 
-	// matrix transpose
-	const Matrix4 Matrix4::Transpose() const{
+	// get transposition of this matrix
+	const Matrix4 Matrix4::Transposition() const{
 		return Matrix4(
 			m[0][0], m[1][0], m[2][0], m[3][0],
+			m[0][1], m[1][1], m[2][1], m[3][1],
+			m[0][2], m[1][2], m[2][2], m[3][2],
+			m[0][3], m[1][3], m[2][3], m[3][3]);
+	}
+
+	// transpose this matrix
+	void Matrix4::Transpose(){
+		Set(m[0][0], m[1][0], m[2][0], m[3][0],
 			m[0][1], m[1][1], m[2][1], m[3][1],
 			m[0][2], m[1][2], m[2][2], m[3][2],
 			m[0][3], m[1][3], m[2][3], m[3][3]);

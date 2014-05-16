@@ -279,7 +279,7 @@ namespace sark{
 
 		void Set(real _x, real _y, real _z);
 
-		// explicitly type cast
+		// explicit type cast
 		explicit Vector3(const Vector2& v);
 
 
@@ -408,7 +408,7 @@ namespace sark{
 
 		void Set(real _x, real _y, real _z, real _w);
 
-		// explicitly type cast
+		// explicit type cast
 		explicit Vector4(const Vector2& v);
 		explicit Vector4(const Vector3& v);
 
@@ -586,8 +586,11 @@ namespace sark{
 		// make this to identity matrix
 		void MakeIdentity();
 
-		// matrix transpose
-		const Matrix3 Transpose() const;
+		// get transposition of this matrix.
+		const Matrix3 Transposition() const;
+
+		// transpose this matrix
+		void Transpose();
 
 		// matrix cofactor matrix
 		const Matrix3 CofactorMatrix() const;
@@ -691,8 +694,11 @@ namespace sark{
 		// make this to identity matrix
 		void MakeIdentity();
 
-		// matrix transpose
-		const Matrix4 Transpose() const;
+		// get transposition of this matrix
+		const Matrix4 Transposition() const;
+
+		// transpose this matrix
+		void Transpose();
 
 		// matrix cofactor matrix
 		const Matrix4 CofactorMatrix() const;

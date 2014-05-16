@@ -262,10 +262,10 @@ namespace sark{
 			u.z*CS_dir.x + v.z*CS_dir.y + n.z*CS_dir.z);
 
 		return Ray(
-			mEye + mVolume.zNear*WS_dir, // ray starts from zn plane
-			WS_dir, true, // actually, WS_dir doesn't normalized.
-			mVolume.zFar - mVolume.zNear // to zf plane
-			);
+			// ray starts from zn plane
+			mEye + mVolume.zNear*WS_dir,
+			// to zf plane
+			WS_dir, mVolume.zFar - mVolume.zNear);
 	}
 
 

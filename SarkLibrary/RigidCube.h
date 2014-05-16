@@ -14,7 +14,7 @@ namespace sark{
 		Mesh* mMesh;
 
 		// bounding box
-		OrientedBox mOBox, mUpdatedObox;
+		OrientedBox mOBox;
 
 		// basic properties of cube
 		real mWidth, mHeight, mDepth;

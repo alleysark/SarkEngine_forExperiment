@@ -1,404 +1,258 @@
 #include "shapes.h"
-#include "Mesh.h"
-#include "Transform.h"
+#include "Debug.h"
 #include <algorithm>
 
 namespace sark{
-
-	IShape::ExtShapeIntersectionChecker IShape::extChecker = NULL;
-
-	IShape::IShape(Type type)
-		: mType(type)
-	{}
-
-	IShape::~IShape(){}
-
-	IShape::Type IShape::GetType() const{
-		return mType;
-	}
-
-	void IShape::SetExtensionShapeIntersectionChecker(ExtShapeIntersectionChecker checker){
-		extChecker = checker;
-	}
-
 
 	// ======================================================
 	//			implemented shapes below..
 	// ======================================================
 
-	Ray::Ray() : IShape(IShape::RAY){}
+	// ray
+	Ray::Ray()
+		: pos(0), dir(Vector3::Forward), limit(0){}
 
-	Ray::Ray(const Position3& position, const Vector3& direction, bool dir_normalized, real limitation)
-		: IShape(IShape::RAY), pos(position), dir(direction), limit(limitation)
+	Ray::Ray(const Vector3& position, const Vector3& direction, real limitation)
+		: pos(position), dir(direction), limit(limitation){}
+
+	Ray::Ray(const Vector3& A, const Vector3& B)
+		: pos(A), dir(B - A), limit(1.f){}
+
+	IShape::Type Ray::GetType() const{
+		return IShape::RAY;
+	}
+
+
+	// plane
+	Plane::Plane()
+		: norm(Vector3::Up), p(0){}
+
+	Plane::Plane(const Vector3& normal, const Vector3& point)
+		: norm(normal), p(point){}
+
+	// Ax + By + Cz + D = 0
+	Plane::Plane(const Vector3& normal, real D)
+		: norm(normal)
 	{
-		if (!dir_normalized)
-			dir.Normalize();
+		if (norm.x != 0)
+			p = Vector3(-D / norm.x, 0, 0);
+		else if (norm.y != 0)
+			p = Vector3(0, -D / norm.y, 0);
+		else if (norm.z != 0)
+			p = Vector3(0, 0, -D / norm.z);
+		else
+			LogWarn("invalid plane normal vector");
 	}
 
-	void Ray::Set(const Position3& position, const Vector3& direction, bool dir_normalized, real limitation){
-		pos = position;
-		dir = direction;
-		limit = limitation;
-
-		if (!dir_normalized)
-			dir.Normalize();
-	}
-
-	bool Ray::IsIntersectedWith(const IShape* shape) const{
-		switch (shape->GetType()){
-		case IShape::RAY:
-			return false;
-		case IShape::SPHERE:
-			return IsIntersected(this, dynamic_cast<const Sphere*>(shape));
-		case IShape::AABOX:
-			return IsIntersected(this, dynamic_cast<const AxisAlignedBox*>(shape));
-		case IShape::OBOX:
-			return IsIntersected(this, dynamic_cast<const OrientedBox*>(shape));
-		case IShape::CONVEXHULL:
-			return IsIntersected(this, dynamic_cast<const ConvexHull*>(shape));
-		default:
-			if (extChecker != NULL)
-				return extChecker(this, shape);
-			return false;
-		}
+	IShape::Type Plane::GetType() const{
+		return IShape::PLANE;
 	}
 
 
-	Sphere::Sphere() : IShape(IShape::SPHERE){}
+	// sphere
+	Sphere::Sphere()
+		: pos(0), r(1.f){}
 
-	Sphere::Sphere(const Point3& position, real radius)
-		: IShape(IShape::SPHERE), pos(position), r(radius)
+	Sphere::Sphere(const Vector3& position, real radius)
+		: pos(position), r(radius)
 	{}
 
-	void Sphere::Set(const Point3& position, real radius){
-		pos = position;
-		r = radius;
-	}
-
-	bool Sphere::IsIntersectedWith(const IShape* shape) const{
-		switch (shape->GetType()){
-		case IShape::RAY:
-			return IsIntersected(dynamic_cast<const Ray*>(shape), this);
-		case IShape::SPHERE:
-			return IsIntersected(this, dynamic_cast<const Sphere*>(shape));
-		case IShape::AABOX:
-			return IsIntersected(this, dynamic_cast<const AxisAlignedBox*>(shape));
-		case IShape::OBOX:
-			return IsIntersected(this, dynamic_cast<const OrientedBox*>(shape));
-		case IShape::CONVEXHULL:
-			return IsIntersected(this, dynamic_cast<const ConvexHull*>(shape));
-		default:
-			if (extChecker != NULL)
-				return extChecker(this, shape);
-			return false;
-		}
+	IShape::Type Sphere::GetType() const{
+		return IShape::SPHERE;
 	}
 
 
-	AxisAlignedBox::AxisAlignedBox() : IShape(IShape::AABOX){}
+	// axis aligned box
+	AxisAlignedBox::AxisAlignedBox()
+		: min(-0.5f), max(0.5f){}
 
-	AxisAlignedBox::AxisAlignedBox(const Position3& position, real extention[3])
-		: IShape(IShape::AABOX), pos(position), ext(extention[0], extention[1], extention[2])
-	{}
+	AxisAlignedBox::AxisAlignedBox(const Vector3& posMin, const Vector3& posMax)
+		: min(posMin), max(posMax){}
 
-	AxisAlignedBox::AxisAlignedBox(const Point3& posMin, const Point3& posMax)
-		: IShape(IShape::AABOX)
-	{
-		pos = (posMin + posMax) / 2.f;
-		ext = (posMax - posMin) / 2.f;
-	}
+	AxisAlignedBox::AxisAlignedBox(const Vector3& center, real half_ext[3])
+		: min(center.x - half_ext[0], center.y - half_ext[1], center.z - half_ext[2]),
+		max(center.x + half_ext[0], center.y + half_ext[1], center.z + half_ext[2]){}
 
-	void AxisAlignedBox::Set(const Position3& position, real extention[3]){
-		pos = position;
-		ext = { extention[0], extention[1], extention[2] };
-	}
-	void AxisAlignedBox::Set(const Point3& posMin, const Point3& posMax){
-		pos = (posMin + posMax) / 2.f;
-		ext = (posMax - posMin) / 2.f;
-	}
-
-	bool AxisAlignedBox::IsIntersectedWith(const IShape* shape) const{
-		switch (shape->GetType()){
-		case IShape::RAY:
-			return IsIntersected(dynamic_cast<const Ray*>(shape), this);
-		case IShape::SPHERE:
-			return IsIntersected(dynamic_cast<const Sphere*>(shape), this);
-		case IShape::AABOX:
-			return IsIntersected(this, dynamic_cast<const AxisAlignedBox*>(shape));
-		case IShape::OBOX:
-			return IsIntersected(this, dynamic_cast<const OrientedBox*>(shape));
-		case IShape::CONVEXHULL:
-			return IsIntersected(this, dynamic_cast<const ConvexHull*>(shape));
-		default:
-			if (extChecker != NULL)
-				return extChecker(this, shape);
-			return false;
-		}
+	IShape::Type AxisAlignedBox::GetType() const{
+		return IShape::AABOX;
 	}
 
 
-	OrientedBox::OrientedBox() : IShape(IShape::OBOX){}
+	// oriented box
+	OrientedBox::OrientedBox()
+		: pos(0), ext(0.5f), rot(true){}
 
-	OrientedBox::OrientedBox(const Position3& position,
-		const Vector4& basisXext, const Vector4& basisYext, const Vector4& basisZext,
-		bool basis_normalized)
-		: IShape(IShape::OBOX), pos(position)
-	{
-		axis[0] = basisXext;
-		axis[1] = basisYext;
-		axis[2] = basisZext;
-		if (!basis_normalized){
-			axis[0].xyz.Normalize();
-			axis[1].xyz.Normalize();
-			axis[2].xyz.Normalize();
-		}
-	}
+	OrientedBox::OrientedBox(const Vector3& position, const Vector3& extention)
+		: pos(position), ext(extention), rot(true){}
+	
+	OrientedBox::OrientedBox(const Vector3& position, const Vector3& extention,
+		const Matrix3& rotation)
+		: pos(position), ext(extention), rot(rotation){}
 
-	void OrientedBox::Set(const Position3& position,
-		const Vector4& basisXext, const Vector4& basisYext, const Vector4& basisZext,
-		bool basis_normalized){
-		pos = position;
-		axis[0] = basisXext;
-		axis[1] = basisYext;
-		axis[2] = basisZext;
-		if (!basis_normalized){
-			axis[0].xyz.Normalize();
-			axis[1].xyz.Normalize();
-			axis[2].xyz.Normalize();
-		}
-	}
-
-	bool OrientedBox::IsIntersectedWith(const IShape* shape) const{
-		switch (shape->GetType()){
-		case IShape::RAY:
-			return IsIntersected(dynamic_cast<const Ray*>(shape), this);
-		case IShape::SPHERE:
-			return IsIntersected(dynamic_cast<const Sphere*>(shape), this);
-		case IShape::AABOX:
-			return IsIntersected(dynamic_cast<const AxisAlignedBox*>(shape), this);
-		case IShape::OBOX:
-			return IsIntersected(this, dynamic_cast<const OrientedBox*>(shape));
-		case IShape::CONVEXHULL:
-			return IsIntersected(this, dynamic_cast<const ConvexHull*>(shape));
-		default:
-			if (extChecker != NULL)
-				return extChecker(this, shape);
-			return false;
-		}
+	IShape::Type OrientedBox::GetType() const{
+		return IShape::OBOX;
 	}
 
 
-	ConvexHull::ConvexHull() : IShape(IShape::CONVEXHULL){}
+	// convex hull
+	ConvexHull::ConvexHull(){}
 
-	bool ConvexHull::IsIntersectedWith(const IShape* shape) const{
-		switch (shape->GetType()){
-		case IShape::RAY:
-			return IsIntersected(dynamic_cast<const Ray*>(shape), this);
-		case IShape::SPHERE:
-			return IsIntersected(dynamic_cast<const Sphere*>(shape), this);
-		case IShape::AABOX:
-			return IsIntersected(dynamic_cast<const AxisAlignedBox*>(shape), this);
-		case IShape::OBOX:
-			return IsIntersected(dynamic_cast<const OrientedBox*>(shape), this);
-		case IShape::CONVEXHULL:
-			return IsIntersected(this, dynamic_cast<const ConvexHull*>(shape));
-		default:
-			if (extChecker != NULL)
-				return extChecker(this, shape);
-			return false;
-		}
+	IShape::Type ConvexHull::GetType() const{
+		return IShape::CONVEXHULL;
 	}
+
 
 
 	// ======================================================
 	//		intersection check functions of basic shapes
 	//
 	//				referenced documents
+	//  * Mathematics for computer graphics | John Vince | Springer | 2010.03.01
+	//  * 3D graphics for game programming | JungHyun Han | CRC Press | 2011.01.01
 	//	* http://paulbourke.net/geometry/
+	//  * http://geomalgorithms.com/a06-_intersect-2.html
 	// ======================================================
 
-	// ray - sphere intersection
-	bool IsIntersected(const Ray* ray, const Sphere* sphere){
-		Vector3 p_o = ray->pos - sphere->pos;
-		real a = ray->dir.MagnitudeSq();
-		real b = ray->dir.Dot(p_o); //half of b
-		real c = p_o.MagnitudeSq() - math::sqre(sphere->r);
+	
+	// ray-plane intersection check.
+	bool Ray_PlaneIntersection(
+		const Vector3& ray_p, const Vector3& ray_v,
+		const Vector3& plane_n, const Vector3& plane_p,
+		real* out_t)
+	{
+		// whether the line vector and plane normal are perpendicular each other.
+		if (ray_v.Dot(plane_n) == 0)
+			return false;
+
+		// Plane(x,y,z) = n_x*x + n_y*y + n_z*z + D = 0
+		real minus_D = plane_n.Dot(plane_p);
+
+		if (out_t != NULL){
+			// (1): P(t) = ray_p + ray_v*t
+			// (2): Plane(x,y,z) = n_x*x + n_y*y + n_z*z + D = 0
+			*out_t = (minus_D - plane_n.Dot(ray_p)) / plane_n.Dot(ray_v);
+		}
+		return true;
+	}
+
+	// ray-sphere intersection test.
+	int8 Ray_SphereIntersection(
+		const Vector3& ray_p, const Vector3& ray_v,
+		const Vector3& sphere_p, const real& sphere_r,
+		real* out_t1, real* out_t2)
+	{
+		Vector3 p_o = ray_p - sphere_p;
+		real a = ray_v.MagnitudeSq();
+		real b = ray_v.Dot(p_o); //half of b
+		real c = p_o.MagnitudeSq() - math::sqre(sphere_r);
 
 		real det = math::sqre(b) - a*c;
 		if (det < 0){
-			return false;
+			return 0;
 		}
-
-		if (det == 0){
-			real t = -b / a;
-			if (0 <= t && t <= ray->limit)
-				return true;
+		else if (det == 0){
+			if (out_t1!=NULL)
+				*out_t1 = -b / a;
+			return 1;
 		}
 		else{//det>0
 			det = math::sqrt(det);
-			real t = (-b + det) / a;
-			if (0 <= t && t <= ray->limit)
-				return true;
 
-			t = (-b - det) / a;
-			if (0 <= t && t <= ray->limit)
-				return true;
+			if (out_t1!=NULL)
+				*out_t1 = (-b + det) / a;
+			if (out_t2!=NULL)
+				*out_t2 = (-b - det) / a;
+			return 2;
 		}
-		return false;
 	}
 
-	// ray - axis aligned box intersection
-	bool IsIntersected(const Ray* ray, const AxisAlignedBox* aabox){
-		if (ContainsIn(aabox, ray->pos)){
-			return true;
-		}
-		if (ray->limit < REAL_MAX && ContainsIn(aabox, ray->pos + ray->limit*ray->dir)){
-			return true;
-		}
-
-		real t_min = 0;
+	// ray-axis aligned box intersection test.
+	bool Ray_AxisAlignedBoxIntersection(
+		const Vector3& ray_p, const Vector3& ray_v,
+		const Vector3& aab_min, const Vector3& aab_max,
+		real* out_t1, real* out_t2)
+	{
+		real t_min = -REAL_MAX;
 		real t_max = REAL_MAX;;
 
-		for (int i = 0; i<3; i++){
-			if (math::real_equal(ray->dir.v[i], 0.f)){
-				if (ray->pos.v[i] < (aabox->pos.v[i] - aabox->ext.v[i]) ||
-					ray->pos.v[i] > (aabox->pos.v[i] + aabox->ext.v[i]))
+		for (integer i = 0; i<3; i++){
+			if (math::real_equal(ray_v.v[i], 0.f)){
+				if (ray_p.v[i] < aab_min.v[i] || aab_max.v[i] < ray_p.v[i]){
 					return false;
+				}
 			}
 			else{
-				float t1 = (-ray->pos.v[i] - (aabox->pos.v[i] - aabox->ext.v[i])) / ray->dir.v[i];
-				float t2 = (-ray->pos.v[i] - (aabox->pos.v[i] + aabox->ext.v[i])) / ray->dir.v[i];
+				real t1 = (aab_min.v[i] - ray_p.v[i]) / ray_v.v[i];
+				real t2 = (aab_max.v[i] - ray_p.v[i]) / ray_v.v[i];
 				if (t1 > t2){
 					std::swap(t1, t2);
 				}
-				t_min = math::max(t_min, t1);
-				t_max = math::min(t_max, t2);
+
+				if (t1 > t_min)
+					t_min = t1;
+				if (t2 < t_max)
+					t_max = t2;
+
 				if (t_min > t_max)
 					return false;
 			}
 		}
 
-		if (t_min > ray->limit)
-			return false;
+		if (out_t1 != NULL)
+			*out_t1 = t_min;
+		if (out_t2 != NULL)
+			*out_t2 = t_max;
 		return true;
 	}
-	
-	// ray - oriented box intersection
-	bool IsIntersected(const Ray* ray, const OrientedBox* obox){
-		Matrix4 obMat;
-		for (integer i = 0; i < 3; i++){
-			obMat.row[i].xyz = obox->axis[i].xyz;
-			obMat.row[i].w = -obox->pos.Dot(obox->axis[i].xyz);
-		}
-		obMat.row[3].Set(0, 0, 0, 1);
 
-		Ray transRay(
-			(obMat*Vector4(ray->pos, 1)).xyz, 
-			Vector3(obox->axis[0].xyz.Dot(ray->dir), obox->axis[1].xyz.Dot(ray->dir), obox->axis[2].xyz.Dot(ray->dir)),
-			true,ray->limit);
-		AxisAlignedBox aabox(Position3(-obox->axis[0].w, -obox->axis[1].w, -obox->axis[2].w),
-			Position3(obox->axis[0].w, obox->axis[1].w, obox->axis[2].w));
-		return IsIntersected(&transRay, &aabox);
-	}
-	
-	// ray - convex hull intersection
-	bool IsIntersected(const Ray* ray, const ConvexHull* convex){
-		// transform ray into object space.
-		//const Matrix4& TM = convex->refTransform->GetMatrix();
-		Matrix4 TM;
-		Matrix4 invTRS = TM.Inverse();
-		Matrix3 invRS = Matrix3(
-			TM.row[0].xyz,
-			TM.row[1].xyz,
-			TM.row[2].xyz).Inverse();
-		Ray os_ray(
-			(invTRS * Vector4(ray->pos, 1)).xyz,
-			invRS * ray->dir, true,
-			ray->limit);
-
-		// for each triangles:
-		//   if Triangle_RayIntersection is true then,
-		//     return true
-		
-		return false;
-	}
-
-
-	// sphere - sphere intersection
-	bool IsIntersected(const Sphere* sphere1, const Sphere* sphere2){
-		real dist = (sphere1->pos - sphere2->pos).Magnitude();
-		if (dist <= sphere1->r + sphere2->r)
-			return true;
-		return false;
-	}
-
-	// sphere - axis aligned box intersection
-	bool IsIntersected(const Sphere* sphere, const AxisAlignedBox* aabox){ return false; }
-	
-	// sphere - oriented box intersection
-	bool IsIntersected(const Sphere* sphere, const OrientedBox* obox){ return false; }
-	
-	// sphere - convex hull intersection
-	bool IsIntersected(const Sphere* sphere, const ConvexHull* convex){ return false; }
-
-	// axis aligned box - axis aligned box intersection
-	bool IsIntersected(const AxisAlignedBox* aabox1, const AxisAlignedBox* aabox2){
-		#define AABOX_MIN(paabox, ax) (paabox->pos.v[ax] - paabox->ext.v[ax])
-		#define AABOX_MAX(paabox, ax) (paabox->pos.v[ax] + paabox->ext.v[ax])
-		for (integer i = 0; i < 3; i++){
-			if (AABOX_MIN(aabox1, i) > AABOX_MAX(aabox2, i) ||
-				AABOX_MAX(aabox1, i) < AABOX_MIN(aabox2, i)){
-				return false;
-			}
-		}
-		return true;
-		#undef AABOX_MIN
-		#undef AABOX_MAX
-	}
-	
-	// axis aligned box - oriented box intersection
-	bool IsIntersected(const AxisAlignedBox* aabox, const OrientedBox* obox){ return false; }
-	
-	// axis aligned box - convex hull intersection
-	bool IsIntersected(const AxisAlignedBox* aabox, const ConvexHull* convex){ return false; }
-
-	// oriented box - oriented box intersection
-	bool IsIntersected(const OrientedBox* obox1, const OrientedBox* obox2){ return false; }
-	
-	// oriented box - convex hull intersection
-	bool IsIntersected(const OrientedBox* obox, const ConvexHull* convex){ return false; }
-
-	// convex hull - convex hull intersection
-	bool IsIntersected(const ConvexHull* convex1, const ConvexHull* convex2){ return false; }
-
-
-
-	// assistance functions
-
-	// triangle - ray intersection test.
-	bool Triangle_RayIntersection(const Vector3& A, const Vector3& B, const Vector3& C,
-		const Ray* ray, real& outParam_t, real& outParam_v, real& outParam_w)
+	// ray - oriented box intersection test.
+	bool Ray_OrientedBoxIntersection(
+		const Vector3& ray_p, const Vector3& ray_v,
+		const Vector3& ob_p, const Vector3& ob_ext, const Matrix3& ob_rot,
+		real* out_t1, real* out_t2)
 	{
-		// barycentric form of triangle plane =>
-		// P(v,w) = (1 - v - w)A + vB + wC; {0<=v<=1, 0<=w<=1, 0<=v+w<=1}
+		// transform ray into oriented box space.
+		// it seems like the camera transformation
+		// with Eye as ob_p, and basis as ob_rot matrix.
+		Vector3 transray_p
+			= Vector3(
+			ob_rot.row[0].Dot(ray_p) - ob_rot.row[0].Dot(ob_p),
+			ob_rot.row[1].Dot(ray_p) - ob_rot.row[1].Dot(ob_p),
+			ob_rot.row[2].Dot(ray_p) - ob_rot.row[2].Dot(ob_p));
+		Vector3 transray_v
+			= Vector3(
+			ob_rot.row[0].Dot(ray_v),
+			ob_rot.row[1].Dot(ray_v),
+			ob_rot.row[2].Dot(ray_v));
 
-		// parametric equation of ray =>
-		// r(t) = o + t*d;
-		// 'o' is start position vector, 'd' is normalized direction vector
+		// from now, oriented box is regarded as axis aligned box.
+		return Ray_AxisAlignedBoxIntersection(
+			transray_p, transray_v,
+			-ob_ext, ob_ext,
+			out_t1, out_t2);
+	}
 
-		// if the ray intersects with triangle, it'll satisfy the equations below.
-		// P(v,w)=r(t)
-		// => (1 - v - w)A + vB + wC = o + t*d
-		// => (-d)t + (B-A)v + (C-A)w = o - A;
-		// let these to be represented as follows,
-		Vector3 e1 = B - A;
-		Vector3 e2 = C - A;
-		Vector3 s = ray->pos - A;
+	// ray intersection test as regards the barycentric coordinates equation.
+	bool Ray_BarycentricCoordIntersection(
+		const Vector3& ray_p, const Vector3& ray_v,
+		const Vector3& bc_o, const Vector3& bc_e1, const Vector3& bc_e2,
+		real* out_t, real* out_u, real* out_v)
+	{
+		// parametric equation of line =>
+		// L(t) = ray_p + ray_v*t
+
+		// if the line intersects with barycentric plane,
+		// it'll satisfy the equations below.
+		// P(u,v) = L(t)
+		// => -(ray_v)t + (e1)u + (e2)v = ray_p - origin
+
+		// for your accommodation, let us represent ray_p - origin as 's'.
+		Vector3 s = ray_p - bc_o;
 
 		// and it is linear equation with three variables.
 		//                [t]
-		// [(-d) e1 e2] x [v] = s;
-		//                [w]
+		// [(-d) e1 e2] x [u] = s;
+		//                [v]
 
 		// from Cramer's rule -
 		// "Ax = b  =>  x_i = det(A_i)/det(A),
@@ -409,31 +263,204 @@ namespace sark{
 
 		// result can be summarized by some cross-product rules.
 		// [t]    1     [s ， (e1 x e2)]    1     [(s x e1)，e2]
-		// [v] = ---  x [(-d)，(s X e2)] = ---  x [(d x e2)，s ]
-		// [w]  det(A)  [(-d)，(e1 X s)]  det(A)  [(s x e1)，d ]
+		// [u] = ---  x [(-d)，(s X e2)] = ---  x [(d x e2)，s ]
+		// [v]  det(A)  [(-d)，(e1 X s)]  det(A)  [(s x e1)，d ]
 		// , where det(A) is (e2 x e1)，d
 
-		Vector3 p = ray->dir.Cross(e2);
-		Vector3 q = s.Cross(e1);
+		Vector3 p = ray_v.Cross(bc_e2);
+		Vector3 q = s.Cross(bc_e1);
 
-		real det = p.Dot(e1);
+		real det = p.Dot(bc_e1);
 		if (math::real_equal(det, 0))
 			return false;
 		det = 1.f / det;
 
-		outParam_t = det * q.Dot(e2);
-		outParam_v = det * p.Dot(s);
-		outParam_w = det * q.Dot(ray->dir);
+		if (out_t != NULL)
+			*out_t = det * q.Dot(bc_e2);
+		if (out_u != NULL)
+			*out_u = det * p.Dot(s);
+		if (out_v != NULL)
+			*out_v = det * q.Dot(ray_v);
 
-		// from t,v and w, it can be tested whether ray intersects with triangle or not
-		if (0 <= outParam_t && outParam_t <= ray->limit){
-			if ((outParam_v >= 0) && (outParam_w >= 0)
-				&& (outParam_v + outParam_w <= 1))
-			{
-				return true;
+		return true;
+	}
+
+	// triangle intersection test as regards the barycentric coordinates equation.
+	bool Triangle_BarycentricCoordIntersection(
+		const Vector3& A, const Vector3& B, const Vector3& C,
+		const Vector3& bc_o, const Vector3& bc_e1, const Vector3& bc_e2,
+		Vector3* out_P, Vector3* out_Q,
+		real* out_Pu, real* out_Pv,
+		real* out_Qu, real* out_Qv)
+	{
+		// normal vector of barycentric coordinates plane.
+		Vector3 n = bc_e1.Cross(bc_e2);
+
+		// point locations.
+		int8 A_loc = PointLocationByPlane(A, n, bc_o);
+		int8 B_loc = PointLocationByPlane(B, n, bc_o);
+		int8 C_loc = PointLocationByPlane(C, n, bc_o);
+
+		// zero location (on the plane) handling.
+		if (A_loc == 0 || B_loc == 0 || C_loc == 0){
+			// it is too hard to handle this situations..
+			return false;
+		}
+
+		// determin which edge do we take.
+		Vector3 v1, v2;
+		if (A_loc == B_loc){
+			if (A_loc == C_loc)
+				return false;
+			v1 = C - A;// line A-C
+			v2 = B - C;// line C-B
+		}
+		else if (A_loc == C_loc){
+			v1 = B - A;// line A-B
+			v2 = B - C;// line C-B	
+		}
+		else{
+			v1 = B - A;// line A-B
+			v2 = A - C;// line C-A
+		}
+
+		// parameters for P and Q.
+		real pt = 0, qt = 0;
+
+		if (!Ray_BarycentricCoordIntersection(A, v1, bc_o, bc_e1, bc_e2,
+			&pt, out_Pu, out_Pv))
+			return false;
+		if (pt < 0 || 1 < pt)
+			return false;
+
+		if (!Ray_BarycentricCoordIntersection(C, v2, bc_o, bc_e1, bc_e2,
+			&qt, out_Qu, out_Qv))
+			return false;
+		if (qt < 0 || 1 < qt)
+			return false;
+
+		if (out_P != NULL)
+			*out_P = A + v1*pt;
+		if (out_Q != NULL)
+			*out_Q = C + v2*qt;
+		return true;
+	}
+
+
+	// triangle - triangle intersection test.
+	bool Triangle_TriangleIntersection(
+		const Vector3& A1, const Vector3& B1, const Vector3& C1,
+		const Vector3& A2, const Vector3& B2, const Vector3& C2,
+		Vector3* out_P, Vector3* out_Q)
+	{
+		Vector3 e1 = B2 - A2;
+		Vector3 e2 = C2 - A2;
+		Vector3 P1, Q1;
+		if (!Triangle_BarycentricCoordIntersection(A1, B1, C1,
+			A2, e1, e2, &P1, &Q1))
+			return false;
+
+		e1 = B1 - A1;
+		e2 = C1 - A1;
+		Vector3 P2, Q2;
+		if (!Triangle_BarycentricCoordIntersection(A2, B2, C2,
+			A1, e1, e2, &P2, &Q2))
+			return false;
+
+		// two segments P1-Q1 and P2-Q2 are collinear.
+		// take one axis and test overlap.
+		uinteger i = 0;
+		for (i = 0; i<3; i++){
+			if (P1.v[i] != Q1.v[i])
+				break;
+		}
+		if (i == 3){
+			for (i = 0; i<3; i++){
+				if (P2.v[i] != Q2.v[i])
+					break;
+			}
+			if (i == 3){
+				if (P1 == P2){
+					// two triangles intersect at a point.
+					// it is extremely special case.
+					*out_P = P1;
+					*out_Q = P1;
+					return true;
+				}
+				return false;
 			}
 		}
-		return false;
+
+		// sort P1-Q1 and P2-Q2
+		if (Q1.v[i] < P1.v[i])
+			std::swap(P1, Q1);
+		if (Q2.v[i] < P2.v[i])
+			std::swap(P2, Q2);
+
+
+		// possible segment overlapping cases.
+		// (1)P2----Q2  (4)P2----Q2       (6)P2----Q2
+		//	    (2)P2----Q2     (5)P2----Q2
+		//	    (3)P2--------------------Q2
+		//	           P1------------Q1
+		if (P2.v[i] < P1.v[i]){
+			if (Q2.v[i] < P1.v[i]){
+				return false; //(1). not overlap
+			}
+			else if (Q2.v[i] <= Q1.v[i]){
+				*out_P = P1; //(2)
+				*out_Q = Q2;
+			}
+			else{
+				*out_P = P1; //(3)
+				*out_Q = Q1;
+			}
+		}
+		else if (P2.v[i] <= Q1.v[i]){
+			if (Q2.v[i] <= Q1.v[i]){
+				*out_P = P2; //(4)
+				*out_Q = Q2;
+			}
+			else{
+				*out_P = P2; //(5)
+				*out_Q = Q1;
+			}
+		}
+		else{
+			return false; //(6)
+		}
+		return true;
+	}
+
+	// sphere - sphere intersection test.
+	bool Sphere_SphereIntersection(
+		const Vector3& sphere1_p, const real& sphere1_r,
+		const Vector3& sphere2_p, const real& sphere2_r,
+		Vector3* out_P)
+	{
+		real distSq = (sphere1_p - sphere2_p).MagnitudeSq();
+		if (distSq > math::sqre(sphere1_r + sphere2_r)){
+			return false;
+		}
+
+		if (out_P != NULL){
+			*out_P = (sphere1_p + sphere2_p) / 2.f;
+		}
+		return true;
+	}
+
+	// axis aligned box - axis aligned box intersection test.
+	bool AxisAlignedBox_AxisAlignedBoxIntersection(
+		const Vector3& aab1_min, const Vector3& aab1_max,
+		const Vector3& aab2_min, const Vector3& aab2_max)
+	{
+		for (integer i = 0; i < 3; i++){
+			if (aab1_min.v[i] > aab2_max.v[i]
+				|| aab1_max.v[i] < aab2_min.v[i]){
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

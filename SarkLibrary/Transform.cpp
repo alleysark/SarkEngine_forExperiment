@@ -171,14 +171,13 @@ namespace sark{
 			mLocalTM.row[0].xyz = matRot.row[0];
 			mLocalTM.row[1].xyz = matRot.row[1];
 			mLocalTM.row[2].xyz = matRot.row[2];
+			mLocalTM.m[3][3] = 1.f;
 
 			if (mScale.x != 1 || mScale.y != 1 || mScale.z != 1){
 				// mLocalTM = (T*R) * sMat
-				for (integer i = 0; i < 3; i++){
-					mLocalTM.row[i].x *= mScale.x;
-					mLocalTM.row[i].y *= mScale.y;
-					mLocalTM.row[i].z *= mScale.z;
-				}
+				mLocalTM.row[0].xyz *= mScale;
+				mLocalTM.row[1].xyz *= mScale;
+				mLocalTM.row[2].xyz *= mScale;
 			}
 		}
 

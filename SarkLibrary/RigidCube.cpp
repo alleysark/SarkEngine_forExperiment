@@ -63,14 +63,13 @@ namespace sark{
 			Texcoord(0, 0), Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0),
 		});
 		arrBuf.SetDrawMode(ArrayBuffer::DrawMode::QUADS);
-
-		mOBox.Set(Position3(0, 0, 0), Vector4(1, 0, 0, width), Vector4(0, 1, 0, height), Vector4(0, 0, 1, depth), true);
 	}
 
 	// create cube from given properties
 	RigidCube::RigidCube(real width, real height, real depth)
 		: ASceneComponent("", NULL, true),
-		mWidth(width), mHeight(height), mDepth(depth)
+		mWidth(width), mHeight(height), mDepth(depth),
+		mOBox(Vector3(0, 0, 0), Vector3(width/2.f, height/2.f, depth/2.f))
 	{
 		CreateCube();
 	}
@@ -79,7 +78,8 @@ namespace sark{
 	RigidCube::RigidCube(const std::string& name, ASceneComponent* parent, bool activate,
 		real width, real height, real depth)
 		: ASceneComponent(name, parent, activate),
-		mWidth(width), mHeight(height), mDepth(depth)
+		mWidth(width), mHeight(height), mDepth(depth),
+		mOBox(Vector3(0, 0, 0), Vector3(width / 2.f, height / 2.f, depth / 2.f))
 	{
 		CreateCube();
 	}
@@ -103,17 +103,17 @@ namespace sark{
 	}
 
 	const IShape* RigidCube::GetBoundingShape() const{
-		return &mUpdatedObox;
+		return &mOBox;
 	}
 
 	void RigidCube::Update(){
-		mUpdatedObox.pos = mTransform.GetPosition();
+		mOBox.pos = mTransform.GetPosition();
+		
 		const Matrix4& mat = mTransform.GetMatrix();
-		Matrix3 rotmat(mat.row[0].xyz, mat.row[1].xyz, mat.row[2].xyz);
-		for (integer i = 0; i < 3; i++){
-			mUpdatedObox.axis[i].xyz = rotmat * mOBox.axis[i].xyz;
-			mUpdatedObox.axis[i].w = mOBox.axis[i].w;
-		}
+		mOBox.rot.row[0] = mat.row[0].xyz;
+		mOBox.rot.row[1] = mat.row[1].xyz;
+		mOBox.rot.row[2] = mat.row[2].xyz;
+		mOBox.rot.Transpose();
 	}
 
 	void RigidCube::Render(){
