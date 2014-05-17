@@ -22,6 +22,15 @@
     <Filter Include="Header Files\core-util\scene components">
       <UniqueIdentifier>{8f984233-3096-4005-b83b-ac8490020791}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\core-util\resource">
+      <UniqueIdentifier>{762811da-a4f6-472d-be20-c24b39bc36c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core-system\physics">
+      <UniqueIdentifier>{ae3a8600-9a41-47a3-b605-41641abb4fad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core-system\rendering">
+      <UniqueIdentifier>{ac889305-6fce-45b3-bb6a-ad72b35af8c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_main.cpp">
@@ -30,56 +39,20 @@
     <ClCompile Include="core.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
-    <ClCompile Include="BMPResource.cpp">
-      <Filter>Header Files\core-util</Filter>
-    </ClCompile>
-    <ClCompile Include="resources.cpp">
-      <Filter>Header Files\core-util</Filter>
-    </ClCompile>
     <ClCompile Include="Engine.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="shapes.cpp">
-      <Filter>Header Files\core-system</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Header Files\core-system</Filter>
-    </ClCompile>
     <ClCompile Include="Input.cpp">
-      <Filter>Header Files\core-system</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
-    <ClCompile Include="ASceneComponent.cpp">
-      <Filter>Header Files\core-system</Filter>
-    </ClCompile>
-    <ClCompile Include="AScene.cpp">
-      <Filter>Header Files\core-system</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Header Files\core-system</Filter>
-    </ClCompile>
     <ClCompile Include="RigidCube.cpp">
       <Filter>Header Files\core-util\scene components</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderProgram.cpp">
-      <Filter>Header Files\core-system</Filter>
-    </ClCompile>
     <ClCompile Include="Debug.cpp">
       <Filter>Header Files\core-util</Filter>
-    </ClCompile>
-    <ClCompile Include="Sampler.cpp">
-      <Filter>Header Files\core-system</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Header Files\core-system</Filter>
-    </ClCompile>
-    <ClCompile Include="ALight.cpp">
-      <Filter>Header Files\core-system</Filter>
     </ClCompile>
     <ClCompile Include="RigidSphere.cpp">
       <Filter>Header Files\core-util\scene components</Filter>
@@ -87,76 +60,76 @@
     <ClCompile Include="DirectionalLight.cpp">
       <Filter>Header Files\core-util\scene components</Filter>
     </ClCompile>
-    <ClCompile Include="FrameBuffer.cpp">
-      <Filter>Header Files\core-system</Filter>
-    </ClCompile>
-    <ClCompile Include="ShaderChef.cpp">
-      <Filter>Header Files\core-system</Filter>
+    <ClCompile Include="resources.cpp">
+      <Filter>Header Files\core-util\resource</Filter>
     </ClCompile>
     <ClCompile Include="PNGResource.cpp">
-      <Filter>Header Files\core-util</Filter>
+      <Filter>Header Files\core-util\resource</Filter>
+    </ClCompile>
+    <ClCompile Include="BMPResource.cpp">
+      <Filter>Header Files\core-util\resource</Filter>
+    </ClCompile>
+    <ClCompile Include="ALight.cpp">
+      <Filter>Header Files\core-system\rendering</Filter>
     </ClCompile>
     <ClCompile Include="ArrayBuffer.cpp">
-      <Filter>Header Files\core-system</Filter>
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="AScene.cpp">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="ASceneComponent.cpp">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Header Files\core-system\rendering</Filter>
     </ClCompile>
     <ClCompile Include="RigidBody.cpp">
-      <Filter>Header Files\core-system</Filter>
+      <Filter>Header Files\core-system\physics</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBuffer.cpp">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Sampler.cpp">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderChef.cpp">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderProgram.cpp">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="shapes.cpp">
+      <Filter>Header Files\core-system\physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
-    <ClInclude Include="BMPResource.h">
-      <Filter>Header Files\core-util</Filter>
-    </ClInclude>
-    <ClInclude Include="resources.h">
-      <Filter>Header Files\core-util</Filter>
-    </ClInclude>
     <ClInclude Include="Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shapes.h">
-      <Filter>Header Files\core-system</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>Header Files\core-system</Filter>
-    </ClInclude>
     <ClInclude Include="Input.h">
-      <Filter>Header Files\core-system</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
-    <ClInclude Include="ASceneComponent.h">
-      <Filter>Header Files\core-system</Filter>
-    </ClInclude>
-    <ClInclude Include="AScene.h">
-      <Filter>Header Files\core-system</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files\core-system</Filter>
-    </ClInclude>
     <ClInclude Include="RigidCube.h">
       <Filter>Header Files\core-util\scene components</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderProgram.h">
-      <Filter>Header Files\core-system</Filter>
-    </ClInclude>
     <ClInclude Include="Debug.h">
       <Filter>Header Files\core-util</Filter>
-    </ClInclude>
-    <ClInclude Include="Sampler.h">
-      <Filter>Header Files\core-system</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files\core-system</Filter>
-    </ClInclude>
-    <ClInclude Include="ALight.h">
-      <Filter>Header Files\core-system</Filter>
     </ClInclude>
     <ClInclude Include="RigidSphere.h">
       <Filter>Header Files\core-util\scene components</Filter>
@@ -164,23 +137,59 @@
     <ClInclude Include="DirectionalLight.h">
       <Filter>Header Files\core-util\scene components</Filter>
     </ClInclude>
-    <ClInclude Include="FrameBuffer.h">
-      <Filter>Header Files\core-system</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderChef.h">
-      <Filter>Header Files\core-system</Filter>
+    <ClInclude Include="resources.h">
+      <Filter>Header Files\core-util\resource</Filter>
     </ClInclude>
     <ClInclude Include="PNGResource.h">
-      <Filter>Header Files\core-util</Filter>
+      <Filter>Header Files\core-util\resource</Filter>
+    </ClInclude>
+    <ClInclude Include="BMPResource.h">
+      <Filter>Header Files\core-util\resource</Filter>
+    </ClInclude>
+    <ClInclude Include="ALight.h">
+      <Filter>Header Files\core-system\rendering</Filter>
     </ClInclude>
     <ClInclude Include="ArrayBuffer.h">
-      <Filter>Header Files\core-system</Filter>
+      <Filter>Header Files\core-system\rendering</Filter>
     </ClInclude>
-    <ClInclude Include="primitives.hpp">
-      <Filter>Header Files\core-system</Filter>
+    <ClInclude Include="AScene.h">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="ASceneComponent.h">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Header Files\core-system\rendering</Filter>
     </ClInclude>
     <ClInclude Include="RigidBody.h">
-      <Filter>Header Files\core-system</Filter>
+      <Filter>Header Files\core-system\physics</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBuffer.h">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="primitives.hpp">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Sampler.h">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderChef.h">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderProgram.h">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="shapes.h">
+      <Filter>Header Files\core-system\physics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
