@@ -99,6 +99,9 @@
     <ClCompile Include="ArrayBuffer.cpp">
       <Filter>Header Files\core-system</Filter>
     </ClCompile>
+    <ClCompile Include="RigidBody.cpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -174,6 +177,9 @@
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
     <ClInclude Include="primitives.hpp">
+      <Filter>Header Files\core-system</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidBody.h">
       <Filter>Header Files\core-system</Filter>
     </ClInclude>
   </ItemGroup>
