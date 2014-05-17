@@ -89,7 +89,7 @@ namespace sark{
 	}
 
 	// get engine timer
-	const Timer& Engine::GetTimer() const{
+	Timer& Engine::GetTimer(){
 		return mTimer;
 	}
 

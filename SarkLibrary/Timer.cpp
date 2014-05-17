@@ -3,14 +3,13 @@
 
 namespace sark{
 
-	Timer::Timer(bool createWorking){
+	Timer::Timer(bool createWorking, bool fixedFlow, real fixedDeltaTime)
+		: mElapsedTime(0.f), mDeltaTime(0.f), mWorking(createWorking),
+		mFixedFlow(fixedFlow), mFixedDeltaTime(fixedDeltaTime)
+	{
 		_start = Clock::now();
 		_prev = _start;
 
-		mElapsedTime = 0;
-		mDeltaTime = 0;
-
-		mWorking = createWorking;
 		if ( !mWorking)
 			_pause = _start;
 	}
@@ -23,11 +22,16 @@ namespace sark{
 		if (!mWorking)
 			return false;
 
-		_cur = Clock::now();
-		mElapsedTime = static_cast<real>(real_d((_cur - _start).count()) * Clock::period::num / Clock::period::den);
-		mDeltaTime = static_cast<real>(real_d((_cur - _prev).count()) * Clock::period::num / Clock::period::den);
-		_prev = _cur;
-		
+		if (mFixedFlow){
+			mElapsedTime += mFixedDeltaTime;
+			mDeltaTime = mFixedDeltaTime;
+		}
+		else{
+			_cur = Clock::now();
+			mElapsedTime = static_cast<real>(real_d((_cur - _start).count()) * Clock::period::num / Clock::period::den);
+			mDeltaTime = static_cast<real>(real_d((_cur - _prev).count()) * Clock::period::num / Clock::period::den);
+			_prev = _cur;
+		}
 		return true;
 	}
 
@@ -60,6 +64,20 @@ namespace sark{
 	// is this timer working?
 	bool Timer::IsWorking() const{
 		return mWorking;
+	}
+
+	// is this timer fixed-flow?
+	bool Timer::IsFixedFlow() const{
+		return mFixedFlow;
+	}
+	// set timer fixed flow or not.
+	void Timer::FixateFlow(bool on){
+		mFixedFlow = on;
+	}
+
+	// set fixed-flow delta time.
+	void Timer::SetFixedDeltaTime(real delta){
+		mFixedDeltaTime = delta;
 	}
 
 	// get currently elapsed time of engine running

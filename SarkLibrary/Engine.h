@@ -83,7 +83,7 @@ namespace sark{
 		ResourceManager& GetResourceManager();
 
 		// get engine timer
-		const Timer& GetTimer() const;
+		Timer& GetTimer();
 
 		// pause engine loop. message loop is not paused
 		bool Pause();

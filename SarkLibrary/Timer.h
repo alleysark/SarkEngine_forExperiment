@@ -6,7 +6,7 @@
 
 namespace sark{
 
-	// timer's time unit is 'second' type as real_d
+	// timer's time unit is 'second' type as real
 	// timer can be the real-time timer or fixed-flow timer
 	class Timer{
 	private:
@@ -21,8 +21,13 @@ namespace sark{
 
 		bool mWorking;
 
+		bool mFixedFlow;
+
+		real mFixedDeltaTime;
+
 	public:
-		Timer(bool createWorking = false);
+		Timer(bool createWorking = false,
+			bool fixedFlow = false, real fixedDeltaTime = 1.f / 60.f);
 		~Timer();
 
 		// update the timer. if it is not working now, then it'll fail
@@ -36,6 +41,14 @@ namespace sark{
 
 		// is this timer working?
 		bool IsWorking() const;
+
+		// is this timer fixed-flow?
+		bool IsFixedFlow() const;
+		// set timer fixed flow or not.
+		void FixateFlow(bool on);
+
+		// set fixed-flow delta time.
+		void SetFixedDeltaTime(real delta);
 
 		// get currently elapsed time of engine running
 		const real& GetElapsedTime() const;
