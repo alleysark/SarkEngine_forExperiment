@@ -145,7 +145,7 @@ namespace sark{
 			// it unmap the mapped buffer and make accessor empty.
 			// *note: even though you didn't destroy accessor by
 			// calling this, its destructor will destroy implicitly.
-			void Destroy() const;
+			void Destroy();
 
 			// get the reference of attribute value at 'index'.
 			//
@@ -276,7 +276,7 @@ namespace sark{
 
 	// destroy this attribute accessor explicitly.
 	template<class _AttribType>
-	void ArrayBuffer::AttributeAccessor<_AttribType>::Destroy() const{
+	void ArrayBuffer::AttributeAccessor<_AttribType>::Destroy(){
 		if (mPtr != NULL){
 			glBindBuffer(mFeatPtr->bufTarget, mFeatPtr->bufId);
 			glUnmapBuffer(mFeatPtr->bufTarget);
@@ -432,8 +432,9 @@ namespace sark{
 	{
 		// existence check
 		if (mAttribFeats[attribSemantic] == NULL){
-			std::string err_str = "there is no buffer for the attribute '" +
-				AttributeSemanticNames[attribSemantic] + "'";
+			std::string err_str = "there is no buffer for the attribute '";
+			err_str += AttributeSemanticNames[attribSemantic];
+			err_str += "'";
 			LogWarn(err_str);
 			return AttributeAccessor<_AttribType>();
 		}
