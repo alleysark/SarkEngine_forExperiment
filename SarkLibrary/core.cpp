@@ -1332,6 +1332,15 @@ namespace sark{
 		x = _x; y = _y; z = _z;
 	}
 
+	Quaternion::Quaternion(const Vector3& v, real _s){
+		s = _s;
+		x = v.x; y = v.y; z = v.z;
+	}
+	Quaternion::Quaternion(const Vector2& v, real _z, real _s){
+		s = _s;
+		x = v.x; y = v.y; z = _z;
+	}
+
 	Quaternion::Quaternion(const Vector3& rotationAxis, real theta, bool axis_normalized){
 		MakeRotatingQuat(rotationAxis, theta, axis_normalized);
 	}
@@ -1353,15 +1362,6 @@ namespace sark{
 	Quaternion& Quaternion::operator=(const Quaternion& q){
 		s = q.s; x = q.x; y = q.y; z = q.z;
 		return *this;
-	}
-
-	Quaternion::Quaternion(const Vector3& v, real _s){
-		s = _s;
-		x = v.x; y = v.y; z = v.z;
-	}
-	Quaternion::Quaternion(const Vector2& v){
-		s = 0.0f;
-		x = v.x; y = v.y; z = 0.0f;
 	}
 
 	void Quaternion::Set(real _x, real _y, real _z, real _s){
@@ -1573,7 +1573,7 @@ namespace sark{
 
 	// rotate input vector from given axis vector and theta
 	void Quaternion::Rotate(Vector3& v, const Vector3& axis, real theta, bool axis_normalized){
-		Quaternion P(v);
+		Quaternion P(v, 0.f);
 		Quaternion q;
 		q.MakeRotatingQuat(axis, theta, axis_normalized);
 
@@ -1584,7 +1584,7 @@ namespace sark{
 	// rotate input vector from given each axis rotating factor
 	// (roll: z, pitch: x, yaw: y axis rotating factor)
 	void Quaternion::Rotate(Vector3& v, real roll, real pitch, real yaw){
-		Quaternion P(v);
+		Quaternion P(v, 0.f);
 		Quaternion q;
 		q.MakeRotatingQuat(roll, pitch, yaw);
 

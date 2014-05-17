@@ -108,19 +108,27 @@ namespace sark{
 		mRotator.MakeRotatingQuat(roll, pitch, yaw);
 		TransformStained();
 	}
+	// rotate it from given rotation quaternion.
+	void Transform::Rotate(const Quaternion& rotation){
+		mRotator = rotation;
+		TransformStained();
+	}
 
 	// rotate it additionally from given axis and theta
 	void Transform::RotateMore(const Vector3& axis, real theta, bool axis_normalized){
-		Quaternion q;
-		q.MakeRotatingQuat(axis, theta, axis_normalized);
-		mRotator *= q;
+		Quaternion q(axis, theta, axis_normalized);
+		mRotator = q * mRotator;
 		TransformStained();
 	}
 	// rotate it additionally from given rotating factor roll(z-axis), pitch(x-axis) and yaw(y-axis)
 	void Transform::RotateMore(real roll, real pitch, real yaw){
-		Quaternion q;
-		q.MakeRotatingQuat(roll, pitch, yaw);
-		mRotator *= q;
+		Quaternion q(roll, pitch, yaw);
+		mRotator = q * mRotator;
+		TransformStained();
+	}
+	// rotate it additionally from given rotation quaternion.
+	void Transform::RotateMore(const Quaternion& rotation){
+		mRotator = rotation * mRotator;
 		TransformStained();
 	}
 

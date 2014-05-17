@@ -85,11 +85,15 @@ namespace sark{
 		void Rotate(const Vector3& axis, real theta, bool axis_normalized = false);
 		// rotate it from given rotating factor roll(z-axis), pitch(x-axis) and yaw(y-axis)
 		void Rotate(real roll, real pitch, real yaw);
+		// rotate it from given rotation quaternion.
+		void Rotate(const Quaternion& rotation);
 
 		// rotate it additionally from given axis and theta
 		void RotateMore(const Vector3& axis, real theta, bool axis_normalized = false);
 		// rotate it additionally from given rotating factor roll(z-axis), pitch(x-axis) and yaw(y-axis)
 		void RotateMore(real roll, real pitch, real yaw);
+		// rotate it additionally from given rotation quaternion.
+		void RotateMore(const Quaternion& rotation);
 
 		// scale it by given scaling factor
 		void Scale(const Vector3& scaleAs);

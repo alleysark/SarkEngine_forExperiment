@@ -734,9 +734,12 @@ namespace sark{
 		};
 
 		Quaternion();
-		Quaternion(real _x, real _y, real _z, real _s = 0.0f);
+		Quaternion(real _x, real _y, real _z, real _s);
 
-		Quaternion(const Vector3& rotationAxis, real theta, bool axis_normalized = false);
+		Quaternion(const Vector3& v, real _s);
+		Quaternion(const Vector2& v, real _z, real _s);
+
+		Quaternion(const Vector3& rotationAxis, real theta, bool axis_normalized);
 		Quaternion(const real roll, real pitch, real yaw);
 
 		Quaternion(const Matrix3& rotMat);
@@ -745,11 +748,7 @@ namespace sark{
 		Quaternion(const Quaternion& q);
 		Quaternion& operator=(const Quaternion& q);
 
-		explicit Quaternion(const Vector3& v, real _s = 0.0f);
-		explicit Quaternion(const Vector2& v);
-
-
-		void Set(real _x, real _y, real _z, real _s = 0.0f);
+		void Set(real _x, real _y, real _z, real _s);
 
 
 		// is scalar factor zero?

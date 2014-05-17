@@ -304,8 +304,8 @@ namespace sark{
 		Quaternion q(u, rad, true);
 		Quaternion q_ = q.Conjugation();
 
-		v = (q * Quaternion(v) * q_).v;
-		n = (q * Quaternion(n) * q_).v;
+		v = (q * Quaternion(v, 0.f) * q_).v;
+		n = (q * Quaternion(n, 0.f) * q_).v;
 		
 		mViewMatrix.m[1][3] = -mEye.Dot(v);
 		mViewMatrix.m[2][3] = -mEye.Dot(n);
@@ -321,8 +321,8 @@ namespace sark{
 		Quaternion q(v, rad, true);
 		Quaternion q_ = q.Conjugation();
 
-		u = (q * Quaternion(u) * q_).v;
-		n = (q * Quaternion(n) * q_).v;
+		u = (q * Quaternion(u, 0.f) * q_).v;
+		n = (q * Quaternion(n, 0.f) * q_).v;
 
 		mViewMatrix.m[0][3] = -mEye.Dot(u);
 		mViewMatrix.m[2][3] = -mEye.Dot(n);
@@ -338,8 +338,8 @@ namespace sark{
 		Quaternion q(n, rad, true);
 		Quaternion q_ = q.Conjugation();
 
-		u = (q * Quaternion(u) * q_).v;
-		v = (q * Quaternion(v) * q_).v;
+		u = (q * Quaternion(u, 0.f) * q_).v;
+		v = (q * Quaternion(v, 0.f) * q_).v;
 
 		mViewMatrix.m[0][3] = -mEye.Dot(u);
 		mViewMatrix.m[1][3] = -mEye.Dot(v);
