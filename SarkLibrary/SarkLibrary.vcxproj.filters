@@ -111,6 +111,9 @@
     <ClCompile Include="shapes.cpp">
       <Filter>Header Files\core-system\physics</Filter>
     </ClCompile>
+    <ClCompile Include="Collision.cpp">
+      <Filter>Header Files\core-system\physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -189,6 +192,9 @@
       <Filter>Header Files\core-system\rendering</Filter>
     </ClInclude>
     <ClInclude Include="shapes.h">
+      <Filter>Header Files\core-system\physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision.h">
       <Filter>Header Files\core-system\physics</Filter>
     </ClInclude>
   </ItemGroup>

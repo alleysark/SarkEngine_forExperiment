@@ -82,6 +82,7 @@
     <ClCompile Include="ASceneComponent.cpp" />
     <ClCompile Include="BMPResource.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Collision.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
@@ -111,6 +112,7 @@
     <ClInclude Include="ASceneComponent.h" />
     <ClInclude Include="BMPResource.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Collision.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="DirectionalLight.h" />
