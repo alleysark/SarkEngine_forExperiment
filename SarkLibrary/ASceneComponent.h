@@ -7,9 +7,12 @@
 #include <map>
 #include "core.h"
 #include "Transform.h"
-#include "shapes.h"
 
 namespace sark{
+
+	class IShape;
+	class Mesh;
+	class RigidBody;
 
 	// pure abstract scene components class.
 	// all scene components have unique component id
@@ -42,7 +45,6 @@ namespace sark{
 		// local scene component transform object
 		Transform mTransform;
 
-	public:
 		// component activation indicator
 		bool mActivated;
 
@@ -115,6 +117,12 @@ namespace sark{
 		// get bounding shape. it is Nullable pointer.
 		virtual const IShape* GetBoundingShape() const = 0;
 
+		// get mesh object of scene component.
+		// it can be NULL for the shapeless component like light.
+		virtual Mesh* GetMesh() = 0;
+
+		// get rigid body. it can be NULL for the non-rigid body.
+		virtual RigidBody* GetRigidBody() = 0;
 
 		// is this component activated?
 		bool IsActive() const;

@@ -28,6 +28,10 @@ namespace sark{
 		// directional light doesn't have bounding shape.
 		// so it simply returns NULL.
 		const IShape* GetBoundingShape() const override;
+
+		Mesh* GetMesh() override;
+
+		RigidBody* GetRigidBody() override;
 	};
 
 }

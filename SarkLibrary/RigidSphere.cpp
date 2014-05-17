@@ -60,27 +60,55 @@ namespace sark{
 	}
 
 	// create sphere from given properties
-	RigidSphere::RigidSphere(real radius, uinteger slice, uinteger stack)
+	RigidSphere::RigidSphere(real radius, uinteger slice, uinteger stack,
+		real invMass,
+		const Vector3& velocity, const Vector3& angularVelocity,
+		bool gravityOn, bool fixed)
 		: ASceneComponent("", NULL, true),
 		mRadius(radius), mSlice(slice), mStack(stack),
-		mSphere(Vector3(0,0,0), radius)
+		mRigidBody(NULL), mSphere(NULL)
 	{
+		// compute invI0
+		const real e = invMass * 5.f / 2.f*math::sqre(radius);
+		mRigidBody = new RigidBody(this, invMass, Matrix3(
+			e, 0, 0,
+			0, e, 0,
+			0, 0, e), velocity, angularVelocity, gravityOn, fixed);
+
+		mSphere = new Sphere(Vector3(0), radius);
+
 		CreateSphere();
 	}
 
 	// create sphere from given properties
 	RigidSphere::RigidSphere(const std::string& name, ASceneComponent* parent, bool activate,
-		real radius, uinteger slice, uinteger stack)
+		real radius, uinteger slice, uinteger stack,
+		real invMass,
+		const Vector3& velocity, const Vector3& angularVelocity,
+		bool gravityOn, bool fixed)
 		: ASceneComponent(name, parent, activate),
 		mRadius(radius), mSlice(slice), mStack(stack),
-		mSphere(Vector3(0, 0, 0), radius)
+		mRigidBody(NULL), mSphere(NULL)
 	{
+		// compute invI0
+		const real e = invMass * 5.f / 2.f*math::sqre(radius);
+		mRigidBody = new RigidBody(this, invMass, Matrix3(
+			e, 0, 0,
+			0, e, 0,
+			0, 0, e), velocity, angularVelocity, gravityOn, fixed);
+
+		mSphere = new Sphere(Vector3(0), radius);
+
 		CreateSphere();
 	}
 
 	RigidSphere::~RigidSphere(){
 		if (mMesh != NULL)
 			delete mMesh;
+		if (mRigidBody != NULL)
+			delete mRigidBody;
+		if (mSphere != NULL)
+			delete mSphere;
 	}
 
 	// get radius of sphere.
@@ -89,11 +117,21 @@ namespace sark{
 	}
 
 	const IShape* RigidSphere::GetBoundingShape() const{
-		return &mSphere;
+		return mSphere;
+	}
+
+	Mesh* RigidSphere::GetMesh(){
+		return mMesh;
+	}
+
+	RigidBody* RigidSphere::GetRigidBody(){
+		return mRigidBody;
 	}
 
 	void RigidSphere::Update(){
-		mSphere.pos = mTransform.GetPosition();
+		mSphere->pos = mTransform.GetPosition();
+
+		mRigidBody->Update();
 	}
 
 	void RigidSphere::Render(){

@@ -3,6 +3,7 @@
 
 #include "ASceneComponent.h"
 #include "Mesh.h"
+#include "RigidBody.h"
 #include "shapes.h"
 
 namespace sark{
@@ -13,20 +14,31 @@ namespace sark{
 		// mesh object
 		Mesh* mMesh;
 
+		// rigid body object
+		RigidBody* mRigidBody;
+
 		// bounding sphere
-		Sphere mSphere;
+		Sphere* mSphere;
 
 		// radius
 		real mRadius;
 		uinteger mSlice, mStack;
 
 	public:
-		// create sphere from given properties
-		RigidSphere(real radius, uinteger slice, uinteger stack);
+		// create sphere from given properties.
+		// inverse of initial inertia tensor(invI0) is computed automatically.
+		RigidSphere(real radius, uinteger slice, uinteger stack,
+			real invMass = 1.f,
+			const Vector3& velocity = 0.f, const Vector3& angularVelocity = 0.f,
+			bool gravityOn = true, bool fixed = false);
 
-		// create sphere from given properties
+		// create sphere from given properties.
+		// inverse of initial inertia tensor(invI0) is computed automatically.
 		RigidSphere(const std::string& name, ASceneComponent* parent, bool activate,
-			real radius, uinteger slice, uinteger stack);
+			real radius, uinteger slice, uinteger stack,
+			real invMass = 1.f,
+			const Vector3& velocity = 0.f, const Vector3& angularVelocity = 0.f,
+			bool gravityOn = true, bool fixed = false);
 
 		~RigidSphere();
 
@@ -34,6 +46,10 @@ namespace sark{
 		const real& GetRadius() const;
 
 		const IShape* GetBoundingShape() const override;
+
+		Mesh* GetMesh() override;
+
+		RigidBody* GetRigidBody() override;
 
 		void Update() override;
 

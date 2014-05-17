@@ -23,4 +23,13 @@ namespace sark{
 	const IShape* DirectionalLight::GetBoundingShape() const{
 		return NULL;
 	}
+
+	Mesh* DirectionalLight::GetMesh(){
+		return NULL;
+	}
+
+	RigidBody* DirectionalLight::GetRigidBody(){
+		return NULL;
+	}
+
 }

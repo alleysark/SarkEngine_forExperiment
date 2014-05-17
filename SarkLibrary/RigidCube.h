@@ -3,6 +3,7 @@
 
 #include "ASceneComponent.h"
 #include "Mesh.h"
+#include "RigidBody.h"
 #include "shapes.h"
 
 namespace sark{
@@ -13,19 +14,28 @@ namespace sark{
 		// mesh object
 		Mesh* mMesh;
 
+		// rigid body object
+		RigidBody* mRigidBody;
+
 		// bounding box
-		OrientedBox mOBox;
+		OrientedBox* mOBox;
 
 		// basic properties of cube
 		real mWidth, mHeight, mDepth;
 
 	public:
 		// create cube from given properties
-		RigidCube(real width, real height, real depth);
+		RigidCube(real width, real height, real depth,
+			real invMass = 1.f,
+			const Vector3& velocity = 0.f, const Vector3& angularVelocity = 0.f,
+			bool gravityOn = true, bool fixed = false);
 
 		// create cube from given properties
 		RigidCube(const std::string& name, ASceneComponent* parent, bool activate,
-			real width, real height, real depth);
+			real width, real height, real depth,
+			real invMass = 1.f,
+			const Vector3& velocity = 0.f, const Vector3& angularVelocity = 0.f,
+			bool gravityOn = true, bool fixed = false);
 		
 		~RigidCube();
 
@@ -37,6 +47,10 @@ namespace sark{
 		const real& GetDepth() const;
 
 		const IShape* GetBoundingShape() const override;
+
+		Mesh* GetMesh() override;
+
+		RigidBody* GetRigidBody() override;
 
 		void Update() override;
 
