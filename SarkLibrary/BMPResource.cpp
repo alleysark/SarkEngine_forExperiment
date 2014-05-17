@@ -72,7 +72,7 @@ namespace sark{
 		}
 
 		if (bmpInfoHead.biBitCount != 24 && bmpInfoHead.biBitCount != 32){
-			LogWarn(name + " has unsupported bit-count")
+			LogWarn(name + " has unsupported bit-count");
 				return NULL;
 		}
 
