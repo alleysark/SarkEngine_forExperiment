@@ -10,107 +10,55 @@ namespace sark{
 
 		mMesh = new Mesh();
 		ArrayBuffer& arrBuf = mMesh->GetArrayBuffer();
-		/*
 		arrBuf.GenAttributeBuffer<Position3>(
 			AttributeSemantic::POSITION, {
-			//top
-			Position3(-width, height, -depth),
-			Position3(-width, height, depth),
-			Position3(width, height, depth),
-			Position3(width, height, -depth),
-			//front
-			Position3(-width, height, depth),
-			Position3(-width, -height, depth),
-			Position3(width, -height, depth),
-			Position3(width, height, depth),
-			//left-side
-			Position3(-width, height, -depth),
 			Position3(-width, -height, -depth),
+			Position3(width, -height, -depth),
+			Position3(width, -height, depth),
 			Position3(-width, -height, depth),
-			Position3(-width, height, depth),
-			//right-side
+
+			Position3(-width, -height, -depth),
+			Position3(-width, height, -depth),
+			Position3(width, height, -depth),
+			Position3(width, -height, -depth),
+
+			Position3(width, -height, -depth),
+			Position3(width, height, -depth),
 			Position3(width, height, depth),
 			Position3(width, -height, depth),
-			Position3(width, -height, -depth),
-			Position3(width, height, -depth),
-			//back
-			Position3(width, height, -depth),
-			Position3(width, -height, -depth),
-			Position3(-width, -height, -depth),
-			Position3(-width, height, -depth),
-			//bottom
+
+			Position3(width, -height, depth),
+			Position3(width, height, depth),
+			Position3(-width, height, depth),
 			Position3(-width, -height, depth),
+
+			Position3(-width, -height, depth),
+			Position3(-width, height, depth),
+			Position3(-width, height, -depth),
 			Position3(-width, -height, -depth),
-			Position3(width, -height, -depth),
-			Position3(width, -height, depth)
+
+			Position3(-width, height, -depth),
+			Position3(-width, height, depth),
+			Position3(width, height, depth),
+			Position3(width, height, -depth)
 		});
 		arrBuf.GenAttributeBuffer<Normal>(
 			AttributeSemantic::NORMAL, {
-			Normal(0, 1, 0), Normal(0, 1, 0), Normal(0, 1, 0), Normal(0, 1, 0),
+			Normal(0, -1, 0), Normal(0, -1, 0), Normal(0, -1, 0), Normal(0, -1, 0),
+			Normal(0, 0, -1), Normal(0, 0, -1), Normal(0, 0, -1), Normal(0, 0, -1),
+			Normal(1, 0, 0), Normal(1, 0, 0), Normal(1, 0, 0), Normal(1, 0, 0),
 			Normal(0, 0, 1), Normal(0, 0, 1), Normal(0, 0, 1), Normal(0, 0, 1),
 			Normal(-1, 0, 0), Normal(-1, 0, 0), Normal(-1, 0, 0), Normal(-1, 0, 0),
-			Normal(1, 0, 0), Normal(1, 0, 0), Normal(1, 0, 0), Normal(1, 0, 0),
-			Normal(0, 0, -1), Normal(0, 0, -1), Normal(0, 0, -1), Normal(0, 0, -1),
-			Normal(0, -1, 0), Normal(0, -1, 0), Normal(0, -1, 0), Normal(0, -1, 0)
-		});
-		arrBuf.GenAttributeBuffer<Texcoord>(
-			AttributeSemantic::TEXCOORD0, {
-			Texcoord(0, 0), Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0),
-			Texcoord(0, 0), Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0),
-			Texcoord(0, 0), Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0),
-			Texcoord(0, 0), Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0),
-			Texcoord(0, 0), Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0),
-			Texcoord(0, 0), Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0),
-		});
-		arrBuf.SetDrawMode(ArrayBuffer::DrawMode::QUADS);
-		*/
-		arrBuf.GenAttributeBuffer<Position3>(
-			AttributeSemantic::POSITION, {
-			Position3(-width, -height, -depth),
-			Position3(width, -height, -depth),
-			Position3(width, -height, depth),
-			Position3(-width, -height, depth),
-			Position3(-width, height, -depth),
-			Position3(width, height, -depth),
-			Position3(width, height, depth),
-			Position3(-width, height, depth),
-		});
-		arrBuf.GenAttributeBuffer<Normal>(
-			AttributeSemantic::NORMAL, {
-			Normal(-1, -1, -1),
-			Normal(1, -1, -1),
-			Normal(1, -1, 1),
-			Normal(-1, -1, 1),
-			Normal(-1, 1, -1),
-			Normal(1, 1, -1),
-			Normal(1, 1, 1),
-			Normal(-1, 1, 1)
-		});
-		arrBuf.GenAttributeBuffer<Texcoord>(
-			AttributeSemantic::TEXCOORD0, {
-			Texcoord(0, 1),
-			Texcoord(1, 1),
-			Texcoord(1, 0),
-			Texcoord(0, 0),
-			Texcoord(0, 1),
-			Texcoord(1, 1),
-			Texcoord(1, 0),
-			Texcoord(0, 0)
+			Normal(0, 1, 0), Normal(0, 1, 0), Normal(0, 1, 0), Normal(0, 1, 0)
 		});
 		arrBuf.GenAttributeBuffer<TriangleFace16>(
 			AttributeSemantic::INDICES, {
-			TriangleFace16(0, 1, 2),
-			TriangleFace16(0, 2, 3),
-			TriangleFace16(0, 4, 1),
-			TriangleFace16(1, 4, 5),
-			TriangleFace16(3, 4, 0),
-			TriangleFace16(4, 3, 7),
-			TriangleFace16(1, 5, 6),
-			TriangleFace16(6, 2, 1),
-			TriangleFace16(3, 2, 6),
-			TriangleFace16(3, 6, 7),
-			TriangleFace16(4, 6, 5),
-			TriangleFace16(7, 6, 4)
+			TriangleFace16(0, 1, 2), TriangleFace16(0, 2, 3),
+			TriangleFace16(4, 5, 6), TriangleFace16(4, 6, 7),
+			TriangleFace16(8, 9, 10), TriangleFace16(8, 10, 11),
+			TriangleFace16(12, 13, 14), TriangleFace16(12, 14, 15),
+			TriangleFace16(16, 17, 18), TriangleFace16(16, 18, 19),
+			TriangleFace16(20, 21, 22), TriangleFace16(20, 22, 23)
 		});
 		arrBuf.SetDrawMode(ArrayBuffer::DrawMode::TRIANGLES);
 	}
