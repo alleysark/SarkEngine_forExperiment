@@ -86,15 +86,17 @@ namespace sark{
 	void RigidBody::AddForceOn(const Position3& position,
 		const Vector3& force)
 	{
-		// unit vector direct to CM
-		Vector3 vecToCM = mReference->GetTransform().GetPosition() - position;
-		vecToCM.Normalize();
-		
-		Vector3 linearF = force.Dot(vecToCM);
-		Vector3 tangentialF = force - linearF;
+		// r: CM to position vector
+		Vector3 r = position - mReference->GetTransform().GetPosition();
+		// ur: -normalize(r)
+		Vector3 ur = -r.Normal();
+
+		// force decomposition.
+		Vector3 linearF = ur * force.Dot(ur);
+		//tangentialF = force - linearF;
 
 		mForce += linearF;
-		mTorque += -vecToCM.Cross(tangentialF);
+		mTorque += r.Cross(force - linearF);
 	}
 
 	// is this body affected by gravity.
