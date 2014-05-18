@@ -159,9 +159,9 @@ namespace sark{
 			det = math::sqrt(det);
 
 			if (out_t1!=NULL)
-				*out_t1 = (-b + det) / a;
+				*out_t1 = (-b - det) / a;
 			if (out_t2!=NULL)
-				*out_t2 = (-b - det) / a;
+				*out_t2 = (-b + det) / a;
 			return 2;
 		}
 	}
