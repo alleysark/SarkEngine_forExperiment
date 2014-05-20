@@ -28,7 +28,7 @@ namespace sark{
 		virtual Type GetType() const = 0;
 
 		// intersection test.
-		//static bool Intersect(const IShape* shapeA, const IShape* shapeB);
+		virtual bool IntersectWith(const IShape* shapeB) const = 0;
 	};
 
 
@@ -54,6 +54,10 @@ namespace sark{
 		Ray(const Vector3& A, const Vector3& B);
 
 		Type GetType() const override;
+
+		bool IntersectWith(const IShape* shapeB) const override;
+
+		bool IntersectPointWith(const IShape* shapeB, Vector3* out_P) const;
 	};
 
 
@@ -71,6 +75,8 @@ namespace sark{
 		Plane(const Vector3& normal, real D);
 
 		Type GetType() const override;
+
+		bool IntersectWith(const IShape* shapeB) const override;
 	};
 
 
@@ -88,6 +94,8 @@ namespace sark{
 		Sphere(const Vector3& position, real radius);
 
 		Type GetType() const override;
+
+		bool IntersectWith(const IShape* shapeB) const override;
 	};
 
 
@@ -108,6 +116,8 @@ namespace sark{
 		
 
 		Type GetType() const override;
+
+		bool IntersectWith(const IShape* shapeB) const override;
 	};
 
 
@@ -122,15 +132,19 @@ namespace sark{
 		// half-extention of each axis.
 		Vector3 ext;
 
-		// rotation matrix.
-		Matrix3 rot;
+		// orthonormal axis
+		Vector3 axis[3];
 
 		OrientedBox();
 		OrientedBox(const Vector3& position, const Vector3& extention);
 		OrientedBox(const Vector3& position, const Vector3& extention,
-			const Matrix3& rotation);
+			const Vector3 _axis[3]);
 
 		Type GetType() const override;
+
+		void SetAxis(const Matrix4& TM);
+
+		bool IntersectWith(const IShape* shapeB) const override;
 	};
 
 
@@ -140,6 +154,8 @@ namespace sark{
 		ConvexHull();
 
 		Type GetType() const override;
+
+		bool IntersectWith(const IShape* shapeB) const override;
 	};
 
 
@@ -156,56 +172,70 @@ namespace sark{
 		return math::sign((P - plane_p).Dot(plane_n));
 	}
 
+	// shortest distance from plane to point.
+	// *param:
+	//     P       - point.
+	//     plane_n - plane normal vector.
+	//     plane_p - a point on the plane.
+	inline real DistancePointFromPlane(const Vector3& P, const Vector3& plane_n, const Vector3& plane_p){
+		// D = -dot(plane_p, plane_n)
+		return P.Dot(plane_n) - plane_p.Dot(plane_n);
+	}
+
+
 
 	// ray-plane intersection test.
 	// *param:
 	//     ray_p   - a point on the line.
 	//     ray_v   - direction vector of line.
+	//     ray_l   - limitation of line.
 	//     plane_n - normal vector of plane.
 	//     plane_p - a point on the plane.
-	//     out_t   - output parameter t, where P(t) = ray_p + t*ray_v
+	//     out_P   - output intersected point.
 	bool Ray_PlaneIntersection(
-		const Vector3& ray_p, const Vector3& ray_v,
+		const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
 		const Vector3& plane_n, const Vector3& plane_p,
-		real* out_t = NULL);
+		Vector3* out_P = NULL);
 
 	// ray - sphere intersection test.
 	// *param:
 	//     ray_p    - a point on the line.
 	//     ray_v    - direction vector of line.
+	//     ray_l    - limitation of line.
 	//     sphere_p - origin of sphere.
 	//     sphere_r - radius of sphere.
-	//     out_t1, out_t2 - output parameter t1 and t2;
-	// *return: the number of intersected point. 0,1 or 2 is possible value.
-	int8 Ray_SphereIntersection(
-		const Vector3& ray_p, const Vector3& ray_v,
+	//     out_P    - nearest intersected point.
+	bool Ray_SphereIntersection(
+		const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
 		const Vector3& sphere_p, const real& sphere_r,
-		real* out_t1 = NULL, real* out_t2 = NULL);
+		Vector3* out_P = NULL);
 
 	// ray - axis aligned box intersection test.
 	// *param:
 	//     ray_p   - a point on the line.
 	//     ray_v   - direction vector of line.
+	//     ray_l   - limitation of line.
 	//     aab_min - min position of axis aligned box.
 	//     aab_max - max position of axis aligned box.
-	//     out_t1, out_t2 - output parameter t1 and t2;
+	//     out_P    - nearest intersected point.
 	bool Ray_AxisAlignedBoxIntersection(
-		const Vector3& ray_p, const Vector3& ray_v,
+		const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
 		const Vector3& aab_min, const Vector3& aab_max,
-		real* out_t1 = NULL, real* out_t2 = NULL);
+		Vector3* out_P = NULL);
 
 	// ray - oriented box intersection test.
 	// *param:
 	//     ray_p  - a point on the line.
 	//     ray_v  - direction vector of line.
+	//     ray_l   - limitation of line.
 	//     ob_p   - center position of oriented box.
 	//     ob_ext - extention of oriented box.
-	//     ob_rot - rotation factor of oriented box.
-	//     out_t1, out_t2 - output parameter t1 and t2;
+	//     ob_axis - orthonormal axis of oriented box.
+	//     out_P    - nearest intersected point.
 	bool Ray_OrientedBoxIntersection(
-		const Vector3& ray_p, const Vector3& ray_v,
-		const Vector3& ob_p, const Vector3& ob_ext, const Matrix3& ob_rot,
-		real* out_t1 = NULL, real* out_t2 = NULL);
+		const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
+		const Vector3& ob_p, const Vector3& ob_ext, const Vector3 ob_axis[3],
+		Vector3* out_P = NULL);
 
 	// ray intersection test as regards the barycentric coordinates equation.
 	// *param:
@@ -229,24 +259,27 @@ namespace sark{
 	//     bc_e1  - an axis of barycentric coordinates.
 	//     bc_e2  - the other axis of barycentric coordinates.
 	//     out_P, out_Q   - output positions where they intersected.
-	//     out_Pu, out_Pv - barycentric coordinates parameters for P.
-	//     out_Qu, out_Qv - barycentric coordinates parameters for Q.
+	//     out_Pu, out_Qu - barycentric coordinates u parameters.
+	//     out_Pu, out_Qv - barycentric coordinates v parameters.
+	//     out_n  - computed unit normal vector.
 	bool Triangle_BarycentricCoordIntersection(
 		const Vector3& A, const Vector3& B, const Vector3& C,
 		const Vector3& bc_o, const Vector3& bc_e1, const Vector3& bc_e2,
-		Vector3* out_P = NULL, Vector3* out_Q = NULL,
-		real* out_Pu = NULL, real* out_Pv = NULL,
-		real* out_Qu = NULL, real* out_Qv = NULL);
+		Vector3* out_P = NULL, real* out_Pu = NULL, real* out_Pv = NULL,
+		Vector3* out_Q = NULL, real* out_Qu = NULL, real* out_Qv = NULL,
+		Vector3* out_n = NULL);
 
 	// triangle - triangle intersection test.
 	// *param:
 	//     A1, B1, C1   - three vertices of triangle 1.
 	//     A2, B2, C2   - three vertices of triangle 2.
 	//     out_P, out_Q - intersected line P-Q.
+	//     out_n        - computed unit normal vector(of triangle 2).
 	bool Triangle_TriangleIntersection(
 		const Vector3& A1, const Vector3& B1, const Vector3& C1,
 		const Vector3& A2, const Vector3& B2, const Vector3& C2,
-		Vector3* out_P = NULL, Vector3* out_Q = NULL);
+		Vector3* out_P = NULL, Vector3* out_Q = NULL,
+		Vector3* out_n = NULL);
 
 	// sphere - sphere intersection test.
 	// *param:
@@ -260,6 +293,27 @@ namespace sark{
 		const Vector3& sphere2_p, const real& sphere2_r,
 		Vector3* out_P = NULL);
 
+	// sphere - axis aligned box intersection test.
+	// *param:
+	//     sphere_p - origin position of sphere.
+	//     sphere_r - radius of sphere.
+	//     aab_min  - min position of box.
+	//     aab_max  - max position of box.
+	bool Sphere_AxisAlignedBoxIntersection(
+		const Vector3& sphere_p, const real& sphere_r,
+		const Vector3& aab_min, const Vector3& aab_max);
+
+	// sphere - oriented box intersection test.
+	// *param:
+	//     sphere_p - origin position of sphere.
+	//     sphere_r - radius of sphere.
+	//     ob_p     - center position of oriented box.
+	//     ob_ext   - extention of oriented box.
+	//     ob_axis  - orthonormal axis of oriented box.
+	bool Sphere_OrientedBoxIntersection(
+		const Vector3& sphere_p, const real& sphere_r,
+		const Vector3& ob_p, const Vector3& ob_ext, const Vector3 ob_axis[3]);
+
 	// axis aligned box - axis aligned box intersection test.
 	// *note: it does not compute contact point.
 	// *param:
@@ -268,6 +322,29 @@ namespace sark{
 	bool AxisAlignedBox_AxisAlignedBoxIntersection(
 		const Vector3& aab1_min, const Vector3& aab1_max,
 		const Vector3& aab2_min, const Vector3& aab2_max);
+
+	// axis aligned box - oriented box intersection test.
+	// *param:
+	//     aab_min - min position of box.
+	//     aab_max - max position of box.
+	//     ob_p    - center position of oriented box.
+	//     ob_ext  - extention of oriented box.
+	//     ob_axis - orthonormal axis of oriented box.
+	bool AxisAlignedBox_OrientedBoxIntersection(
+		const Vector3& aab_min, const Vector3& aab_max,
+		const Vector3& ob_p, const Vector3& ob_ext, const Vector3 ob_axis[3]);
+
+	// oriented box - oriented box intersection test.
+	// *param:
+	//     ob1_p    - center position of oriented box 1.
+	//     ob1_ext  - extention of oriented box 1.
+	//     ob1_axis - orthonormal axis of oriented box 1.
+	//     ob2_p    - center position of oriented box 2.
+	//     ob2_ext  - extention of oriented box 2.
+	//     ob2_axis - orthonormal axis of oriented box 2.
+	bool OrientedBox_OrientedBoxIntersection(
+		const Vector3& ob1_p, const Vector3& ob1_ext, const Vector3 ob1_axis[3],
+		const Vector3& ob2_p, const Vector3& ob2_ext, const Vector3 ob2_axis[3]);
 
 }
 #endif

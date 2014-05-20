@@ -22,6 +22,40 @@ namespace sark{
 		return IShape::RAY;
 	}
 
+	bool Ray::IntersectWith(const IShape* shapeB) const{
+		return IntersectPointWith(shapeB, NULL);
+	}
+
+	bool Ray::IntersectPointWith(const IShape* shapeB, Vector3* out_P) const{
+		switch (shapeB->GetType()){
+		case IShape::RAY:
+			break;
+		case IShape::PLANE:{
+				const Plane& plane = reinterpret_cast<const Plane&>(*shapeB);
+				return Ray_PlaneIntersection(pos, dir, limit, plane.norm, plane.p, out_P);
+			}
+			break;
+		case IShape::SPHERE:{
+				const Sphere& sphere = reinterpret_cast<const Sphere&>(*shapeB);
+				return Ray_SphereIntersection(pos, dir, limit, sphere.pos, sphere.r, out_P);
+			}
+			break;
+		case IShape::AABOX:{
+				const AxisAlignedBox& aab = reinterpret_cast<const AxisAlignedBox&>(*shapeB);
+				return Ray_AxisAlignedBoxIntersection(pos, dir, limit, aab.min, aab.max, out_P);
+			}
+			break;
+		case IShape::OBOX:{
+				const OrientedBox& ob = reinterpret_cast<const OrientedBox&>(*shapeB);
+				return Ray_OrientedBoxIntersection(pos, dir, limit, ob.pos, ob.ext, ob.axis, out_P);
+			}
+			break;
+		case IShape::CONVEXHULL:
+			break;
+		}
+		return false;
+	}
+
 
 	// plane
 	Plane::Plane()
@@ -48,6 +82,27 @@ namespace sark{
 		return IShape::PLANE;
 	}
 
+	bool Plane::IntersectWith(const IShape* shapeB) const{
+		switch (shapeB->GetType()){
+		case IShape::RAY:{
+				const Ray& ray = reinterpret_cast<const Ray&>(*shapeB);
+				return Ray_PlaneIntersection(ray.pos, ray.dir, ray.limit, norm, p);
+			}
+			break;
+		case IShape::PLANE:
+			break;
+		case IShape::SPHERE:
+			break;
+		case IShape::AABOX:
+			break;
+		case IShape::OBOX:
+			break;
+		case IShape::CONVEXHULL:
+			break;
+		}
+		return false;
+	}
+
 
 	// sphere
 	Sphere::Sphere()
@@ -59,6 +114,36 @@ namespace sark{
 
 	IShape::Type Sphere::GetType() const{
 		return IShape::SPHERE;
+	}
+
+	bool Sphere::IntersectWith(const IShape* shapeB) const{
+		switch (shapeB->GetType()){
+		case IShape::RAY:{
+				const Ray& ray = reinterpret_cast<const Ray&>(*shapeB);
+				return Ray_SphereIntersection(ray.pos, ray.dir, ray.limit, pos, r);
+			}
+			break;
+		case IShape::PLANE:
+			break;
+		case IShape::SPHERE:{
+				const Sphere& sphereB = reinterpret_cast<const Sphere&>(*shapeB);
+				return Sphere_SphereIntersection(pos, r, sphereB.pos, sphereB.r);
+			}
+			break;
+		case IShape::AABOX:{
+				const AxisAlignedBox& aab = reinterpret_cast<const AxisAlignedBox&>(*shapeB);
+				return Sphere_AxisAlignedBoxIntersection(pos, r, aab.min, aab.max);
+			}
+			break;
+		case IShape::OBOX:{
+				const OrientedBox& ob = reinterpret_cast<const OrientedBox&>(*shapeB);
+				return Sphere_OrientedBoxIntersection(pos, r, ob.pos, ob.ext, ob.axis);
+			}
+			break;
+		case IShape::CONVEXHULL:
+			break;
+		}
+		return false;
 	}
 
 
@@ -77,20 +162,100 @@ namespace sark{
 		return IShape::AABOX;
 	}
 
+	bool AxisAlignedBox::IntersectWith(const IShape* shapeB) const{
+		switch (shapeB->GetType()){
+		case IShape::RAY:{
+				const Ray& ray = reinterpret_cast<const Ray&>(*shapeB);
+				return Ray_AxisAlignedBoxIntersection(ray.pos, ray.dir, ray.limit, min, max);
+			}
+			break;
+		case IShape::PLANE:
+			break;
+		case IShape::SPHERE:{
+				const Sphere& sphere = reinterpret_cast<const Sphere&>(*shapeB);
+				return Sphere_AxisAlignedBoxIntersection(sphere.pos, sphere.r, min, max);
+			}
+			break;
+		case IShape::AABOX:{
+				const AxisAlignedBox& aabB = reinterpret_cast<const AxisAlignedBox&>(*shapeB);
+				return AxisAlignedBox_AxisAlignedBoxIntersection(min, max, aabB.min, aabB.max);
+			}
+			break;
+		case IShape::OBOX:{
+				const OrientedBox& ob = reinterpret_cast<const OrientedBox&>(*shapeB);
+				return AxisAlignedBox_OrientedBoxIntersection(min, max, ob.pos, ob.ext, ob.axis);
+			}
+			break;
+		case IShape::CONVEXHULL:
+			break;
+		}
+		return false;
+	}
+
 
 	// oriented box
 	OrientedBox::OrientedBox()
-		: pos(0), ext(0.5f), rot(true){}
+		: pos(0), ext(0.5f)
+	{
+		axis[0].Set(1, 0, 0); axis[1].Set(0, 1, 0); axis[2].Set(0, 0, 1);
+	}
 
 	OrientedBox::OrientedBox(const Vector3& position, const Vector3& extention)
-		: pos(position), ext(extention), rot(true){}
+		: pos(position), ext(extention)
+	{
+		axis[0].Set(1, 0, 0); axis[1].Set(0, 1, 0); axis[2].Set(0, 0, 1);
+	}
 	
 	OrientedBox::OrientedBox(const Vector3& position, const Vector3& extention,
-		const Matrix3& rotation)
-		: pos(position), ext(extention), rot(rotation){}
+		const Vector3 _axis[3])
+		: pos(position), ext(extention)
+	{
+		axis[0] = _axis[0]; axis[1] = _axis[1]; axis[2] = _axis[2];
+	}
 
 	IShape::Type OrientedBox::GetType() const{
 		return IShape::OBOX;
+	}
+
+	bool OrientedBox::IntersectWith(const IShape* shapeB) const{
+		switch (shapeB->GetType()){
+		case IShape::RAY:{
+				const Ray& ray = reinterpret_cast<const Ray&>(*shapeB);
+				return Ray_OrientedBoxIntersection(ray.pos, ray.dir, ray.limit, pos, ext, axis);
+			}
+			break;
+		case IShape::PLANE:
+			break;
+		case IShape::SPHERE:{
+				const Sphere& sphere = reinterpret_cast<const Sphere&>(*shapeB);
+				return Sphere_OrientedBoxIntersection(sphere.pos, sphere.r, pos, ext, axis);
+			}
+			break;
+		case IShape::AABOX:{
+				const AxisAlignedBox& aab = reinterpret_cast<const AxisAlignedBox&>(*shapeB);
+				return AxisAlignedBox_OrientedBoxIntersection(aab.min, aab.max, pos, ext, axis);
+			}
+			break;
+		case IShape::OBOX:{
+				const OrientedBox& obB = reinterpret_cast<const OrientedBox&>(*shapeB);
+				return OrientedBox_OrientedBoxIntersection(pos, ext, axis, obB.pos, obB.ext, obB.axis);
+			}
+			break;
+		case IShape::CONVEXHULL:
+			break;
+		}
+		return false;
+	}
+
+	void OrientedBox::SetAxis(const Matrix4& TM){
+		// to orient the object, it needs the rotation matrix R.
+		// therefore, transposition of R can transform the object
+		// in the world-space into the origin of the object-space.
+		// it means that each rows of transposition of R becomes
+		// the orthonormal basis of the object-space.
+		axis[0].Set(TM.m[0][0], TM.m[1][0], TM.m[2][0]);
+		axis[1].Set(TM.m[0][1], TM.m[1][1], TM.m[2][1]);
+		axis[2].Set(TM.m[0][2], TM.m[1][2], TM.m[2][2]);
 	}
 
 
@@ -101,6 +266,24 @@ namespace sark{
 		return IShape::CONVEXHULL;
 	}
 
+	bool ConvexHull::IntersectWith(const IShape* shapeB) const{
+		switch (shapeB->GetType()){
+		case IShape::RAY:
+			break;
+		case IShape::PLANE:
+			break;
+		case IShape::SPHERE:
+			break;
+		case IShape::AABOX:
+			break;
+		case IShape::OBOX:
+			break;
+		case IShape::CONVEXHULL:
+			break;
+		}
+		return false;
+	}
+
 
 
 	// ======================================================
@@ -109,6 +292,7 @@ namespace sark{
 	//				referenced documents
 	//  * Mathematics for computer graphics | John Vince | Springer | 2010.03.01
 	//  * 3D graphics for game programming | JungHyun Han | CRC Press | 2011.01.01
+	//  * Real-Time Collision Detection | Christer Ericson | Morgan Kaufmann Pub. | 2005.02.07
 	//	* http://paulbourke.net/geometry/
 	//  * http://geomalgorithms.com/a06-_intersect-2.html
 	// ======================================================
@@ -116,9 +300,9 @@ namespace sark{
 	
 	// ray-plane intersection check.
 	bool Ray_PlaneIntersection(
-		const Vector3& ray_p, const Vector3& ray_v,
+		const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
 		const Vector3& plane_n, const Vector3& plane_p,
-		real* out_t)
+		Vector3* out_P)
 	{
 		// whether the line vector and plane normal are perpendicular each other.
 		if (ray_v.Dot(plane_n) == 0)
@@ -127,19 +311,23 @@ namespace sark{
 		// Plane(x,y,z) = n_x*x + n_y*y + n_z*z + D = 0
 		real minus_D = plane_n.Dot(plane_p);
 
-		if (out_t != NULL){
-			// (1): P(t) = ray_p + ray_v*t
-			// (2): Plane(x,y,z) = n_x*x + n_y*y + n_z*z + D = 0
-			*out_t = (minus_D - plane_n.Dot(ray_p)) / plane_n.Dot(ray_v);
-		}
+		// (1): P(t) = ray_p + ray_v*t
+		// (2): Plane(x,y,z) = n_x*x + n_y*y + n_z*z + D = 0
+		real t = (minus_D - plane_n.Dot(ray_p)) / plane_n.Dot(ray_v);
+
+		if (t < 0 || ray_l < t)
+			return false;
+
+		if (out_P != NULL)
+			*out_P = ray_p + ray_v*t;
 		return true;
 	}
 
 	// ray-sphere intersection test.
-	int8 Ray_SphereIntersection(
-		const Vector3& ray_p, const Vector3& ray_v,
+	bool Ray_SphereIntersection(
+		const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
 		const Vector3& sphere_p, const real& sphere_r,
-		real* out_t1, real* out_t2)
+		Vector3* out_P)
 	{
 		Vector3 p_o = ray_p - sphere_p;
 		real a = ray_v.MagnitudeSq();
@@ -148,32 +336,43 @@ namespace sark{
 
 		real det = math::sqre(b) - a*c;
 		if (det < 0){
-			return 0;
+			return false;
 		}
-		else if (det == 0){
-			if (out_t1!=NULL)
-				*out_t1 = -b / a;
-			return 1;
+		
+		real t = 0;
+		if (det == 0){
+			t = -b / a;
+			if (t < 0 || ray_l < t)
+				return false;	
 		}
 		else{//det>0
 			det = math::sqrt(det);
 
-			if (out_t1!=NULL)
-				*out_t1 = (-b - det) / a;
-			if (out_t2!=NULL)
-				*out_t2 = (-b + det) / a;
-			return 2;
+			t = (-b - det) / a;
+			if (t > ray_l)
+				return false;
+
+			if (t < 0){
+				t = (-b + det) / a;
+				if (t < 0 || ray_l < t)
+					return false;
+			}
 		}
+
+		if (out_P != NULL)
+			*out_P = ray_p + ray_v*t;
+		return true;
 	}
 
 	// ray-axis aligned box intersection test.
 	bool Ray_AxisAlignedBoxIntersection(
-		const Vector3& ray_p, const Vector3& ray_v,
+		const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
 		const Vector3& aab_min, const Vector3& aab_max,
-		real* out_t1, real* out_t2)
+		Vector3* out_P)
 	{
 		real t_min = -REAL_MAX;
-		real t_max = REAL_MAX;;
+		real t_max = REAL_MAX;
+		real t1, t2;
 
 		for (integer i = 0; i<3; i++){
 			if (math::real_equal(ray_v.v[i], 0.f)){
@@ -182,8 +381,8 @@ namespace sark{
 				}
 			}
 			else{
-				real t1 = (aab_min.v[i] - ray_p.v[i]) / ray_v.v[i];
-				real t2 = (aab_max.v[i] - ray_p.v[i]) / ray_v.v[i];
+				t1 = (aab_min.v[i] - ray_p.v[i]) / ray_v.v[i];
+				t2 = (aab_max.v[i] - ray_p.v[i]) / ray_v.v[i];
 				if (t1 > t2){
 					std::swap(t1, t2);
 				}
@@ -193,43 +392,84 @@ namespace sark{
 				if (t2 < t_max)
 					t_max = t2;
 
-				if (t_min > t_max)
+				if ((t_min > t_max) || (t_min > ray_l))
 					return false;
 			}
 		}
 
-		if (out_t1 != NULL)
-			*out_t1 = t_min;
-		if (out_t2 != NULL)
-			*out_t2 = t_max;
+		if (t_min < 0 ){
+			if (t_max > ray_l)
+				return false;
+			t_min = t_max;
+		}
+		if (out_P != NULL)
+			*out_P = ray_p + ray_v*t_min;
 		return true;
 	}
 
 	// ray - oriented box intersection test.
 	bool Ray_OrientedBoxIntersection(
-		const Vector3& ray_p, const Vector3& ray_v,
-		const Vector3& ob_p, const Vector3& ob_ext, const Matrix3& ob_rot,
-		real* out_t1, real* out_t2)
+		const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
+		const Vector3& ob_p, const Vector3& ob_ext, const Vector3 ob_axis[3],
+		Vector3* out_P)
 	{
 		// transform ray into oriented box space.
 		// it seems like the camera transformation
 		// with Eye as ob_p, and basis as ob_rot matrix.
 		Vector3 transray_p
 			= Vector3(
-			ob_rot.row[0].Dot(ray_p) - ob_rot.row[0].Dot(ob_p),
-			ob_rot.row[1].Dot(ray_p) - ob_rot.row[1].Dot(ob_p),
-			ob_rot.row[2].Dot(ray_p) - ob_rot.row[2].Dot(ob_p));
+			ob_axis[0].Dot(ray_p) - ob_axis[0].Dot(ob_p),
+			ob_axis[1].Dot(ray_p) - ob_axis[1].Dot(ob_p),
+			ob_axis[2].Dot(ray_p) - ob_axis[2].Dot(ob_p));
 		Vector3 transray_v
 			= Vector3(
-			ob_rot.row[0].Dot(ray_v),
-			ob_rot.row[1].Dot(ray_v),
-			ob_rot.row[2].Dot(ray_v));
+			ob_axis[0].Dot(ray_v),
+			ob_axis[1].Dot(ray_v),
+			ob_axis[2].Dot(ray_v));
 
-		// from now, oriented box is regarded as axis aligned box.
-		return Ray_AxisAlignedBoxIntersection(
-			transray_p, transray_v,
-			-ob_ext, ob_ext,
-			out_t1, out_t2);
+		real t_min = -REAL_MAX;
+		real t_max = REAL_MAX;
+
+		Vector3 aab_min = -ob_ext;
+		const Vector3& aab_max = ob_ext;
+
+		for (integer i = 0; i<3; i++){
+			if (math::real_equal(transray_v.v[i], 0.f)){
+				if (transray_p.v[i] < aab_min.v[i] || aab_max.v[i] < transray_p.v[i]){
+					return false;
+				}
+			}
+			else{
+				real t1 = (aab_min.v[i] - transray_p.v[i]) / transray_v.v[i];
+				real t2 = (aab_max.v[i] - transray_p.v[i]) / transray_v.v[i];
+				if (t1 > t2){
+					std::swap(t1, t2);
+				}
+
+				if (t1 > t_min){
+					t_min = t1;
+					if (t_min > ray_l)
+						return false;
+				}
+				if (t2 < t_max){
+					t_max = t2;
+					if (t_max < 0)
+						return false;
+				}
+
+				if ((t_min > t_max))
+					return false;
+			}
+		}
+
+		if (t_min < 0){
+			if (t_max > ray_l)
+				return false;
+			t_min = t_max;
+		}
+		if (out_P != NULL)
+			*out_P = ray_p + ray_v*t_min;
+		return true;
 	}
 
 	// ray intersection test as regards the barycentric coordinates equation.
@@ -289,12 +529,14 @@ namespace sark{
 	bool Triangle_BarycentricCoordIntersection(
 		const Vector3& A, const Vector3& B, const Vector3& C,
 		const Vector3& bc_o, const Vector3& bc_e1, const Vector3& bc_e2,
-		Vector3* out_P, Vector3* out_Q,
-		real* out_Pu, real* out_Pv,
-		real* out_Qu, real* out_Qv)
+		Vector3* out_P, real* out_Pu, real* out_Pv,
+		Vector3* out_Q, real* out_Qu, real* out_Qv,
+		Vector3* out_n)
 	{
 		// normal vector of barycentric coordinates plane.
 		Vector3 n = bc_e1.Cross(bc_e2);
+		if (out_n != NULL)
+			*out_n = n.Normal();
 
 		// point locations.
 		int8 A_loc = PointLocationByPlane(A, n, bc_o);
@@ -351,20 +593,22 @@ namespace sark{
 	bool Triangle_TriangleIntersection(
 		const Vector3& A1, const Vector3& B1, const Vector3& C1,
 		const Vector3& A2, const Vector3& B2, const Vector3& C2,
-		Vector3* out_P, Vector3* out_Q)
+		Vector3* out_P, Vector3* out_Q,
+		Vector3* out_n)
 	{
 		Vector3 e1 = B2 - A2;
 		Vector3 e2 = C2 - A2;
+		
 		Vector3 P1, Q1;
 		if (!Triangle_BarycentricCoordIntersection(A1, B1, C1,
-			A2, e1, e2, &P1, &Q1))
+			A2, e1, e2, &P1, NULL, NULL, &Q1, NULL, NULL, out_n))
 			return false;
 
 		e1 = B1 - A1;
 		e2 = C1 - A1;
 		Vector3 P2, Q2;
 		if (!Triangle_BarycentricCoordIntersection(A2, B2, C2,
-			A1, e1, e2, &P2, &Q2))
+			A1, e1, e2, &P2, NULL, NULL, &Q2, NULL, NULL))
 			return false;
 
 		// two segments P1-Q1 and P2-Q2 are collinear.
@@ -449,6 +693,41 @@ namespace sark{
 		return true;
 	}
 
+	// sphere - axis aligned box intersection test.
+	bool Sphere_AxisAlignedBoxIntersection(
+		const Vector3& sphere_p, const real& sphere_r,
+		const Vector3& aab_min, const Vector3& aab_max)
+	{
+		real distSq = math::sqre(sphere_r);
+		for (uinteger i = 0; i < 3; i++){
+			if (sphere_p.v[i] < aab_min.v[i])
+				distSq -= math::sqre(sphere_p.v[i] - aab_min.v[i]);
+			else if (sphere_p.v[i] > aab_max.v[i])
+				distSq -= math::sqre(sphere_p.v[i] - aab_max.v[i]);
+		}
+		return (distSq >= 0);
+	}
+
+	// sphere - oriented box intersection test.
+	bool Sphere_OrientedBoxIntersection(
+		const Vector3& sphere_p, const real& sphere_r,
+		const Vector3& ob_p, const Vector3& ob_ext, const Vector3 ob_axis[3])
+	{
+		// transform sphere into oriented box space.
+		// it seems like the camera transformation
+		// with Eye as ob_p, and basis as ob_rot matrix.
+		Vector3 transSphere_p
+			= Vector3(
+			ob_axis[0].Dot(sphere_p) - ob_axis[0].Dot(ob_p),
+			ob_axis[1].Dot(sphere_p) - ob_axis[1].Dot(ob_p),
+			ob_axis[2].Dot(sphere_p) - ob_axis[2].Dot(ob_p));
+
+		// from now, oriented box is regarded as axis aligned box.
+		return Sphere_AxisAlignedBoxIntersection(
+			transSphere_p, sphere_r,
+			-ob_ext, ob_ext);
+	}
+
 	// axis aligned box - axis aligned box intersection test.
 	bool AxisAlignedBox_AxisAlignedBoxIntersection(
 		const Vector3& aab1_min, const Vector3& aab1_max,
@@ -460,6 +739,199 @@ namespace sark{
 				return false;
 			}
 		}
+		return true;
+	}
+
+	// axis aligned box - oriented box intersection test.
+	// *note: code from ch.4.4 Oriented Bounding Boxes(OBBs)
+	// of <Real-Time Collision Detection>.
+	bool AxisAlignedBox_OrientedBoxIntersection(
+		const Vector3& aab_min, const Vector3& aab_max,
+		const Vector3& ob_p, const Vector3& ob_ext, const Vector3 ob_axis[3])
+	{
+		real ra = 0.f, rb = 0.f;
+		Vector3 aab_ext = (aab_max - aab_min) / 2.f;
+		Vector3 t = ob_p - ((aab_min + aab_max) / 2.f);
+
+		Matrix3 absR;
+		for (uinteger i = 0; i < 3; i++){
+			for (uinteger j = 0; j < 3; j++){
+				absR.m[i][j] = math::abs(ob_axis[j].v[i]) + math::EPSILON;
+			}
+		}
+
+		// test axes L: A0, A1, A2
+		for (uinteger i = 0; i < 3; i++){
+			ra = aab_ext.v[i];
+			rb = ob_ext.Dot(absR.row[i]); //projection ob's ext into aab space.
+			if (math::abs(t.v[i]) > ra + rb)
+				return false;
+		}
+
+		// test axes L: B0, B1, B2
+		// combine aab with transposition of rotation matrix
+		// to transform aab into ob's coordinate.
+		for (uinteger i = 0; i < 3; i++){
+			ra = absR.m[0][i] * aab_ext.x + absR.m[1][i] * aab_ext.y
+				+ absR.m[2][i] * aab_ext.z;
+			rb = ob_ext.v[i];
+			if (math::abs(absR.m[0][i] * t.x 
+				+ absR.m[1][i] * t.y + absR.m[2][i] * t.z) > ra + rb)
+				return false;
+		}
+
+		// Test axis L = (1,0,0) x B0
+		ra = aab_ext.y * absR.m[2][0] + aab_ext.z * absR.m[1][0];
+		rb = ob_ext.y * absR.m[0][2] + ob_ext.z * absR.m[0][1];
+		if (math::abs(t.z * ob_axis[0].y - t.y * ob_axis[0].z) > ra + rb)
+			return false;
+
+		// Test axis L = (1,0,0) x B1
+		ra = aab_ext.y * absR.m[2][1] + aab_ext.z * absR.m[1][1];
+		rb = ob_ext.x * absR.m[0][2] + ob_ext.z * absR.m[0][0];
+		if (math::abs(t.z * ob_axis[1].y - t.y * ob_axis[1].z) > ra + rb)
+			return false;
+
+		// Test axis L = (1,0,0) x B2
+		ra = aab_ext.y * absR.m[2][2] + aab_ext.z * absR.m[1][2];
+		rb = ob_ext.x * absR.m[0][1] + ob_ext.y * absR.m[0][0];
+		if (math::abs(t.z * ob_axis[2].y - t.y * ob_axis[2].z) > ra + rb)
+			return false;
+
+		// Test axis L = (0,1,0) x B0
+		ra = aab_ext.x * absR.m[2][0] + aab_ext.z * absR.m[0][0];
+		rb = ob_ext.y * absR.m[1][2] + ob_ext.z * absR.m[1][1];
+		if (math::abs(t.x * ob_axis[0].z - t.z * ob_axis[0].x) > ra + rb)
+			return false;
+
+		// Test axis L = (0,1,0) x B1
+		ra = aab_ext.x * absR.m[2][1] + aab_ext.z * absR.m[0][1];
+		rb = ob_ext.x * absR.m[1][2] + ob_ext.z * absR.m[1][0];
+		if (math::abs(t.x * ob_axis[1].z - t.z * ob_axis[1].x) > ra + rb)
+			return false;
+
+		// Test axis L = (0,1,0) x B2
+		ra = aab_ext.x * absR.m[2][2] + aab_ext.z * absR.m[0][2];
+		rb = ob_ext.x * absR.m[1][1] + ob_ext.y * absR.m[1][0];
+		if (math::abs(t.x * ob_axis[2].z - t.z * ob_axis[2].x) > ra + rb)
+			return false;
+
+		// Test axis L = (0,0,1) x B0
+		ra = aab_ext.x * absR.m[1][0] + aab_ext.y * absR.m[0][0];
+		rb = ob_ext.y * absR.m[2][2] + ob_ext.z * absR.m[2][1];
+		if (math::abs(t.y * ob_axis[0].x - t.x * ob_axis[0].y) > ra + rb)
+			return false;
+
+		// Test axis L = (0,0,1) x B1
+		ra = aab_ext.x * absR.m[1][1] + aab_ext.y * absR.m[0][1];
+		rb = ob_ext.x * absR.m[2][2] + ob_ext.z * absR.m[2][0];
+		if (math::abs(t.y * ob_axis[1].x - t.x * ob_axis[1].y) > ra + rb)
+			return false;
+
+		// Test axis L = (0,0,1) x B2
+		ra = aab_ext.x * absR.m[1][2] + aab_ext.y * absR.m[0][2];
+		rb = ob_ext.x * absR.m[2][1] + ob_ext.y * absR.m[2][0];
+		if (math::abs(t.y * ob_axis[2].x - t.x * ob_axis[2].y) > ra + rb)
+			return false;
+
+		return true;
+	}
+
+	// oriented box - oriented box intersection test.
+	// *note: code from ch.4.4 Oriented Bounding Boxes(OBBs)
+	// of <Real-Time Collision Detection>.
+	// *note: some reasons(i don't know what they are),
+	// it decides some slight gaps between the two boxes
+	// as overlapped case very often.
+	bool OrientedBox_OrientedBoxIntersection(
+		const Vector3& ob1_p, const Vector3& ob1_ext, const Vector3 ob1_axis[3],
+		const Vector3& ob2_p, const Vector3& ob2_ext, const Vector3 ob2_axis[3])
+	{
+		real ra = 0, rb = 0;
+
+		// transformation matrix which is transforming
+		// the ob2's world-pos into ob1's coordinates frame.
+		Matrix3 R;
+		Matrix3 absR;
+		for (uinteger i = 0; i < 3; i++){
+			for (uinteger j = 0; j < 3; j++){
+				R.m[i][j] = ob1_axis[i].Dot(ob2_axis[j]);
+				absR.m[i][j] = math::abs(R.m[i][j]) + math::EPSILON;
+			}
+		}
+
+		Vector3 t = ob2_p - ob1_p;
+		t = Vector3(t.Dot(ob1_axis[0]), t.Dot(ob1_axis[1]), t.Dot(ob1_axis[2]));
+
+		// test
+		for (uinteger i = 0; i < 3; i++){
+			ra = ob1_ext.v[i];
+			rb = ob2_ext.x * absR.m[i][0] + ob2_ext.y*absR.m[i][1] + ob2_ext.z*absR.m[i][2];
+			if (math::abs(t.v[i]) > ra + rb)
+				return false;
+		}
+
+		for (uinteger i = 0; i < 3; i++){
+			ra = ob1_ext.x*absR.m[0][i] + ob1_ext.y*absR.m[1][i] + ob1_ext.z*absR.m[2][i];
+			rb = ob2_ext.v[i];
+			if (math::abs(t.x*absR.m[0][i] + t.y*absR.m[1][i] + t.z*absR.m[2][i]) > ra + rb)
+				return false;
+		}
+
+		// Test axis L = A0 x B0
+		ra = ob1_ext.y * absR.m[2][0] + ob1_ext.z * absR.m[1][0];
+		rb = ob2_ext.y * absR.m[0][2] + ob2_ext.z * absR.m[0][1];
+		if (math::abs(t.z * R.m[1][0] - t.y * R.m[2][0]) > ra + rb)
+			return false;
+
+		// Test axis L = A0 x B1
+		ra = ob1_ext.y * absR.m[2][1] + ob1_ext.z * absR.m[1][1];
+		rb = ob2_ext.x * absR.m[0][2] + ob2_ext.z * absR.m[0][0];
+		if (math::abs(t.z * R.m[1][1] - t.y * R.m[2][1]) > ra + rb)
+			return false;
+
+		// Test axis L = A0 x B2
+		ra = ob1_ext.y * absR.m[2][2] + ob1_ext.z * absR.m[1][2];
+		rb = ob2_ext.x * absR.m[0][1] + ob2_ext.y * absR.m[0][0];
+		if (math::abs(t.z * R.m[1][2] - t.y * R.m[2][2]) > ra + rb)
+			return false;
+
+		// Test axis L = A1 x B0
+		ra = ob1_ext.x * absR.m[2][0] + ob1_ext.z * absR.m[0][0];
+		rb = ob2_ext.y * absR.m[1][2] + ob2_ext.z * absR.m[1][1];
+		if (math::abs(t.x * R.m[2][0] - t.z * R.m[0][0]) > ra + rb)
+			return false;
+
+		// Test axis L = A1 x B1
+		ra = ob1_ext.x * absR.m[2][1] + ob1_ext.z * absR.m[0][1];
+		rb = ob2_ext.x * absR.m[1][2] + ob2_ext.z * absR.m[1][0];
+		if (math::abs(t.x * R.m[2][1] - t.z * R.m[0][1]) > ra + rb)
+			return false;
+
+		// Test axis L = A1 x B2
+		ra = ob1_ext.x * absR.m[2][2] + ob1_ext.z * absR.m[0][2];
+		rb = ob2_ext.x * absR.m[1][1] + ob2_ext.y * absR.m[1][0];
+		if (math::abs(t.x * R.m[2][2] - t.z * R.m[0][2]) > ra + rb)
+			return false;
+
+		// Test axis L = A2 x B0
+		ra = ob1_ext.x * absR.m[1][0] + ob1_ext.y * absR.m[0][0];
+		rb = ob2_ext.y * absR.m[2][2] + ob2_ext.z * absR.m[2][1];
+		if (math::abs(t.y * R.m[0][0] - t.x * R.m[1][0]) > ra + rb)
+			return false;
+
+		// Test axis L = A2 x B1
+		ra = ob1_ext.x * absR.m[1][1] + ob1_ext.y * absR.m[0][1];
+		rb = ob2_ext.x * absR.m[2][2] + ob2_ext.z * absR.m[2][0];
+		if (math::abs(t.y * R.m[0][1] - t.x * R.m[1][1]) > ra + rb)
+			return false;
+
+		// Test axis L = A2 x B2
+		ra = ob1_ext.x * absR.m[1][2] + ob1_ext.y * absR.m[0][2];
+		rb = ob2_ext.x * absR.m[2][1] + ob2_ext.y * absR.m[2][0];
+		if (math::abs(t.y * R.m[0][2] - t.x * R.m[1][2]) > ra + rb)
+			return false;
+
 		return true;
 	}
 

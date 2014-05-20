@@ -17,30 +17,30 @@ namespace sark{
 			Position3(width, -height, depth),
 			Position3(-width, -height, depth),
 
+			Position3(width, -height, -depth),
 			Position3(-width, -height, -depth),
 			Position3(-width, height, -depth),
 			Position3(width, height, -depth),
-			Position3(width, -height, -depth),
 
+			Position3(width, -height, depth),
 			Position3(width, -height, -depth),
 			Position3(width, height, -depth),
 			Position3(width, height, depth),
-			Position3(width, -height, depth),
 
+			Position3(-width, -height, depth),
 			Position3(width, -height, depth),
 			Position3(width, height, depth),
 			Position3(-width, height, depth),
-			Position3(-width, -height, depth),
 
-			Position3(-width, -height, depth),
-			Position3(-width, height, depth),
-			Position3(-width, height, -depth),
 			Position3(-width, -height, -depth),
-
+			Position3(-width, -height, depth),
+			Position3(-width, height, depth),
 			Position3(-width, height, -depth),
+
 			Position3(-width, height, depth),
 			Position3(width, height, depth),
-			Position3(width, height, -depth)
+			Position3(width, height, -depth),
+			Position3(-width, height, -depth)
 		});
 		arrBuf.GenAttributeBuffer<Normal>(
 			AttributeSemantic::NORMAL, {
@@ -50,6 +50,15 @@ namespace sark{
 			Normal(0, 0, 1), Normal(0, 0, 1), Normal(0, 0, 1), Normal(0, 0, 1),
 			Normal(-1, 0, 0), Normal(-1, 0, 0), Normal(-1, 0, 0), Normal(-1, 0, 0),
 			Normal(0, 1, 0), Normal(0, 1, 0), Normal(0, 1, 0), Normal(0, 1, 0)
+		});
+		arrBuf.GenAttributeBuffer<Texcoord>(
+			AttributeSemantic::TEXCOORD0, {
+			Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0), Texcoord(0, 0),
+			Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0), Texcoord(0, 0),
+			Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0), Texcoord(0, 0),
+			Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0), Texcoord(0, 0),
+			Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0), Texcoord(0, 0),
+			Texcoord(0, 1), Texcoord(1, 1), Texcoord(1, 0), Texcoord(0, 0)
 		});
 		arrBuf.GenAttributeBuffer<TriangleFace16>(
 			AttributeSemantic::INDICES, {
@@ -146,13 +155,8 @@ namespace sark{
 
 	void RigidCube::Update(){
 		mOBox->pos = mTransform.GetPosition();
+		mOBox->SetAxis(mTransform.GetMatrix());
 		
-		const Matrix4& mat = mTransform.GetMatrix();
-		mOBox->rot.row[0] = mat.row[0].xyz;
-		mOBox->rot.row[1] = mat.row[1].xyz;
-		mOBox->rot.row[2] = mat.row[2].xyz;
-		mOBox->rot.Transpose();
-
 		mRigidBody->Update();
 	}
 
