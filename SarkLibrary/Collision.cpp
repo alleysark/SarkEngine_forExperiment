@@ -40,6 +40,8 @@ namespace sark{
 			if (indices_1.Empty())
 				continue;
 
+			const IShape* bndShape1 = (*itr)->GetBoundingShape();
+
 			// compare component 1 and component 2.
 			for (jtr = itr + 1; jtr != end; jtr++){
 				if ((*jtr)->GetRigidBody() == NULL)
@@ -58,6 +60,16 @@ namespace sark{
 					continue;
 				}
 
+				// broad phase.
+				if (bndShape1 != NULL){
+					const IShape* bndShape2 = (*jtr)->GetBoundingShape();
+					if (bndShape2 != NULL){
+						if (bndShape1->IntersectWith(bndShape2) == false)
+							continue;
+					}
+				}
+
+				// narrow phase.
 				PositionAccessor positions_2
 					= arrbuf_2.GetAttributeAccessor<Position3>(AttributeSemantic::POSITION);
 				if (positions_2.Empty())
@@ -86,7 +98,7 @@ namespace sark{
 	{
 		uinteger count_1 = indices1.Count();
 		uinteger count_2 = indices2.Count();
-		Vector3 P, Q;
+		Vector3 P, Q, n;
 		uinteger contactCount = 0;
 
 		Position3 transA2, transB2, transC2;
@@ -111,9 +123,9 @@ namespace sark{
 					(TM1 * Vector4(B1, 1.f)).xyz,
 					(TM1 * Vector4(C1, 1.f)).xyz,
 					transA2, transB2, transC2,
-					&P, &Q) == true)
+					&P, &Q, &n) == true)
 				{
-					out_CN += ((transB2 - transA2).Cross(transC2 - transA2)).Normal();
+					out_CN += n;
 					out_CP += (P + Q) / 2.f;
 					contactCount++;
 				}
