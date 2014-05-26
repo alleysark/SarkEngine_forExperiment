@@ -61,7 +61,7 @@ namespace sark{
 			mReplicas.begin(),
 			mReplicas.end(),
 			[](const ASceneComponent* lhs, const ASceneComponent* rhs)->bool{
-			return (lhs->rel_distance <= rhs->rel_distance);
+			return (lhs->rel_distance < rhs->rel_distance);
 		});
 	}
 
