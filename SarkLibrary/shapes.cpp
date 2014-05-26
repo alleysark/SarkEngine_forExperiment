@@ -305,15 +305,57 @@ namespace sark{
 		Vector3* out_P)
 	{
 		// whether the line vector and plane normal are perpendicular each other.
-		if (ray_v.Dot(plane_n) == 0)
-			return false;
+		real n_dot_v = plane_n.Dot(ray_v);
+		if (n_dot_v == 0){
+			if (PointLocationByPlane(ray_p, plane_n, plane_p) != 0)
+				return false;
+			// ray lying on the plane.
+			if (out_P != NULL)
+				*out_P = ray_p + ray_v*(ray_l / 2.f);
+			return true;
+		}
 
 		// Plane(x,y,z) = n_x*x + n_y*y + n_z*z + D = 0
 		real minus_D = plane_n.Dot(plane_p);
 
 		// (1): P(t) = ray_p + ray_v*t
 		// (2): Plane(x,y,z) = n_x*x + n_y*y + n_z*z + D = 0
-		real t = (minus_D - plane_n.Dot(ray_p)) / plane_n.Dot(ray_v);
+		real t = (minus_D - plane_n.Dot(ray_p)) / n_dot_v;
+
+		if (t < 0 || ray_l < t)
+			return false;
+
+		if (out_P != NULL)
+			*out_P = ray_p + ray_v*t;
+		return true;
+	}
+
+	// ray-plane intersection test.
+	bool Ray_PlaneIntersection(
+		const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
+		const Vector3& plane_n, const real& plane_d,
+		Vector3* out_P)
+	{
+		// whether the line vector and plane normal are perpendicular each other.
+		real n_dot_v = plane_n.Dot(ray_v);
+		if (n_dot_v == 0){
+			// compute a point on the plane.
+			Vector3 p(0.f);
+			for (uinteger i = 0; i < 3; i++){
+				if (plane_n.v[i] != 0){
+					p.v[i] = -plane_d / plane_n.v[i];
+					break;
+				}
+			}
+			if (PointLocationByPlane(ray_p, plane_n, p) != 0)
+				return false;
+			// ray lying on the plane.
+			if (out_P != NULL)
+				*out_P = ray_p + ray_v*(ray_l / 2.f);
+			return true;
+		}
+
+		real t = (-plane_d - plane_n.Dot(ray_p)) / n_dot_v;
 
 		if (t < 0 || ray_l < t)
 			return false;
@@ -526,65 +568,119 @@ namespace sark{
 	}
 
 	// triangle intersection test as regards the barycentric coordinates equation.
-	bool Triangle_BarycentricCoordIntersection(
+	bool Triangle_PlaneIntersection(
 		const Vector3& A, const Vector3& B, const Vector3& C,
-		const Vector3& bc_o, const Vector3& bc_e1, const Vector3& bc_e2,
-		Vector3* out_P, real* out_Pu, real* out_Pv,
-		Vector3* out_Q, real* out_Qu, real* out_Qv,
-		Vector3* out_n)
+		const Vector3& plane_n, const Vector3& plane_p,
+		Vector3* out_P, Vector3* out_Q )
 	{
-		// normal vector of barycentric coordinates plane.
-		Vector3 n = bc_e1.Cross(bc_e2);
-		if (out_n != NULL)
-			*out_n = n.Normal();
-
 		// point locations.
-		int8 A_loc = PointLocationByPlane(A, n, bc_o);
-		int8 B_loc = PointLocationByPlane(B, n, bc_o);
-		int8 C_loc = PointLocationByPlane(C, n, bc_o);
+		int8 A_loc = PointLocationByPlane(A, plane_n, plane_p);
+		int8 B_loc = PointLocationByPlane(B, plane_n, plane_p);
+		int8 C_loc = PointLocationByPlane(C, plane_n, plane_p);
 
-		// zero location (on the plane) handling.
-		if (A_loc == 0 || B_loc == 0 || C_loc == 0){
-			// it is too hard to handle this situations..
-			return false;
-		}
-
-		// determin which edge do we take.
-		Vector3 v1, v2;
-		if (A_loc == B_loc){
-			if (A_loc == C_loc)
-				return false;
-			v1 = C - A;// line A-C
-			v2 = B - C;// line C-B
-		}
-		else if (A_loc == C_loc){
-			v1 = B - A;// line A-B
-			v2 = B - C;// line C-B	
+		// possible position of A,B and C.
+		// +  o   o   o   ก่ n   
+		// 0 -o---o---o-- ฆช plane
+		// -  o   o   o
+		// , there are 27 cases.
+		if (A_loc == 0){
+			if (B_loc == 0){
+				if (C_loc == 0){
+					// [1]. ABC is lying on the plane
+					Vector3 CM = (A + B + C) / 3.f;
+					if (out_P != NULL) *out_P = CM;
+					if (out_Q != NULL) *out_Q = CM;
+				}
+				else{
+					// [2]. edge A-B is lying ~.
+					if (out_P != NULL) *out_P = A;
+					if (out_Q != NULL) *out_Q = B;
+				}
+			}
+			else{
+				if (C_loc == 0){
+					// [2]. edge A-C is lying ~.
+					if (out_P != NULL) *out_P = A;
+					if (out_Q != NULL) *out_Q = C;
+				}
+				else{
+					if (B_loc == C_loc){
+						// [2]. point A is lying ~.
+						if (out_P != NULL) *out_P = A;
+						if (out_Q != NULL) *out_Q = A;
+					}
+					else{
+						// [2]. point A is lying ~,
+						// edge B-C is intersected with plane.
+						if (out_P != NULL) *out_P = A;
+						Ray_PlaneIntersection(B, C - B, 1, plane_n, plane_p, out_Q);
+					}
+				}
+			}
 		}
 		else{
-			v1 = B - A;// line A-B
-			v2 = A - C;// line C-A
+			if (B_loc == 0){
+				if (C_loc == 0){
+					// [2]. edge B-C is lying ~.
+					if (out_P != NULL) *out_P = B;
+					if (out_Q != NULL) *out_Q = C;
+				}
+				else{
+					if (A_loc == C_loc){
+						// [2]. point B is lying ~.
+						if (out_P != NULL) *out_P = B;
+						if (out_Q != NULL) *out_Q = B;
+					}
+					else{
+						// [2]. point B is lying ~,
+						// edge A-C is intersected ~.
+						if (out_P != NULL) *out_P = B;
+						Ray_PlaneIntersection(A, C - A, 1, plane_n, plane_p, out_Q);
+					}
+				}
+			}
+			else{
+				if (C_loc == 0){
+					if (A_loc == B_loc){
+						// [2]. point C is lying ~.
+						if (out_P != NULL) *out_P = C;
+						if (out_Q != NULL) *out_Q = C;
+					}
+					else{
+						// [2]. point C is lying ~,
+						// edge A-B is intersected ~.
+						if (out_P != NULL) *out_P = C;
+						Ray_PlaneIntersection(A, B - A, 1, plane_n, plane_p, out_Q);
+					}
+				}
+				else{
+					if (A_loc == B_loc){
+						if (A_loc == C_loc){
+							// [2]. ABC is in the sky.
+							// there are no intersections.
+							return false;
+						}
+						else{
+							// [2]. edge A-C and B-C is intersected ~.
+							Ray_PlaneIntersection(A, C - A, 1, plane_n, plane_p, out_P);
+							Ray_PlaneIntersection(B, C - B, 1, plane_n, plane_p, out_Q);
+						}
+					}
+					else{
+						if (A_loc == C_loc){
+							// [2]. edge A-B and B-C is intersected ~.
+							Ray_PlaneIntersection(A, B - A, 1, plane_n, plane_p, out_P);
+							Ray_PlaneIntersection(B, C - B, 1, plane_n, plane_p, out_Q);
+						}
+						else{
+							// [2]. edge A-B and A-C is intersected ~.
+							Ray_PlaneIntersection(A, B - A, 1, plane_n, plane_p, out_P);
+							Ray_PlaneIntersection(A, C - A, 1, plane_n, plane_p, out_Q);
+						}
+					}
+				}
+			}
 		}
-
-		// parameters for P and Q.
-		real pt = 0, qt = 0;
-
-		if (!Ray_BarycentricCoordIntersection(A, v1, bc_o, bc_e1, bc_e2,
-			&pt, out_Pu, out_Pv))
-			return false;
-		if (pt < 0 || 1 < pt)
-			return false;
-
-		if (!Ray_BarycentricCoordIntersection(C, v2, bc_o, bc_e1, bc_e2,
-			&qt, out_Qu, out_Qv))
-			return false;
-		if (qt < 0 || 1 < qt)
-			return false;
-
-		if (out_P != NULL)
-			*out_P = A + v1*pt;
-		if (out_Q != NULL)
-			*out_Q = C + v2*qt;
 		return true;
 	}
 
@@ -596,37 +692,36 @@ namespace sark{
 		Vector3* out_P, Vector3* out_Q,
 		Vector3* out_n)
 	{
-		Vector3 e1 = B2 - A2;
-		Vector3 e2 = C2 - A2;
-		
+		Vector3 n = (B2 - A2).Cross(C2 - A2);
 		Vector3 P1, Q1;
-		if (!Triangle_BarycentricCoordIntersection(A1, B1, C1,
-			A2, e1, e2, &P1, NULL, NULL, &Q1, NULL, NULL, out_n))
+		if (!Triangle_PlaneIntersection(A1, B1, C1, n, A2, &P1, &Q1))
 			return false;
 
-		e1 = B1 - A1;
-		e2 = C1 - A1;
+		if (out_n != NULL)
+			*out_n = n.Normal();
+
+		n = (B1 - A1).Cross(C1 - A1);
 		Vector3 P2, Q2;
-		if (!Triangle_BarycentricCoordIntersection(A2, B2, C2,
-			A1, e1, e2, &P2, NULL, NULL, &Q2, NULL, NULL))
+		if (!Triangle_PlaneIntersection(A2, B2, C2, n, A1, &P2, &Q2))
 			return false;
-
+		
 		// two segments P1-Q1 and P2-Q2 are collinear.
 		// take one axis and test overlap.
 		uinteger i = 0;
 		for (i = 0; i<3; i++){
-			if (P1.v[i] != Q1.v[i])
+			if (!math::almost_equal(P1.v[i], Q1.v[i]))
 				break;
 		}
 		if (i == 3){
 			for (i = 0; i<3; i++){
-				if (P2.v[i] != Q2.v[i])
+				if (!math::almost_equal(P2.v[i], Q2.v[i]))
 					break;
 			}
 			if (i == 3){
+				// P1==Q1 , P2==Q2
 				if (P1 == P2){
 					// two triangles intersect at a point.
-					// it is extremely special case.
+					// it is super extremely special case.
 					*out_P = P1;
 					*out_Q = P1;
 					return true;

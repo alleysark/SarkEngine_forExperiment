@@ -1,6 +1,7 @@
 #ifndef __SHAPES_H__
 #define __SHAPES_H__
 
+#include <vector>
 #include "core.h"
 
 namespace sark{
@@ -151,6 +152,8 @@ namespace sark{
 	// convex hull.
 	class ConvexHull : public IShape{
 	public:
+		std::vector<Vector3> points;
+		
 		ConvexHull();
 
 		Type GetType() const override;
@@ -179,9 +182,25 @@ namespace sark{
 	//     plane_p - a point on the plane.
 	inline real DistancePointFromPlane(const Vector3& P, const Vector3& plane_n, const Vector3& plane_p){
 		// D = -dot(plane_p, plane_n)
-		return P.Dot(plane_n) - plane_p.Dot(plane_n);
+		return (P.Dot(plane_n) - plane_p.Dot(plane_n)) / plane_n.Magnitude();
 	}
 
+	// get farthest point in given specific direction.
+	inline const Vector3 FarthestPointInDirection(
+		const std::vector<Vector3>& pointSet, const Vector3& direction)
+	{
+		integer idx = 0;
+		real maxd = -REAL_MAX;
+		uinteger size = pointSet.size();
+		for (uinteger i = 0; i < size; i++){
+			real d = direction.Dot(pointSet[i]);
+			if (maxd < d){
+				maxd = d;
+				idx = i;
+			}
+		}
+		return pointSet[idx];
+	}
 
 
 	// ray-plane intersection test.
@@ -195,6 +214,19 @@ namespace sark{
 	bool Ray_PlaneIntersection(
 		const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
 		const Vector3& plane_n, const Vector3& plane_p,
+		Vector3* out_P = NULL);
+
+	// ray-plane intersection test.
+	// *param:
+	//     ray_p   - a point on the line.
+	//     ray_v   - direction vector of line.
+	//     ray_l   - limitation of line.
+	//     plane_n - normal vector of plane.
+	//     plane_d - D factor of plane.
+	//     out_P   - output intersected point.
+	bool Ray_PlaneIntersection(
+		const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
+		const Vector3& plane_n, const real& plane_d,
 		Vector3* out_P = NULL);
 
 	// ray - sphere intersection test.
@@ -252,22 +284,16 @@ namespace sark{
 		const Vector3& bc_o, const Vector3& bc_e1, const Vector3& bc_e2,
 		real* out_t = NULL, real* out_u = NULL, real* out_v = NULL);
 
-	// triangle intersection test as regards the barycentric coordinates equation.
+	// triangle - plane intersection test.
 	// *param:
-	//     A,B,C  - vertices of triangle.
-	//     bc_o   - origin of barycentric coordinates.
-	//     bc_e1  - an axis of barycentric coordinates.
-	//     bc_e2  - the other axis of barycentric coordinates.
-	//     out_P, out_Q   - output positions where they intersected.
-	//     out_Pu, out_Qu - barycentric coordinates u parameters.
-	//     out_Pu, out_Qv - barycentric coordinates v parameters.
-	//     out_n  - computed unit normal vector.
-	bool Triangle_BarycentricCoordIntersection(
+	//     A,B,C   - vertices of triangle.
+	//     plane_n - normal vector of plane.
+	//     plane_p - a point on the plane.
+	//     out_P, out_Q - output positions where they intersected.
+	bool Triangle_PlaneIntersection(
 		const Vector3& A, const Vector3& B, const Vector3& C,
-		const Vector3& bc_o, const Vector3& bc_e1, const Vector3& bc_e2,
-		Vector3* out_P = NULL, real* out_Pu = NULL, real* out_Pv = NULL,
-		Vector3* out_Q = NULL, real* out_Qu = NULL, real* out_Qv = NULL,
-		Vector3* out_n = NULL);
+		const Vector3& plane_n, const Vector3& plane_p,
+		Vector3* out_P = NULL, Vector3* out_Q = NULL);
 
 	// triangle - triangle intersection test.
 	// *param:

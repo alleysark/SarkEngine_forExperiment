@@ -109,6 +109,18 @@ namespace sark{
 			return abs(v1 - v2) >= EPSILON;
 		}
 
+		// check the given two real values are almost equal.
+		inline bool almost_equal(real v1, real v2, const real allow = 0.00001){
+			return abs(v1 - v2) < allow;
+		}
+
+		// round floating point value from 'digi'E.
+		inline real real_round(real v, int8 digi){
+			real p = pow(10.f, -digi);
+			return floor(v*p + 0.5f) / p;
+		}
+
+
 		// for specifying the methods within math.h
 		using ::abs;
 		using ::ceil;	using ::floor;
