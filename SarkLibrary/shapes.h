@@ -14,7 +14,7 @@ namespace sark{
 	class Sphere;
 	class AxisAlignedBox;
 	class OrientedBox;
-	class ConvexHull;
+	class ConvexHull; // see 'ConvexHull.h'
 
 	
 	// interface of shape things.
@@ -144,19 +144,6 @@ namespace sark{
 		Type GetType() const override;
 
 		void SetAxis(const Matrix4& TM);
-
-		bool IntersectWith(const IShape* shapeB) const override;
-	};
-
-
-	// convex hull.
-	class ConvexHull : public IShape{
-	public:
-		std::vector<Vector3> points;
-		
-		ConvexHull();
-
-		Type GetType() const override;
 
 		bool IntersectWith(const IShape* shapeB) const override;
 	};

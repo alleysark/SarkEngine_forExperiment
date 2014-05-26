@@ -257,33 +257,7 @@ namespace sark{
 		axis[1].Set(TM.m[0][1], TM.m[1][1], TM.m[2][1]);
 		axis[2].Set(TM.m[0][2], TM.m[1][2], TM.m[2][2]);
 	}
-
-
-	// convex hull
-	ConvexHull::ConvexHull(){}
-
-	IShape::Type ConvexHull::GetType() const{
-		return IShape::CONVEXHULL;
-	}
-
-	bool ConvexHull::IntersectWith(const IShape* shapeB) const{
-		switch (shapeB->GetType()){
-		case IShape::RAY:
-			break;
-		case IShape::PLANE:
-			break;
-		case IShape::SPHERE:
-			break;
-		case IShape::AABOX:
-			break;
-		case IShape::OBOX:
-			break;
-		case IShape::CONVEXHULL:
-			break;
-		}
-		return false;
-	}
-
+	
 
 
 	// ======================================================
