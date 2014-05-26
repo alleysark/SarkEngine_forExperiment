@@ -16,7 +16,7 @@ namespace sark{
 		// of the rigid bodies in a given scene layer.
 		static void DetectAndResolve(AScene::Layer& physLayer);
 
-	private:
+	public:
 		typedef ArrayBuffer::AttributeAccessor<Position3> PositionAccessor;
 		typedef ArrayBuffer::AttributeAccessor<TriangleFace16> IndexAccessor;
 

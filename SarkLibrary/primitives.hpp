@@ -15,7 +15,14 @@ namespace sark{
 	template<typename _T>
 	class TrianglePrimitive{
 	public:
-		_T a, b, c;
+		union{
+			struct{
+				_T a, b, c;
+			};
+			struct{
+				_T idx[3];
+			};
+		};
 
 		TrianglePrimitive()
 			: a(0), b(0), c(0)
@@ -34,7 +41,14 @@ namespace sark{
 	template<typename _T>
 	class QuadPrimitive{
 	public:
-		_T a, b, c, d;
+		union{
+			struct{
+				_T a, b, c, d;
+			};
+			struct{
+				_T idx[4];
+			};
+		};
 
 		QuadPrimitive()
 			: a(0), b(0), c(0), d(0)
