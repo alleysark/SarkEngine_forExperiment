@@ -105,7 +105,9 @@ namespace sark{
 
 	AScene::AScene(){}
 
-	AScene::~AScene(){}
+	AScene::~AScene(){
+		ClearSceneComponents();
+	}
 
 	// clear whole scene components
 	void AScene::ClearSceneComponents(){
@@ -116,18 +118,6 @@ namespace sark{
 		}
 		mComponents.clear();
 	}
-
-	// clear whole cameras
-	void AScene::ClearCameras(){
-		CameraContainer::iterator itr = mCameras.begin();
-		CameraContainer::iterator end = mCameras.end();
-		for (; itr != end; itr++){
-			delete (*itr);
-		}
-		mCameras.clear();
-		mMainCam = NULL;
-	}
-
 
 	// add scene component
 	bool AScene::AddSceneComponent(ASceneComponent* sceneComponent){

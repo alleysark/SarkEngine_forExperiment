@@ -65,7 +65,7 @@ namespace sark{
 		typedef std::map<ASceneComponent::ComponentID, ASceneComponent*> ComponentMap;
 		typedef std::vector<Layer> LayerContainer;
 
-		typedef std::vector<Camera*> CameraContainer;
+		typedef std::vector<Camera> CameraContainer;
 
 	protected:
 		// map-like component container.
@@ -97,9 +97,6 @@ namespace sark{
 
 		// clear whole scene components
 		void ClearSceneComponents();
-
-		// clear whole cameras
-		void ClearCameras();
 
 		// add scene component
 		bool AddSceneComponent(ASceneComponent* sceneComponent);
