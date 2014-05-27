@@ -1,4 +1,5 @@
 #include "DirectionalLight.h"
+#include "Debug.h"
 
 namespace sark{
 
@@ -18,10 +19,17 @@ namespace sark{
 
 	void DirectionalLight::Render(){ }
 
-	// directional light doesn't have bounding shape.
+	// directional light doesn't have collider.
 	// so it simply returns NULL.
-	const IShape* DirectionalLight::GetBoundingShape() const{
+	const ACollider* DirectionalLight::GetCollider() const{
 		return NULL;
+	}
+
+	void DirectionalLight::SetCollider(ACollider* newColl){
+		if (newColl != NULL){
+			LogWarn("directional light can't have collider");
+			delete newColl;
+		}
 	}
 
 	Mesh* DirectionalLight::GetMesh(){

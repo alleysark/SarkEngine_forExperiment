@@ -31,6 +31,28 @@ namespace sark{
 		//  * http://geomalgorithms.com/a06-_intersect-2.html
 		// ======================================================
 
+		// ray-triangle intersection test.
+		bool Ray_TriangleIntersection(
+			const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
+			const Vector3& A, const Vector3& B, const Vector3& C,
+			Vector3* out_P)
+		{
+			Vector3 e1 = B - A;
+			Vector3 e2 = C - A;
+			real t, u, v;
+			if (!Ray_BarycentricCoordIntersection(ray_p, ray_v, A, e1, e2, &t, &u, &v)){
+				return false;
+			}
+
+			if (t < 0 || ray_l < t)
+				return false;
+			if (u < 0 || v<0 || (u + v)>1)
+				return false;
+			
+			if (out_P != NULL)
+				*out_P = ray_p + t*ray_v;
+			return true;
+		}
 
 		// ray-plane intersection check.
 		bool Ray_PlaneIntersection(
@@ -141,7 +163,7 @@ namespace sark{
 		}
 
 		// ray-axis aligned box intersection test.
-		bool Ray_AxisAlignedBoxIntersection(
+		bool Ray_AABoxIntersection(
 			const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
 			const Vector3& aab_min, const Vector3& aab_max,
 			Vector3* out_P)
@@ -184,7 +206,7 @@ namespace sark{
 		}
 
 		// ray - oriented box intersection test.
-		bool Ray_OrientedBoxIntersection(
+		bool Ray_OBoxIntersection(
 			const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
 			const Vector3& ob_p, const Vector3& ob_ext, const Vector3 ob_axis[3],
 			Vector3* out_P)
@@ -523,7 +545,7 @@ namespace sark{
 		}
 
 		// sphere - axis aligned box intersection test.
-		bool Sphere_AxisAlignedBoxIntersection(
+		bool Sphere_AABoxIntersection(
 			const Vector3& sphere_p, const real& sphere_r,
 			const Vector3& aab_min, const Vector3& aab_max)
 		{
@@ -538,7 +560,7 @@ namespace sark{
 		}
 
 		// sphere - oriented box intersection test.
-		bool Sphere_OrientedBoxIntersection(
+		bool Sphere_OBoxIntersection(
 			const Vector3& sphere_p, const real& sphere_r,
 			const Vector3& ob_p, const Vector3& ob_ext, const Vector3 ob_axis[3])
 		{
@@ -552,13 +574,13 @@ namespace sark{
 				ob_axis[2].Dot(sphere_p) - ob_axis[2].Dot(ob_p));
 
 			// from now, oriented box is regarded as axis aligned box.
-			return Sphere_AxisAlignedBoxIntersection(
+			return Sphere_AABoxIntersection(
 				transSphere_p, sphere_r,
 				-ob_ext, ob_ext);
 		}
 
 		// axis aligned box - axis aligned box intersection test.
-		bool AxisAlignedBox_AxisAlignedBoxIntersection(
+		bool AABox_AABoxIntersection(
 			const Vector3& aab1_min, const Vector3& aab1_max,
 			const Vector3& aab2_min, const Vector3& aab2_max)
 		{
@@ -574,7 +596,7 @@ namespace sark{
 		// axis aligned box - oriented box intersection test.
 		// *note: code from ch.4.4 Oriented Bounding Boxes(OBBs)
 		// of <Real-Time Collision Detection>.
-		bool AxisAlignedBox_OrientedBoxIntersection(
+		bool AABox_OBoxIntersection(
 			const Vector3& aab_min, const Vector3& aab_max,
 			const Vector3& ob_p, const Vector3& ob_ext, const Vector3 ob_axis[3])
 		{
@@ -672,7 +694,7 @@ namespace sark{
 		// *note: some reasons(i don't know what they are),
 		// it decides some slight gaps between the two boxes
 		// as overlapped case very often.
-		bool OrientedBox_OrientedBoxIntersection(
+		bool OBox_OBoxIntersection(
 			const Vector3& ob1_p, const Vector3& ob1_ext, const Vector3 ob1_axis[3],
 			const Vector3& ob2_p, const Vector3& ob2_ext, const Vector3 ob2_axis[3])
 		{

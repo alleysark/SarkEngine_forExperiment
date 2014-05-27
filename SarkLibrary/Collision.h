@@ -23,7 +23,7 @@ namespace sark{
 
 		// process the collisions about convexity objects.
 		// it assumes that the scene components in given layer have
-		// those own convex-hull as bounding shape.
+		// those own convex-hull as collider.
 		static void ProcessConvexCollision(AScene::Layer& physLayer);
 
 	public:

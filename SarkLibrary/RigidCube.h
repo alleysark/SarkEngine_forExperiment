@@ -2,11 +2,12 @@
 #define __RIGID_CUBE_H__
 
 #include "ASceneComponent.h"
-#include "Mesh.h"
-#include "RigidBody.h"
-#include "shapes.h"
 
 namespace sark{
+
+	class Mesh;
+	class RigidBody;
+	class ACollider;
 
 	// simple rigid cube scene component.
 	class RigidCube : public ASceneComponent{
@@ -17,8 +18,8 @@ namespace sark{
 		// rigid body object
 		RigidBody* mRigidBody;
 
-		// bounding box
-		OrientedBox* mOBox;
+		// collider
+		ACollider* mCollider;
 
 		// basic properties of cube
 		real mWidth, mHeight, mDepth;
@@ -46,7 +47,13 @@ namespace sark{
 		// get depth of cube.
 		const real& GetDepth() const;
 
-		const IShape* GetBoundingShape() const override;
+		// get collider.
+		const ACollider* GetCollider() const override;
+		
+		// set new collider. or set NULL.
+		// you may pass new collider through memory allocation.
+		// *note: do not pass the address of plane variable.
+		void SetCollider(ACollider* newColl) override;
 
 		Mesh* GetMesh() override;
 

@@ -31,6 +31,9 @@
     <Filter Include="Header Files\core-system\rendering">
       <UniqueIdentifier>{ac889305-6fce-45b3-bb6a-ad72b35af8c7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\core-system\physics\collider">
+      <UniqueIdentifier>{65e18056-62ba-4d90-97a8-a500a6773f04}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_main.cpp">
@@ -108,20 +111,32 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Header Files\core-system\rendering</Filter>
     </ClCompile>
-    <ClCompile Include="shapes.cpp">
-      <Filter>Header Files\core-system\physics</Filter>
-    </ClCompile>
     <ClCompile Include="Collision.cpp">
       <Filter>Header Files\core-system\physics</Filter>
     </ClCompile>
     <ClCompile Include="GJK_EPA.cpp">
       <Filter>Header Files\core-system\physics</Filter>
     </ClCompile>
-    <ClCompile Include="ConvexHull.cpp">
-      <Filter>Header Files\core-system\physics</Filter>
-    </ClCompile>
     <ClCompile Include="tools.cpp">
       <Filter>Header Files\core-system\physics</Filter>
+    </ClCompile>
+    <ClCompile Include="ACollider.cpp">
+      <Filter>Header Files\core-system\physics\collider</Filter>
+    </ClCompile>
+    <ClCompile Include="ConvexHull.cpp">
+      <Filter>Header Files\core-system\physics\collider</Filter>
+    </ClCompile>
+    <ClCompile Include="Ray.cpp">
+      <Filter>Header Files\core-system\physics\collider</Filter>
+    </ClCompile>
+    <ClCompile Include="SphereCollider.cpp">
+      <Filter>Header Files\core-system\physics\collider</Filter>
+    </ClCompile>
+    <ClCompile Include="OBoxCollider.cpp">
+      <Filter>Header Files\core-system\physics\collider</Filter>
+    </ClCompile>
+    <ClCompile Include="AABoxCollider.cpp">
+      <Filter>Header Files\core-system\physics\collider</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -200,20 +215,32 @@
     <ClInclude Include="Texture.h">
       <Filter>Header Files\core-system\rendering</Filter>
     </ClInclude>
-    <ClInclude Include="shapes.h">
-      <Filter>Header Files\core-system\physics</Filter>
-    </ClInclude>
     <ClInclude Include="Collision.h">
       <Filter>Header Files\core-system\physics</Filter>
     </ClInclude>
     <ClInclude Include="GJK_EPA.h">
       <Filter>Header Files\core-system\physics</Filter>
     </ClInclude>
-    <ClInclude Include="ConvexHull.h">
-      <Filter>Header Files\core-system\physics</Filter>
-    </ClInclude>
     <ClInclude Include="tools.h">
       <Filter>Header Files\core-system\physics</Filter>
+    </ClInclude>
+    <ClInclude Include="ACollider.h">
+      <Filter>Header Files\core-system\physics\collider</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvexHull.h">
+      <Filter>Header Files\core-system\physics\collider</Filter>
+    </ClInclude>
+    <ClInclude Include="Ray.h">
+      <Filter>Header Files\core-system\physics\collider</Filter>
+    </ClInclude>
+    <ClInclude Include="SphereCollider.h">
+      <Filter>Header Files\core-system\physics\collider</Filter>
+    </ClInclude>
+    <ClInclude Include="OBoxCollider.h">
+      <Filter>Header Files\core-system\physics\collider</Filter>
+    </ClInclude>
+    <ClInclude Include="AABoxCollider.h">
+      <Filter>Header Files\core-system\physics\collider</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

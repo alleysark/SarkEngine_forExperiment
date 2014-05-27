@@ -2,11 +2,12 @@
 #define __RIGID_SPHERE_H__
 
 #include "ASceneComponent.h"
-#include "Mesh.h"
-#include "RigidBody.h"
-#include "shapes.h"
 
 namespace sark{
+
+	class Mesh;
+	class RigidBody;
+	class ACollider;
 
 	// simple rigid sphere scene component.
 	class RigidSphere : public ASceneComponent{
@@ -17,8 +18,8 @@ namespace sark{
 		// rigid body object
 		RigidBody* mRigidBody;
 
-		// bounding sphere
-		Sphere* mSphere;
+		// collider
+		ACollider* mCollider;
 
 		// radius
 		real mRadius;
@@ -45,7 +46,12 @@ namespace sark{
 		// get radius of sphere.
 		const real& GetRadius() const;
 
-		const IShape* GetBoundingShape() const override;
+		const ACollider* GetCollider() const override;
+		
+		// set new collider. or set NULL.
+		// you may pass new collider through memory allocation.
+		// *note: do not pass the address of plane variable.
+		void SetCollider(ACollider* newColl) override;
 
 		Mesh* GetMesh() override;
 

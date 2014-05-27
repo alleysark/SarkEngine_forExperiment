@@ -1,5 +1,4 @@
 #include "GJK_EPA.h"
-#include "shapes.h"
 #include "tools.h"
 #include "ConvexHull.h"
 #include "Debug.h"

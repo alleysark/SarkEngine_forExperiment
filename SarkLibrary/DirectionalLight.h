@@ -25,9 +25,14 @@ namespace sark{
 		// getting direction by Transform::GetDirection()
 		// you can easily modify the direction by Transform::Rotate.
 
-		// directional light doesn't have bounding shape.
+		// directional light doesn't have collider.
 		// so it simply returns NULL.
-		const IShape* GetBoundingShape() const override;
+		const ACollider* GetCollider() const override;
+		
+		// set new collider. or set NULL.
+		// you may pass new collider through memory allocation.
+		// *note: do not pass the address of plane variable.
+		void SetCollider(ACollider* newColl) override;
 
 		Mesh* GetMesh() override;
 

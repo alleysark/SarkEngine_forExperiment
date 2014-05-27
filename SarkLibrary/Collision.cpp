@@ -43,7 +43,7 @@ namespace sark{
 			if (indices1.Empty())
 				continue;
 
-			const IShape* bndShape1 = (*itr)->GetBoundingShape();
+			const ACollider* coll1 = (*itr)->GetCollider();
 
 			// compare component 1 and component 2.
 			for (jtr = itr + 1; jtr != end; jtr++){
@@ -63,10 +63,10 @@ namespace sark{
 				}
 
 				// broad phase.
-				if (bndShape1 != NULL){
-					const IShape* bndShape2 = (*jtr)->GetBoundingShape();
-					if (bndShape2 != NULL){
-						if (bndShape1->IntersectWith(bndShape2) == false)
+				if (coll1 != NULL){
+					const ACollider* coll2 = (*jtr)->GetCollider();
+					if (coll2 != NULL){
+						if (coll1->IntersectWith(coll2) == false)
 							continue;
 					}
 				}
@@ -106,20 +106,20 @@ namespace sark{
 		AScene::Layer::ReplicaArrayIterator end = physLayer.End();
 		for (; itr != end; itr++){
 			if ((*itr)->GetRigidBody() == NULL
-				|| (*itr)->GetBoundingShape() == NULL
-				|| (*itr)->GetBoundingShape()->GetType() != IShape::CONVEXHULL)
+				|| (*itr)->GetCollider() == NULL
+				|| (*itr)->GetCollider()->GetType() != ACollider::CONVEXHULL)
 				continue;
 
-			const ConvexHull* convex1 = reinterpret_cast<const ConvexHull*>((*itr)->GetBoundingShape());
+			const ConvexHull* convex1 = reinterpret_cast<const ConvexHull*>((*itr)->GetCollider());
 
 			// compare component 1 and component 2.
 			for (jtr = itr + 1; jtr != end; jtr++){
 				if ((*jtr)->GetRigidBody() == NULL
-					|| (*jtr)->GetBoundingShape() == NULL
-					|| (*jtr)->GetBoundingShape()->GetType() != IShape::CONVEXHULL)
+					|| (*jtr)->GetCollider() == NULL
+					|| (*jtr)->GetCollider()->GetType() != ACollider::CONVEXHULL)
 					continue;
 
-				const ConvexHull* convex2 = reinterpret_cast<const ConvexHull*>((*jtr)->GetBoundingShape());
+				const ConvexHull* convex2 = reinterpret_cast<const ConvexHull*>((*jtr)->GetCollider());
 
 				if (ConvexLevelDetection(convex1, convex2, CN, CP, depth)){
 					// *note: at this time, i just translate depth toward contact normal.

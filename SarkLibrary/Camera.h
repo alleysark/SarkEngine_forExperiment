@@ -2,7 +2,7 @@
 #define __CAMERA_H__
 
 #include "core.h"
-#include "shapes.h"
+#include "Ray.h"
 
 namespace sark{
 

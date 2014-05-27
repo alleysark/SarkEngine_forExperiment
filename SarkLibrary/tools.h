@@ -36,6 +36,18 @@ namespace sark{
 		//		intersection check functions of basic shapes
 		// ======================================================
 
+		// ray-triangle intersection test.
+		// *param:
+		//     ray_p - a point on the line.
+		//     ray_v - direction vector of line.
+		//     ray_l - limitation of line.
+		//     A,B,C - three points of triangle.
+		//     out_P - output intersected point.
+		bool Ray_TriangleIntersection(
+			const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
+			const Vector3& A, const Vector3& B, const Vector3& C,
+			Vector3* out_P = NULL);
+
 		// ray-plane intersection test.
 		// *param:
 		//     ray_p   - a point on the line.
@@ -83,7 +95,7 @@ namespace sark{
 		//     aab_min - min position of axis aligned box.
 		//     aab_max - max position of axis aligned box.
 		//     out_P    - nearest intersected point.
-		bool Ray_AxisAlignedBoxIntersection(
+		bool Ray_AABoxIntersection(
 			const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
 			const Vector3& aab_min, const Vector3& aab_max,
 			Vector3* out_P = NULL);
@@ -97,7 +109,7 @@ namespace sark{
 		//     ob_ext - extention of oriented box.
 		//     ob_axis - orthonormal axis of oriented box.
 		//     out_P    - nearest intersected point.
-		bool Ray_OrientedBoxIntersection(
+		bool Ray_OBoxIntersection(
 			const Vector3& ray_p, const Vector3& ray_v, const real& ray_l,
 			const Vector3& ob_p, const Vector3& ob_ext, const Vector3 ob_axis[3],
 			Vector3* out_P = NULL);
@@ -158,7 +170,7 @@ namespace sark{
 		//     sphere_r - radius of sphere.
 		//     aab_min  - min position of box.
 		//     aab_max  - max position of box.
-		bool Sphere_AxisAlignedBoxIntersection(
+		bool Sphere_AABoxIntersection(
 			const Vector3& sphere_p, const real& sphere_r,
 			const Vector3& aab_min, const Vector3& aab_max);
 
@@ -169,7 +181,7 @@ namespace sark{
 		//     ob_p     - center position of oriented box.
 		//     ob_ext   - extention of oriented box.
 		//     ob_axis  - orthonormal axis of oriented box.
-		bool Sphere_OrientedBoxIntersection(
+		bool Sphere_OBoxIntersection(
 			const Vector3& sphere_p, const real& sphere_r,
 			const Vector3& ob_p, const Vector3& ob_ext, const Vector3 ob_axis[3]);
 
@@ -178,7 +190,7 @@ namespace sark{
 		// *param:
 		//     aab1_min, aab1_max - min, max of axis aligned box 1.
 		//     aab2_min, aab2_max - min, max of axis aligned box 2.
-		bool AxisAlignedBox_AxisAlignedBoxIntersection(
+		bool AABox_AABoxIntersection(
 			const Vector3& aab1_min, const Vector3& aab1_max,
 			const Vector3& aab2_min, const Vector3& aab2_max);
 
@@ -189,7 +201,7 @@ namespace sark{
 		//     ob_p    - center position of oriented box.
 		//     ob_ext  - extention of oriented box.
 		//     ob_axis - orthonormal axis of oriented box.
-		bool AxisAlignedBox_OrientedBoxIntersection(
+		bool AABox_OBoxIntersection(
 			const Vector3& aab_min, const Vector3& aab_max,
 			const Vector3& ob_p, const Vector3& ob_ext, const Vector3 ob_axis[3]);
 
@@ -201,7 +213,7 @@ namespace sark{
 		//     ob2_p    - center position of oriented box 2.
 		//     ob2_ext  - extention of oriented box 2.
 		//     ob2_axis - orthonormal axis of oriented box 2.
-		bool OrientedBox_OrientedBoxIntersection(
+		bool OBox_OBoxIntersection(
 			const Vector3& ob1_p, const Vector3& ob1_ext, const Vector3 ob1_axis[3],
 			const Vector3& ob2_p, const Vector3& ob2_ext, const Vector3 ob2_axis[3]);
 

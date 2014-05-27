@@ -78,6 +78,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AABoxCollider.cpp" />
+    <ClCompile Include="ACollider.cpp" />
     <ClCompile Include="ArrayBuffer.cpp" />
     <ClCompile Include="ASceneComponent.cpp" />
     <ClCompile Include="BMPResource.cpp" />
@@ -93,7 +95,9 @@
     <ClCompile Include="GJK_EPA.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="OBoxCollider.cpp" />
     <ClCompile Include="PNGResource.cpp" />
+    <ClCompile Include="Ray.cpp" />
     <ClCompile Include="resources.cpp" />
     <ClCompile Include="AScene.cpp" />
     <ClCompile Include="RigidBody.cpp" />
@@ -102,7 +106,7 @@
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="ShaderChef.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
-    <ClCompile Include="shapes.cpp" />
+    <ClCompile Include="SphereCollider.cpp" />
     <ClCompile Include="test_main.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -110,6 +114,7 @@
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AABoxCollider.h" />
     <ClInclude Include="ALight.h" />
     <ClInclude Include="ArrayBuffer.h" />
     <ClInclude Include="ASceneComponent.h" />
@@ -123,10 +128,13 @@
     <ClInclude Include="Engine.h" />
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="GJK_EPA.h" />
+    <ClInclude Include="ACollider.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="OBoxCollider.h" />
     <ClInclude Include="PNGResource.h" />
     <ClInclude Include="primitives.hpp" />
+    <ClInclude Include="Ray.h" />
     <ClInclude Include="resources.h" />
     <ClInclude Include="AScene.h" />
     <ClInclude Include="RigidBody.h" />
@@ -135,7 +143,7 @@
     <ClInclude Include="Sampler.h" />
     <ClInclude Include="ShaderChef.h" />
     <ClInclude Include="ShaderProgram.h" />
-    <ClInclude Include="shapes.h" />
+    <ClInclude Include="SphereCollider.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="tools.h" />

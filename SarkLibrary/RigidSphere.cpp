@@ -1,4 +1,7 @@
 #include "RigidSphere.h"
+#include "Mesh.h"
+#include "RigidBody.h"
+#include "ACollider.h"
 #include "primitives.hpp"
 
 namespace sark{
@@ -66,7 +69,7 @@ namespace sark{
 		bool gravityOn)
 		: ASceneComponent("", NULL, true),
 		mRadius(radius), mSlice(slice), mStack(stack),
-		mRigidBody(NULL), mSphere(NULL)
+		mRigidBody(NULL), mCollider(NULL)
 	{
 		// compute invI0
 		const real e = invMass * 5.f / 2.f*math::sqre(radius);
@@ -74,8 +77,6 @@ namespace sark{
 			e, 0, 0,
 			0, e, 0,
 			0, 0, e), velocity, angularVelocity, gravityOn);
-
-		mSphere = new Sphere(Vector3(0), radius);
 
 		CreateSphere();
 	}
@@ -88,7 +89,7 @@ namespace sark{
 		bool gravityOn)
 		: ASceneComponent(name, parent, activate),
 		mRadius(radius), mSlice(slice), mStack(stack),
-		mRigidBody(NULL), mSphere(NULL)
+		mRigidBody(NULL), mCollider(NULL)
 	{
 		// compute invI0
 		const real e = invMass * 5.f / 2.f*math::sqre(radius);
@@ -96,8 +97,6 @@ namespace sark{
 			e, 0, 0,
 			0, e, 0,
 			0, 0, e), velocity, angularVelocity, gravityOn);
-
-		mSphere = new Sphere(Vector3(0), radius);
 
 		CreateSphere();
 	}
@@ -107,8 +106,8 @@ namespace sark{
 			delete mMesh;
 		if (mRigidBody != NULL)
 			delete mRigidBody;
-		if (mSphere != NULL)
-			delete mSphere;
+		if (mCollider != NULL)
+			delete mCollider;
 	}
 
 	// get radius of sphere.
@@ -116,8 +115,14 @@ namespace sark{
 		return mRadius;
 	}
 
-	const IShape* RigidSphere::GetBoundingShape() const{
-		return mSphere;
+	const ACollider* RigidSphere::GetCollider() const{
+		return mCollider;
+	}
+
+	void RigidSphere::SetCollider(ACollider* newColl){
+		if (mCollider != NULL)
+			delete mCollider;
+		mCollider = newColl;
 	}
 
 	Mesh* RigidSphere::GetMesh(){
@@ -129,8 +134,8 @@ namespace sark{
 	}
 
 	void RigidSphere::Update(){
-		mSphere->pos = mTransform.GetPosition();
-
+		if (mCollider != NULL)
+			mCollider->Update();
 		mRigidBody->Update();
 	}
 
