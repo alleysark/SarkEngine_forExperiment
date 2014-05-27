@@ -55,11 +55,8 @@ namespace sark{
 			// get array iterator of end
 			ReplicaArrayIterator End();
 
-			// update only for this layer
-			void UpdateAll();
-
-			// render only for this layer
-			void RenderAll();
+			// clear layer
+			void Clear();
 		};
 		
 		typedef std::map<ASceneComponent::ComponentID, ASceneComponent*> ComponentMap;

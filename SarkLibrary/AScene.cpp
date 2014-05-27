@@ -75,29 +75,12 @@ namespace sark{
 		return mReplicas.end();
 	}
 
-	// update only for this layer
-	void AScene::Layer::UpdateAll(){
-		ReplicaArray::iterator itr = mReplicas.begin();
-		ReplicaArray::iterator end = mReplicas.end();
-		for (; itr != end; itr++){
-			if (!(*itr)->IsActive())
-				continue;
-			(*itr)->Update();
-		}
+	// clear layer
+	void AScene::Layer::Clear(){
+		mReplicas.clear();
 	}
 
-	// render only for this layer
-	void AScene::Layer::RenderAll(){
-		ReplicaArray::iterator itr = mReplicas.begin();
-		ReplicaArray::iterator end = mReplicas.end();
-		for (; itr != end; itr++){
-			if (!(*itr)->IsActive())
-				continue;
-			(*itr)->Render();
-		}
-	}
-
-
+	
 
 	//=============================================
 	//			AScene class implementation
