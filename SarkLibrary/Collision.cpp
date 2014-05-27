@@ -8,6 +8,8 @@
 
 namespace sark{
 
+	real Collision::C_RESTITUT = 0.3f;
+
 	// process the collisions.
 	void Collision::ProcessCollision(AScene::Layer& physLayer){
 		// temporal contact informations
@@ -124,7 +126,8 @@ namespace sark{
 				if (ConvexLevelDetection(convex1, convex2, CN, CP, depth)){
 					// *note: at this time, i just translate depth toward contact normal.
 					// but it should be modified as correction impulse based method.
-					(*itr)->GetTransform().TranslateMore(CN*depth);
+					if (!(*itr)->GetRigidBody()->IsFixed())
+						(*itr)->GetTransform().TranslateMore(CN*depth);
 
 					Resolve((*itr)->GetRigidBody(), (*jtr)->GetRigidBody(), CN, CP, depth);
 				}
@@ -227,11 +230,7 @@ namespace sark{
 		Matrix3 invI1 = rigidBody1->GetInvInertiaTensor();
 		Matrix3 invI2 = rigidBody2->GetInvInertiaTensor();
 
-		// *note: coefficient of restitution should be
-		// computed with consideration of materials.
-		const real restitution = 0.1f;
-
-		real j = -(1 + restitution)*c 
+		real j = -(1 + C_RESTITUT)*c 
 			/ (CN.Dot((invI1 * r1.Cross(CN)).Cross(r1)) + CN.Dot((invI2*r2.Cross(CN)).Cross(r2)) + invM1 + invM2);
 		j = math::max(j, 0);
 

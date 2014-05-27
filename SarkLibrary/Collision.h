@@ -14,6 +14,11 @@ namespace sark{
 	// and it does not resolve the 'resting state'.
 	class Collision{
 	public:
+		// coefficient of restitution.
+		// it'll be deprecated soon.
+		static real C_RESTITUT;
+
+	public:
 		// process the collisions.
 		// it checks the bounding volume intersections on broad-phase
 		// and then test mesh-level collisions to generate collision
