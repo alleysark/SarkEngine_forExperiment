@@ -1,11 +1,15 @@
 #include "Collision.h"
+#include "GJK_EPA.h"
+#include "ConvexHull.h"
 #include "RigidBody.h"
 #include "Mesh.h"
+#include "tools.h"
 #include "Debug.h"
 
 namespace sark{
 
-	void Collision::DetectAndResolve(AScene::Layer& physLayer){
+	// process the collisions.
+	void Collision::ProcessCollision(AScene::Layer& physLayer){
 		// temporal contact informations
 		Vector3 CN; // contact normal
 		Vector3 CP; // contact point
@@ -14,48 +18,46 @@ namespace sark{
 		AScene::Layer::ReplicaArrayIterator jtr;
 		AScene::Layer::ReplicaArrayIterator end = physLayer.End();
 		for (; itr != end; itr++){
-			if ((*itr)->GetRigidBody() == NULL)
-				continue;
-			if ((*itr)->GetMesh() == NULL)
+			if ((*itr)->GetRigidBody() == NULL
+				|| (*itr)->GetMesh() == NULL)
 				continue;
 
-			ArrayBuffer& arrbuf_1 = (*itr)->GetMesh()->GetArrayBuffer();
-			if (arrbuf_1.GetDrawMode() != ArrayBuffer::DrawMode::TRIANGLES){
+			ArrayBuffer& arrbuf1 = (*itr)->GetMesh()->GetArrayBuffer();
+			if (arrbuf1.GetDrawMode() != ArrayBuffer::DrawMode::TRIANGLES){
 				LogWarn("it supports only for the triangle mesh");
 				continue;
 			}
 
-			if (arrbuf_1.GetDataCount(AttributeSemantic::INDICES) == 0){
+			if (arrbuf1.GetDataCount(AttributeSemantic::INDICES) == 0){
 				LogWarn("it does not support indexless mesh");
 				continue;
 			}
 
-			PositionAccessor positions_1
-				= arrbuf_1.GetAttributeAccessor<Position3>(AttributeSemantic::POSITION);
-			if (positions_1.Empty())
+			PositionAccessor positions1
+				= arrbuf1.GetAttributeAccessor<Position3>(AttributeSemantic::POSITION);
+			if (positions1.Empty())
 				continue;
 
-			IndexAccessor indices_1
-				= arrbuf_1.GetAttributeAccessor<TriangleFace16>(AttributeSemantic::INDICES);
-			if (indices_1.Empty())
+			IndexAccessor indices1
+				= arrbuf1.GetAttributeAccessor<TriangleFace16>(AttributeSemantic::INDICES);
+			if (indices1.Empty())
 				continue;
 
 			const IShape* bndShape1 = (*itr)->GetBoundingShape();
 
 			// compare component 1 and component 2.
 			for (jtr = itr + 1; jtr != end; jtr++){
-				if ((*jtr)->GetRigidBody() == NULL)
-					continue;
-				if ((*jtr)->GetMesh() == NULL)
+				if ((*jtr)->GetRigidBody() == NULL
+					|| (*jtr)->GetMesh() == NULL)
 					continue;
 
-				ArrayBuffer& arrbuf_2 = (*jtr)->GetMesh()->GetArrayBuffer();
-				if (arrbuf_2.GetDrawMode() != ArrayBuffer::DrawMode::TRIANGLES){
+				ArrayBuffer& arrbuf2 = (*jtr)->GetMesh()->GetArrayBuffer();
+				if (arrbuf2.GetDrawMode() != ArrayBuffer::DrawMode::TRIANGLES){
 					LogWarn("it supports only for the triangle mesh");
 					continue;
 				}
 
-				if (arrbuf_2.GetDataCount(AttributeSemantic::INDICES) == 0){
+				if (arrbuf2.GetDataCount(AttributeSemantic::INDICES) == 0){
 					LogWarn("it does not support indexless mesh");
 					continue;
 				}
@@ -70,29 +72,68 @@ namespace sark{
 				}
 
 				// narrow phase.
-				PositionAccessor positions_2
-					= arrbuf_2.GetAttributeAccessor<Position3>(AttributeSemantic::POSITION);
-				if (positions_2.Empty())
+				PositionAccessor positions2
+					= arrbuf2.GetAttributeAccessor<Position3>(AttributeSemantic::POSITION);
+				if (positions2.Empty())
 					continue;
 
-				IndexAccessor indices_2
-					= arrbuf_2.GetAttributeAccessor<TriangleFace16>(AttributeSemantic::INDICES);
-				if (indices_2.Empty())
+				IndexAccessor indices2
+					= arrbuf2.GetAttributeAccessor<TriangleFace16>(AttributeSemantic::INDICES);
+				if (indices2.Empty())
 					continue;
 
 				CN = 0.f;
 				CP = 0.f;
 
-				if (Detect(positions_1, indices_1, (*itr)->GetTransform().GetMatrix(),
-					positions_2, indices_2, (*jtr)->GetTransform().GetMatrix(), CN, CP))
+				if (MeshLevelDetection(positions1, indices1, (*itr)->GetTransform().GetMatrix(),
+					positions2, indices2, (*jtr)->GetTransform().GetMatrix(), CN, CP))
 				{
-					Resolve((*itr)->GetRigidBody(), (*jtr)->GetRigidBody(), CN, CP);
+					Resolve((*itr)->GetRigidBody(), (*jtr)->GetRigidBody(), CN, CP, 0);
 				}
 			}
 		}
 	}
 
-	bool Collision::Detect(const PositionAccessor& positions1, const IndexAccessor& indices1, const Matrix4& TM1,
+	// process the collisions about convexity objects.
+	void Collision::ProcessConvexCollision(AScene::Layer& physLayer){
+		// temporal contact informations
+		Vector3 CN; // contact normal
+		Vector3 CP; // contact point
+		real depth; // contact depth
+
+		AScene::Layer::ReplicaArrayIterator itr = physLayer.Begin();
+		AScene::Layer::ReplicaArrayIterator jtr;
+		AScene::Layer::ReplicaArrayIterator end = physLayer.End();
+		for (; itr != end; itr++){
+			if ((*itr)->GetRigidBody() == NULL
+				|| (*itr)->GetBoundingShape() == NULL
+				|| (*itr)->GetBoundingShape()->GetType() != IShape::CONVEXHULL)
+				continue;
+
+			const ConvexHull* convex1 = reinterpret_cast<const ConvexHull*>((*itr)->GetBoundingShape());
+
+			// compare component 1 and component 2.
+			for (jtr = itr + 1; jtr != end; jtr++){
+				if ((*jtr)->GetRigidBody() == NULL
+					|| (*jtr)->GetBoundingShape() == NULL
+					|| (*jtr)->GetBoundingShape()->GetType() != IShape::CONVEXHULL)
+					continue;
+
+				const ConvexHull* convex2 = reinterpret_cast<const ConvexHull*>((*jtr)->GetBoundingShape());
+
+				if (ConvexLevelDetection(convex1, convex2, CN, CP, depth)){
+					// *note: at this time, i just translate depth toward contact normal.
+					// but it should be modified as correction impulse based method.
+					(*itr)->GetTransform().TranslateMore(CN*depth);
+
+					Resolve((*itr)->GetRigidBody(), (*jtr)->GetRigidBody(), CN, CP, depth);
+				}
+			}
+		}
+	}
+
+
+	bool Collision::MeshLevelDetection(const PositionAccessor& positions1, const IndexAccessor& indices1, const Matrix4& TM1,
 		const PositionAccessor& positions2, const IndexAccessor& indices2, const Matrix4& TM2,
 		Vector3& out_CN, Vector3& out_CP)
 	{
@@ -118,7 +159,7 @@ namespace sark{
 				transB2 = (TM2 * Vector4(B2, 1.f)).xyz;
 				transC2 = (TM2 * Vector4(C2, 1.f)).xyz;
 
-				if (Triangle_TriangleIntersection(
+				if (tool::Triangle_TriangleIntersection(
 					(TM1 * Vector4(A1, 1.f)).xyz,
 					(TM1 * Vector4(B1, 1.f)).xyz,
 					(TM1 * Vector4(C1, 1.f)).xyz,
@@ -141,7 +182,25 @@ namespace sark{
 		return true;
 	}
 
-	void Collision::Resolve(RigidBody* rigidBody1, RigidBody* rigidBody2, const Vector3& n, const Vector3& CP){
+	// convex level detection.
+	bool Collision::ConvexLevelDetection(const ConvexHull* convex1, const ConvexHull* convex2,
+		Vector3& out_CN, Vector3& out_CP, real& out_depth)
+	{
+		GJK_EPA::Simplex simplex;
+		if (!GJK_EPA::DoGJK(convex1, convex2, &simplex))
+			return false;
+
+		if (!GJK_EPA::DoEPA(convex1, convex2, simplex, &out_CN, &out_depth))
+			return false;
+
+		out_CP = tool::FarthestPointInDirection(convex1->GetTransPointSet(), out_CN);
+		out_CN = -out_CN;
+		return true;
+	}
+
+	void Collision::Resolve(RigidBody* rigidBody1, RigidBody* rigidBody2,
+		const Vector3& CN, const Vector3& CP, const real depth)
+	{
 		const Vector3& v1 = rigidBody1->GetVelocity();
 		const Vector3& w1 = rigidBody1->GetAngularVelocity();
 
@@ -154,7 +213,7 @@ namespace sark{
 		// sвл(t); velocity of point s(t)
 		// c = n.Dot(s1вл - s2вл)
 		// sвл(t) = v(t) + w(t)xr(t)
-		real c = n.Dot((v1 + w1.Cross(r1)) - (v2 + w2.Cross(r2)));
+		real c = CN.Dot((v1 + w1.Cross(r1)) - (v2 + w2.Cross(r2)));
 		if (c > 0)
 			return;
 		else if (c == 0){
@@ -168,11 +227,15 @@ namespace sark{
 		Matrix3 invI1 = rigidBody1->GetInvInertiaTensor();
 		Matrix3 invI2 = rigidBody2->GetInvInertiaTensor();
 
+		// *note: coefficient of restitution should be
+		// computed with consideration of materials.
+		const real restitution = 0.1f;
 
-		const real restitute = 1.f;
-		real j = -(1 + restitute)*c / (n.Dot((invI1 * r1.Cross(n)).Cross(r1)) + n.Dot((invI2*r2.Cross(n)).Cross(r2)) + invM1 + invM2);
+		real j = -(1 + restitution)*c 
+			/ (CN.Dot((invI1 * r1.Cross(CN)).Cross(r1)) + CN.Dot((invI2*r2.Cross(CN)).Cross(r2)) + invM1 + invM2);
+		j = math::max(j, 0);
 
-		Vector3 J = j*n;
+		Vector3 J = j*CN;
 
 		//v'(t) = v(t) + J/M
 		rigidBody1->SetVelocity(v1 + J*invM1);

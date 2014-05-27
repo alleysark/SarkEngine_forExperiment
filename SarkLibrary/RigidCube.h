@@ -26,16 +26,16 @@ namespace sark{
 	public:
 		// create cube from given properties
 		RigidCube(real width, real height, real depth,
-			real invMass = 1.f,
+			real invMass = 0.f,
 			const Vector3& velocity = 0.f, const Vector3& angularVelocity = 0.f,
-			bool gravityOn = true, bool fixed = false);
+			bool gravityOn = true);
 
 		// create cube from given properties
 		RigidCube(const std::string& name, ASceneComponent* parent, bool activate,
 			real width, real height, real depth,
-			real invMass = 1.f,
+			real invMass = 0.f,
 			const Vector3& velocity = 0.f, const Vector3& angularVelocity = 0.f,
-			bool gravityOn = true, bool fixed = false);
+			bool gravityOn = true);
 		
 		~RigidCube();
 

@@ -120,6 +120,9 @@
     <ClCompile Include="ConvexHull.cpp">
       <Filter>Header Files\core-system\physics</Filter>
     </ClCompile>
+    <ClCompile Include="tools.cpp">
+      <Filter>Header Files\core-system\physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -207,6 +210,9 @@
       <Filter>Header Files\core-system\physics</Filter>
     </ClInclude>
     <ClInclude Include="ConvexHull.h">
+      <Filter>Header Files\core-system\physics</Filter>
+    </ClInclude>
+    <ClInclude Include="tools.h">
       <Filter>Header Files\core-system\physics</Filter>
     </ClInclude>
   </ItemGroup>

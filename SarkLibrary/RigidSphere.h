@@ -30,7 +30,7 @@ namespace sark{
 		RigidSphere(real radius, uinteger slice, uinteger stack,
 			real invMass = 1.f,
 			const Vector3& velocity = 0.f, const Vector3& angularVelocity = 0.f,
-			bool gravityOn = true, bool fixed = false);
+			bool gravityOn = true);
 
 		// create sphere from given properties.
 		// inverse of initial inertia tensor(invI0) is computed automatically.
@@ -38,7 +38,7 @@ namespace sark{
 			real radius, uinteger slice, uinteger stack,
 			real invMass = 1.f,
 			const Vector3& velocity = 0.f, const Vector3& angularVelocity = 0.f,
-			bool gravityOn = true, bool fixed = false);
+			bool gravityOn = true);
 
 		~RigidSphere();
 

@@ -7,12 +7,12 @@
 namespace sark{
 
 	RigidBody::RigidBody(ASceneComponent* reference,
-		real invMass, const Matrix3& invI0,
+		const real invMass, const Matrix3& invI0,
 		const Vector3& velocity, const Vector3& angularVelocity,
-		bool gravityOn, bool fixed)
+		bool gravityOn)
 		: mReference(reference), mInvMass(invMass), mInvI0(invI0),
 		mVelocity(velocity), mAngularVelocity(angularVelocity),
-		mGravityOn(gravityOn), mFixed(fixed),
+		mGravityOn(gravityOn),
 		mForce(0.f), mTorque(0.f)
 	{
 		if (mReference == NULL){
@@ -32,7 +32,7 @@ namespace sark{
 		return mInvMass;
 	}
 
-	// set mass.
+	// set mass. if zero, then body is fixed.
 	void RigidBody::SetInvMass(real invMass){
 		mInvMass = invMass;
 	}
@@ -111,17 +111,12 @@ namespace sark{
 
 	// is this body fixed.
 	bool RigidBody::IsFixed() const{
-		return mFixed;
-	}
-
-	// fixate or liberate this body.
-	void RigidBody::Fixate(bool on){
-		mFixed = on;
+		return (mInvMass == 0);
 	}
 
 	// update translational terms and rotational terms.
 	void RigidBody::Update(){
-		if (mFixed){
+		if (mInvMass == 0){
 			mVelocity = 0.f;
 			mAngularVelocity = 0.f;
 			return;

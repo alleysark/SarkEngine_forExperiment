@@ -63,7 +63,7 @@ namespace sark{
 	RigidSphere::RigidSphere(real radius, uinteger slice, uinteger stack,
 		real invMass,
 		const Vector3& velocity, const Vector3& angularVelocity,
-		bool gravityOn, bool fixed)
+		bool gravityOn)
 		: ASceneComponent("", NULL, true),
 		mRadius(radius), mSlice(slice), mStack(stack),
 		mRigidBody(NULL), mSphere(NULL)
@@ -73,7 +73,7 @@ namespace sark{
 		mRigidBody = new RigidBody(this, invMass, Matrix3(
 			e, 0, 0,
 			0, e, 0,
-			0, 0, e), velocity, angularVelocity, gravityOn, fixed);
+			0, 0, e), velocity, angularVelocity, gravityOn);
 
 		mSphere = new Sphere(Vector3(0), radius);
 
@@ -85,7 +85,7 @@ namespace sark{
 		real radius, uinteger slice, uinteger stack,
 		real invMass,
 		const Vector3& velocity, const Vector3& angularVelocity,
-		bool gravityOn, bool fixed)
+		bool gravityOn)
 		: ASceneComponent(name, parent, activate),
 		mRadius(radius), mSlice(slice), mStack(stack),
 		mRigidBody(NULL), mSphere(NULL)
@@ -95,7 +95,7 @@ namespace sark{
 		mRigidBody = new RigidBody(this, invMass, Matrix3(
 			e, 0, 0,
 			0, e, 0,
-			0, 0, e), velocity, angularVelocity, gravityOn, fixed);
+			0, 0, e), velocity, angularVelocity, gravityOn);
 
 		mSphere = new Sphere(Vector3(0), radius);
 

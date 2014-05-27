@@ -76,7 +76,7 @@ namespace sark{
 	RigidCube::RigidCube(real width, real height, real depth,
 		real invMass,
 		const Vector3& velocity, const Vector3& angularVelocity,
-		bool gravityOn, bool fixed)
+		bool gravityOn)
 		: ASceneComponent("", NULL, true),
 		mWidth(width), mHeight(height), mDepth(depth),
 		mRigidBody(NULL), mOBox(NULL)
@@ -88,7 +88,7 @@ namespace sark{
 			invMass*12.f / (hsq + dsq), 0, 0,
 			0, invMass*12.f / (wsq + dsq), 0,
 			0, 0, invMass*12.f / (wsq + hsq)
-			), velocity, angularVelocity, gravityOn, fixed);
+			), velocity, angularVelocity, gravityOn);
 
 		mOBox = new OrientedBox(Vector3(0), Vector3(width / 2.f, height / 2.f, depth / 2.f));
 
@@ -100,7 +100,7 @@ namespace sark{
 		real width, real height, real depth,
 		real invMass,
 		const Vector3& velocity, const Vector3& angularVelocity,
-		bool gravityOn, bool fixed)
+		bool gravityOn)
 		: ASceneComponent(name, parent, activate),
 		mWidth(width), mHeight(height), mDepth(depth),
 		mRigidBody(NULL), mOBox(NULL)
@@ -112,7 +112,7 @@ namespace sark{
 			invMass*12.f / (hsq + dsq), 0, 0,
 			0, invMass*12.f / (wsq + dsq), 0,
 			0, 0, invMass*12.f / (wsq + hsq)
-			), velocity, angularVelocity, gravityOn, fixed);
+			), velocity, angularVelocity, gravityOn);
 
 		mOBox = new OrientedBox(Vector3(0), Vector3(width / 2.f, height / 2.f, depth / 2.f));
 

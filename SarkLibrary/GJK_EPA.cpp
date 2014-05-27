@@ -1,5 +1,6 @@
 #include "GJK_EPA.h"
 #include "shapes.h"
+#include "tools.h"
 #include "ConvexHull.h"
 #include "Debug.h"
 
@@ -51,7 +52,7 @@ namespace sark{
 		if (dir == Vector3(0, 0, 0)){
 			if (out_simplex != NULL){
 				// origin is lying on the line CD. so two shapes are intersecting obviously.
-				// for the purpose of EPA, simplex should to be completed as tetrahedron(in 3D).
+				// for the purpose of EPA, simplex should be completed as tetrahedron(in 3D).
 				// *caution: same points in the current simplex can be added as a new point very occasionally.
 				// but i just ignore this case.. please remember this problematic implemantation.
 				simplex.push_back(SupportPoint(convexA, convexB, Vector3::Up));
@@ -69,7 +70,7 @@ namespace sark{
 			dir = (simplex[1] - simplex[2]).Cross(simplex[0] - simplex[2]);
 
 			// check location of origin
-			int8 loc = PointLocationByPlane(Vector3(0), dir, simplex[2]);
+			int8 loc = tool::PointLocationByPlane(Vector3(0), dir, simplex[2]);
 			if (loc == 0){
 				// adjust point B
 				simplex[2] = SupportPoint(convexA, convexB, dir);
@@ -117,7 +118,7 @@ namespace sark{
 
 			// is A above BCD?
 			Vector3 BCD = (C - B).Cross(D - B);
-			int8 loc = PointLocationByPlane(A, BCD, B);
+			int8 loc = tool::PointLocationByPlane(A, BCD, B);
 			if (loc > 0){
 				// orient BCD toward outside
 				BCD = -BCD;
@@ -180,7 +181,7 @@ namespace sark{
 				// find visible faces
 				std::vector<FaceList::iterator> targets;
 				for (itr = faces.begin(); itr != end; itr++){
-					if (PointLocationByPlane(P, itr->normal, simplex[itr->a]) > 0){
+					if (tool::PointLocationByPlane(P, itr->normal, simplex[itr->a]) > 0){
 						targets.push_back(itr);
 					}
 				}
@@ -197,8 +198,8 @@ namespace sark{
 	const Vector3 GJK_EPA::SupportPoint(const ConvexHull* convexA, const ConvexHull* convexB,
 		const Vector3& direction)
 	{
-		const Vector3 farA = FarthestPointInDirection(convexA->GetTransPointSet(), direction);
-		const Vector3 farB = FarthestPointInDirection(convexB->GetTransPointSet(), -direction);
+		const Vector3 farA = tool::FarthestPointInDirection(convexA->GetTransPointSet(), direction);
+		const Vector3 farB = tool::FarthestPointInDirection(convexB->GetTransPointSet(), -direction);
 		return farA - farB;
 	}
 

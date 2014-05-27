@@ -18,6 +18,7 @@ namespace sark{
 		Vector3 mCM;
 
 		// inverse of object mass. 1/M
+		// if it is zero, then this body is fixed object.
 		real mInvMass;
 
 		// inverse of initial inertia tensor (I_0)^{-1}
@@ -32,9 +33,6 @@ namespace sark{
 		// if true, it is affected by gravity.
 		bool mGravityOn;
 
-		// if true, it is fixed.
-		bool mFixed;
-
 		// temporal summation result
 		// of affected linear forces.
 		Vector3 mForce;
@@ -48,9 +46,9 @@ namespace sark{
 
 	public:
 		RigidBody(ASceneComponent* reference,
-			real invMass, const Matrix3& invI0,
+			const real invMass, const Matrix3& invI0,
 			const Vector3& velocity, const Vector3& angularVelocity,
-			bool gravityOn, bool fixed);
+			bool gravityOn);
 
 		~RigidBody();
 
@@ -59,7 +57,7 @@ namespace sark{
 
 		// get inverse of mass. 1/M
 		const real& GetInvMass() const;
-		// set mass.
+		// set mass. if zero, then body is fixed.
 		void SetInvMass(real invMass);
 
 		// get inverse of initial inertia tensor.
@@ -97,8 +95,6 @@ namespace sark{
 
 		// is this body fixed.
 		bool IsFixed() const;
-		// fixate or liberate this body.
-		void Fixate(bool on);
 
 		// update translational terms and rotational terms.
 		void Update();
