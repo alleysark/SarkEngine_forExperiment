@@ -31,6 +31,10 @@ namespace sark{
 		const Vector3 FarthestPointInDirection(
 			const std::vector<Vector3>& pointSet, const Vector3& direction);
 
+		// separate axis theorem
+		bool SeparateAxisTest(
+			const std::vector<Vector3>& pointsA, const std::vector<Vector3>& pointsB,
+			const Vector3& axis);
 
 		// ======================================================
 		//		intersection check functions of basic shapes

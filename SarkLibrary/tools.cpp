@@ -20,6 +20,46 @@ namespace sark{
 			return pointSet[idx];
 		}
 
+		// separate axis theorem
+		bool SeparateAxisTest(
+			const std::vector<Vector3>& pointsA, const std::vector<Vector3>& pointsB,
+			const Vector3& axis)
+		{
+			real minA = REAL_MAX, minB = REAL_MAX;
+			real maxA = -REAL_MAX, maxB = -REAL_MAX;
+
+			uinteger sz = pointsA.size();
+			for (uinteger i = 0; i < sz; i++){
+				real d = axis.Dot(pointsA[i]);
+				if (minA > d){
+					minA = d;
+				}
+				else if (maxA < d){
+					maxA = d;
+				}
+			}
+			sz = pointsB.size();
+			for (uinteger i = 0; i < sz; i++){
+				real d = axis.Dot(pointsB[i]);
+				if (minB > d){
+					minB = d;
+				}
+				else if (maxB < d){
+					maxB = d;
+				}
+			}
+
+			if (minA <= minB){
+				if (maxA >= minB)
+					return true;
+			}
+			else{
+				if (maxB >= minA)
+					return true;
+			}
+			return false;
+		}
+
 		// ======================================================
 		//		intersection check functions of basic shapes
 		//
@@ -689,100 +729,58 @@ namespace sark{
 		}
 
 		// oriented box - oriented box intersection test.
-		// *note: code from ch.4.4 Oriented Bounding Boxes(OBBs)
-		// of <Real-Time Collision Detection>.
-		// *note: some reasons(i don't know what they are),
-		// it decides some slight gaps between the two boxes
-		// as overlapped case very often.
 		bool OBox_OBoxIntersection(
 			const Vector3& ob1_p, const Vector3& ob1_ext, const Vector3 ob1_axis[3],
 			const Vector3& ob2_p, const Vector3& ob2_ext, const Vector3 ob2_axis[3])
 		{
-			real ra = 0, rb = 0;
+			// TODO: i just use general SAT test,
+			// it needs to be more optimized.
 
-			// transformation matrix which is transforming
-			// the ob2's world-pos into ob1's coordinates frame.
-			Matrix3 R;
-			Matrix3 absR;
+			Vector3 x[3];
+			for (uinteger i = 0; i < 3; i++){
+				x[i] = ob1_axis[i] * ob1_ext.v[i];
+			}
+			std::vector<Vector3> pts1;
+			pts1.push_back(ob1_p + x[0] + x[1] + x[2]);
+			pts1.push_back(ob1_p + x[0] + x[1] - x[2]);
+			pts1.push_back(ob1_p + x[0] - x[1] + x[2]);
+			pts1.push_back(ob1_p + x[0] - x[1] - x[2]);
+			pts1.push_back(ob1_p - x[0] + x[1] + x[2]);
+			pts1.push_back(ob1_p - x[0] + x[1] - x[2]);
+			pts1.push_back(ob1_p - x[0] - x[1] + x[2]);
+			pts1.push_back(ob1_p - x[0] - x[1] - x[2]);
+
+			for (uinteger i = 0; i < 3; i++){
+				x[i] = ob2_axis[i] * ob2_ext.v[i];
+			}
+			std::vector<Vector3> pts2;
+			pts2.push_back(ob2_p + x[0] + x[1] + x[2]);
+			pts2.push_back(ob2_p + x[0] + x[1] - x[2]);
+			pts2.push_back(ob2_p + x[0] - x[1] + x[2]);
+			pts2.push_back(ob2_p + x[0] - x[1] - x[2]);
+			pts2.push_back(ob2_p - x[0] + x[1] + x[2]);
+			pts2.push_back(ob2_p - x[0] + x[1] - x[2]);
+			pts2.push_back(ob2_p - x[0] - x[1] + x[2]);
+			pts2.push_back(ob2_p - x[0] - x[1] - x[2]);
+
+			// axis test
+			for (uinteger i = 0; i < 3; i++){
+				if (!SeparateAxisTest(pts1, pts2, ob1_axis[i]))
+					return false;
+				if (!SeparateAxisTest(pts1, pts2, ob2_axis[i]))
+					return false;
+			}
+
 			for (uinteger i = 0; i < 3; i++){
 				for (uinteger j = 0; j < 3; j++){
-					R.m[i][j] = ob1_axis[i].Dot(ob2_axis[j]);
-					absR.m[i][j] = math::abs(R.m[i][j]) + math::EPSILON;
+					Vector3 ax = ob1_axis[i].Cross(ob2_axis[j]);
+					if (ax == 0)
+						continue;
+
+					if (!SeparateAxisTest(pts1, pts2, ax))
+						return false;
 				}
 			}
-
-			Vector3 t = ob2_p - ob1_p;
-			t = Vector3(t.Dot(ob1_axis[0]), t.Dot(ob1_axis[1]), t.Dot(ob1_axis[2]));
-
-			// test
-			for (uinteger i = 0; i < 3; i++){
-				ra = ob1_ext.v[i];
-				rb = ob2_ext.x * absR.m[i][0] + ob2_ext.y*absR.m[i][1] + ob2_ext.z*absR.m[i][2];
-				if (math::abs(t.v[i]) > ra + rb)
-					return false;
-			}
-
-			for (uinteger i = 0; i < 3; i++){
-				ra = ob1_ext.x*absR.m[0][i] + ob1_ext.y*absR.m[1][i] + ob1_ext.z*absR.m[2][i];
-				rb = ob2_ext.v[i];
-				if (math::abs(t.x*absR.m[0][i] + t.y*absR.m[1][i] + t.z*absR.m[2][i]) > ra + rb)
-					return false;
-			}
-
-			// Test axis L = A0 x B0
-			ra = ob1_ext.y * absR.m[2][0] + ob1_ext.z * absR.m[1][0];
-			rb = ob2_ext.y * absR.m[0][2] + ob2_ext.z * absR.m[0][1];
-			if (math::abs(t.z * R.m[1][0] - t.y * R.m[2][0]) > ra + rb)
-				return false;
-
-			// Test axis L = A0 x B1
-			ra = ob1_ext.y * absR.m[2][1] + ob1_ext.z * absR.m[1][1];
-			rb = ob2_ext.x * absR.m[0][2] + ob2_ext.z * absR.m[0][0];
-			if (math::abs(t.z * R.m[1][1] - t.y * R.m[2][1]) > ra + rb)
-				return false;
-
-			// Test axis L = A0 x B2
-			ra = ob1_ext.y * absR.m[2][2] + ob1_ext.z * absR.m[1][2];
-			rb = ob2_ext.x * absR.m[0][1] + ob2_ext.y * absR.m[0][0];
-			if (math::abs(t.z * R.m[1][2] - t.y * R.m[2][2]) > ra + rb)
-				return false;
-
-			// Test axis L = A1 x B0
-			ra = ob1_ext.x * absR.m[2][0] + ob1_ext.z * absR.m[0][0];
-			rb = ob2_ext.y * absR.m[1][2] + ob2_ext.z * absR.m[1][1];
-			if (math::abs(t.x * R.m[2][0] - t.z * R.m[0][0]) > ra + rb)
-				return false;
-
-			// Test axis L = A1 x B1
-			ra = ob1_ext.x * absR.m[2][1] + ob1_ext.z * absR.m[0][1];
-			rb = ob2_ext.x * absR.m[1][2] + ob2_ext.z * absR.m[1][0];
-			if (math::abs(t.x * R.m[2][1] - t.z * R.m[0][1]) > ra + rb)
-				return false;
-
-			// Test axis L = A1 x B2
-			ra = ob1_ext.x * absR.m[2][2] + ob1_ext.z * absR.m[0][2];
-			rb = ob2_ext.x * absR.m[1][1] + ob2_ext.y * absR.m[1][0];
-			if (math::abs(t.x * R.m[2][2] - t.z * R.m[0][2]) > ra + rb)
-				return false;
-
-			// Test axis L = A2 x B0
-			ra = ob1_ext.x * absR.m[1][0] + ob1_ext.y * absR.m[0][0];
-			rb = ob2_ext.y * absR.m[2][2] + ob2_ext.z * absR.m[2][1];
-			if (math::abs(t.y * R.m[0][0] - t.x * R.m[1][0]) > ra + rb)
-				return false;
-
-			// Test axis L = A2 x B1
-			ra = ob1_ext.x * absR.m[1][1] + ob1_ext.y * absR.m[0][1];
-			rb = ob2_ext.x * absR.m[2][2] + ob2_ext.z * absR.m[2][0];
-			if (math::abs(t.y * R.m[0][1] - t.x * R.m[1][1]) > ra + rb)
-				return false;
-
-			// Test axis L = A2 x B2
-			ra = ob1_ext.x * absR.m[1][2] + ob1_ext.y * absR.m[0][2];
-			rb = ob2_ext.x * absR.m[2][1] + ob2_ext.y * absR.m[2][0];
-			if (math::abs(t.y * R.m[0][2] - t.x * R.m[1][2]) > ra + rb)
-				return false;
-
 			return true;
 		}
 
