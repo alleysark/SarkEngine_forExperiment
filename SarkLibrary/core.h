@@ -141,10 +141,14 @@ namespace sark{
 		using ::round;
 
 
-		// interpolations
+		// linear interpolations
 		inline real lerp(real q0, real q1, real t){
 			return t*(q1 - q0) + q0;
 		}
+
+		// spherical linear interpolation.
+		// use Quaternion::Slerp(...)
+		//inline real slerp(const Quaternion& q0, const Quaternion& q1, real t);
 
 	}
 
@@ -784,6 +788,17 @@ namespace sark{
 		const Quaternion operator*(const Quaternion& q) const;
 		Quaternion& operator*=(const Quaternion& q);
 
+		// quaternion constant multiplication operator
+		const Quaternion operator*(real fConstant) const;
+		Quaternion& operator*=(real fConstant);
+		friend const Quaternion operator*(real fConstant, const Quaternion& q);
+
+		// quaternion constant division operator
+		const Quaternion operator/(real fConstant) const;
+		Quaternion& operator/=(real fConstant);
+
+		// quaternion dot product
+		real Dot(const Quaternion& q) const;
 
 		// get conjugation and conjugate this
 		const Quaternion Conjugation() const;
@@ -823,6 +838,10 @@ namespace sark{
 		// rotate input vector from given each axis rotating factor
 		// (roll: z, pitch: x, yaw: y axis rotating factor)
 		static void Rotate(Vector3& v, real roll, real pitch, real yaw);
+
+		// spherical linear interpolation
+		// q0 and q1 must be unit quaternion, and 0<=t<=1.
+		static const Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, real t);
 	};
 
 }

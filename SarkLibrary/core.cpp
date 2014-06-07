@@ -1413,6 +1413,36 @@ namespace sark{
 		return *this;
 	}
 
+	// quaternion constant multiplication operator
+	const Quaternion Quaternion::operator*(real fConstant) const{
+		return Quaternion(x * fConstant, y * fConstant, z * fConstant, s * fConstant);
+	}
+
+	Quaternion& Quaternion::operator*=(real fConstant){
+		x *= fConstant; y *= fConstant; z *= fConstant; s *= fConstant;
+		return *this;
+	}
+
+	// quaternion constant muliplication friend operator
+	const Quaternion operator*(real fConstant, const Quaternion& q){
+		return Quaternion(q.x*fConstant, q.y*fConstant, q.z*fConstant, q.s*fConstant);
+	}
+
+	// quaternion constant division operator
+	const Quaternion Quaternion::operator/(real fConstant) const{
+		return Quaternion(x / fConstant, y / fConstant, z / fConstant, s / fConstant);
+	}
+
+	Quaternion& Quaternion::operator/=(real fConstant){
+		x /= fConstant; y /= fConstant; z /= fConstant; s /= fConstant;
+		return *this;
+	}
+
+	// quaternion dot product
+	real Quaternion::Dot(const Quaternion& q) const{
+		return x*q.x + y*q.y + z*q.z + s*q.s;
+	}
+
 	// get conjugation
 	const Quaternion Quaternion::Conjugation() const{
 		return Quaternion(-x, -y, -z, s);
@@ -1587,6 +1617,15 @@ namespace sark{
 
 		P = (q * P) * q.Conjugation();
 		v.Set(P.x, P.y, P.z);
+	}
+
+	// spherical linear interpolation
+	// q0 and q1 must be unit quaternion, and 0<=t<=1.
+	const Quaternion Quaternion::Slerp(const Quaternion& q0, const Quaternion& q1, real t){
+		// the angle ¥Õ of q0 and q1, ¥Õ = acos(q0¡¤q1)
+		real phi = math::acos(q0.Dot(q1));
+		real sin_phi = math::sin(phi);
+		return (math::sin(phi*(1.f - t)) / sin_phi)*q0 + (math::sin(phi*t) / sin_phi)*q1;
 	}
 
 }
