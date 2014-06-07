@@ -537,7 +537,7 @@ namespace sark{
 			};
 		};
 
-		Matrix3(bool identity = false);
+		Matrix3(real diagonal = 0.f);
 		Matrix3(real _00, real _01, real _02,
 			real _10, real _11, real _12,
 			real _20, real _21, real _22);
@@ -635,7 +635,7 @@ namespace sark{
 			};
 		};
 
-		Matrix4(bool identity = false);
+		Matrix4(real diagonal = 0.f);
 		Matrix4(real _00, real _01, real _02, real _03,
 			real _10, real _11, real _12, real _13,
 			real _20, real _21, real _22, real _23,
