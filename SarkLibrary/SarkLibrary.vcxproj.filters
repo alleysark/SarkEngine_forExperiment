@@ -138,6 +138,9 @@
     <ClCompile Include="AABoxCollider.cpp">
       <Filter>Header Files\core-system\physics\collider</Filter>
     </ClCompile>
+    <ClCompile Include="AModel.cpp">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -241,6 +244,9 @@
     </ClInclude>
     <ClInclude Include="AABoxCollider.h">
       <Filter>Header Files\core-system\physics\collider</Filter>
+    </ClInclude>
+    <ClInclude Include="AModel.h">
+      <Filter>Header Files\core-system\rendering</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

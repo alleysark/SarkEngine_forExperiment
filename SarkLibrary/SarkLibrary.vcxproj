@@ -80,6 +80,7 @@
   <ItemGroup>
     <ClCompile Include="AABoxCollider.cpp" />
     <ClCompile Include="ACollider.cpp" />
+    <ClCompile Include="AModel.cpp" />
     <ClCompile Include="ArrayBuffer.cpp" />
     <ClCompile Include="ASceneComponent.cpp" />
     <ClCompile Include="BMPResource.cpp" />
@@ -116,6 +117,7 @@
   <ItemGroup>
     <ClInclude Include="AABoxCollider.h" />
     <ClInclude Include="ALight.h" />
+    <ClInclude Include="AModel.h" />
     <ClInclude Include="ArrayBuffer.h" />
     <ClInclude Include="ASceneComponent.h" />
     <ClInclude Include="BMPResource.h" />
