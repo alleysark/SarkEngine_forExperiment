@@ -141,6 +141,9 @@
     <ClCompile Include="AModel.cpp">
       <Filter>Header Files\core-system\rendering</Filter>
     </ClCompile>
+    <ClCompile Include="StaticModel.cpp">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -246,6 +249,9 @@
       <Filter>Header Files\core-system\physics\collider</Filter>
     </ClInclude>
     <ClInclude Include="AModel.h">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticModel.h">
       <Filter>Header Files\core-system\rendering</Filter>
     </ClInclude>
   </ItemGroup>

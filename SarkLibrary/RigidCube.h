@@ -1,26 +1,13 @@
 #ifndef __RIGID_CUBE_H__
 #define __RIGID_CUBE_H__
 
-#include "ASceneComponent.h"
+#include "StaticModel.h"
 
 namespace sark{
 
-	class Mesh;
-	class RigidBody;
-	class ACollider;
-
 	// simple rigid cube scene component.
-	class RigidCube : public ASceneComponent{
+	class RigidCube : public StaticModel{
 	private:
-		// mesh object
-		Mesh* mMesh;
-
-		// rigid body object
-		RigidBody* mRigidBody;
-
-		// collider
-		ACollider* mCollider;
-
 		// basic properties of cube
 		real mWidth, mHeight, mDepth;
 
@@ -46,22 +33,6 @@ namespace sark{
 		const real& GetHeight() const;
 		// get depth of cube.
 		const real& GetDepth() const;
-
-		// get collider.
-		const ACollider* GetCollider() const override;
-		
-		// set new collider. or set NULL.
-		// you may pass new collider through memory allocation.
-		// *note: do not pass the address of plane variable.
-		void SetCollider(ACollider* newColl);
-
-		Mesh* GetMesh() override;
-
-		RigidBody* GetRigidBody() override;
-
-		void Update() override;
-
-		void Render() override;
 
 	private:
 		void CreateCube();

@@ -11,7 +11,6 @@ namespace sark{
 		real height = mHeight / 2.f;
 		real depth = mDepth / 2.f;
 
-		mMesh = new Mesh();
 		ArrayBuffer& arrBuf = mMesh->GetArrayBuffer();
 		arrBuf.GenAttributeBuffer<Position3>(
 			AttributeSemantic::POSITION, {
@@ -80,9 +79,8 @@ namespace sark{
 		real invMass,
 		const Vector3& velocity, const Vector3& angularVelocity,
 		bool gravityOn)
-		: ASceneComponent("", NULL, true),
-		mWidth(width), mHeight(height), mDepth(depth),
-		mRigidBody(NULL), mCollider(NULL)
+		: StaticModel("", NULL, true),
+		mWidth(width), mHeight(height), mDepth(depth)
 	{
 		const real wsq = math::sqre(width);
 		const real hsq = math::sqre(height);
@@ -102,9 +100,8 @@ namespace sark{
 		real invMass,
 		const Vector3& velocity, const Vector3& angularVelocity,
 		bool gravityOn)
-		: ASceneComponent(name, parent, activate),
-		mWidth(width), mHeight(height), mDepth(depth),
-		mRigidBody(NULL), mCollider(NULL)
+		: StaticModel(name, parent, activate),
+		mWidth(width), mHeight(height), mDepth(depth)
 	{
 		const real wsq = math::sqre(width);
 		const real hsq = math::sqre(height);
@@ -138,34 +135,6 @@ namespace sark{
 	// get depth of cube.
 	const real& RigidCube::GetDepth() const{
 		return mDepth;
-	}
-
-	const ACollider* RigidCube::GetCollider() const{
-		return mCollider;
-	}
-
-	void RigidCube::SetCollider(ACollider* newColl){
-		if (mCollider != NULL)
-			delete mCollider;
-		mCollider = newColl;
-	}
-
-	Mesh* RigidCube::GetMesh(){
-		return mMesh;
-	}
-
-	RigidBody* RigidCube::GetRigidBody(){
-		return mRigidBody;
-	}
-
-	void RigidCube::Update(){
-		if (mCollider != NULL)
-			mCollider->Update();
-		mRigidBody->Update();
-	}
-
-	void RigidCube::Render(){
-		mMesh->Draw();
 	}
 
 }

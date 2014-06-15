@@ -46,7 +46,6 @@ namespace sark{
 			}
 		}
 
-		mMesh = new Mesh();
 		ArrayBuffer& arrBuf = mMesh->GetArrayBuffer();
 		
 		arrBuf.GenAttributeBuffer<Position3>(
@@ -67,9 +66,8 @@ namespace sark{
 		real invMass,
 		const Vector3& velocity, const Vector3& angularVelocity,
 		bool gravityOn)
-		: ASceneComponent("", NULL, true),
-		mRadius(radius), mSlice(slice), mStack(stack),
-		mRigidBody(NULL), mCollider(NULL)
+		: StaticModel("", NULL, true),
+		mRadius(radius), mSlice(slice), mStack(stack)
 	{
 		// compute invI0
 		const real e = invMass * 5.f / 2.f*math::sqre(radius);
@@ -87,9 +85,8 @@ namespace sark{
 		real invMass,
 		const Vector3& velocity, const Vector3& angularVelocity,
 		bool gravityOn)
-		: ASceneComponent(name, parent, activate),
-		mRadius(radius), mSlice(slice), mStack(stack),
-		mRigidBody(NULL), mCollider(NULL)
+		: StaticModel(name, parent, activate),
+		mRadius(radius), mSlice(slice), mStack(stack)
 	{
 		// compute invI0
 		const real e = invMass * 5.f / 2.f*math::sqre(radius);
@@ -115,32 +112,14 @@ namespace sark{
 		return mRadius;
 	}
 
-	const ACollider* RigidSphere::GetCollider() const{
-		return mCollider;
+	// get slice count.
+	const uinteger& RigidSphere::GetSliceCount() const{
+		return mSlice;
 	}
 
-	void RigidSphere::SetCollider(ACollider* newColl){
-		if (mCollider != NULL)
-			delete mCollider;
-		mCollider = newColl;
-	}
-
-	Mesh* RigidSphere::GetMesh(){
-		return mMesh;
-	}
-
-	RigidBody* RigidSphere::GetRigidBody(){
-		return mRigidBody;
-	}
-
-	void RigidSphere::Update(){
-		if (mCollider != NULL)
-			mCollider->Update();
-		mRigidBody->Update();
-	}
-
-	void RigidSphere::Render(){
-		mMesh->Draw();
+	// get stack count.
+	const uinteger& RigidSphere::GetStackCount() const{
+		return mStack;
 	}
 
 }

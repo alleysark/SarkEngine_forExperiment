@@ -108,6 +108,7 @@
     <ClCompile Include="ShaderChef.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="SphereCollider.cpp" />
+    <ClCompile Include="StaticModel.cpp" />
     <ClCompile Include="test_main.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -146,6 +147,7 @@
     <ClInclude Include="ShaderChef.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="SphereCollider.h" />
+    <ClInclude Include="StaticModel.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="tools.h" />

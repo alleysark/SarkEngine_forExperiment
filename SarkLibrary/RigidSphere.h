@@ -1,7 +1,7 @@
 #ifndef __RIGID_SPHERE_H__
 #define __RIGID_SPHERE_H__
 
-#include "ASceneComponent.h"
+#include "StaticModel.h"
 
 namespace sark{
 
@@ -10,17 +10,8 @@ namespace sark{
 	class ACollider;
 
 	// simple rigid sphere scene component.
-	class RigidSphere : public ASceneComponent{
+	class RigidSphere : public StaticModel{
 	private:
-		// mesh object
-		Mesh* mMesh;
-
-		// rigid body object
-		RigidBody* mRigidBody;
-
-		// collider
-		ACollider* mCollider;
-
 		// radius
 		real mRadius;
 		uinteger mSlice, mStack;
@@ -46,20 +37,11 @@ namespace sark{
 		// get radius of sphere.
 		const real& GetRadius() const;
 
-		const ACollider* GetCollider() const override;
-		
-		// set new collider. or set NULL.
-		// you may pass new collider through memory allocation.
-		// *note: do not pass the address of plane variable.
-		void SetCollider(ACollider* newColl);
+		// get slice count.
+		const uinteger& GetSliceCount() const;
 
-		Mesh* GetMesh() override;
-
-		RigidBody* GetRigidBody() override;
-
-		void Update() override;
-
-		void Render() override;
+		// get stack count.
+		const uinteger& GetStackCount() const;
 
 	private:
 		void CreateSphere();
