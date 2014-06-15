@@ -53,7 +53,7 @@ namespace sark{
 		// set new collider. or set NULL.
 		// you may pass new collider through memory allocation.
 		// *note: do not pass the address of plane variable.
-		void SetCollider(ACollider* newColl) override;
+		void SetCollider(ACollider* newColl);
 
 		Mesh* GetMesh() override;
 

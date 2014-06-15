@@ -28,11 +28,6 @@ namespace sark{
 		// directional light doesn't have collider.
 		// so it simply returns NULL.
 		const ACollider* GetCollider() const override;
-		
-		// set new collider. or set NULL.
-		// you may pass new collider through memory allocation.
-		// *note: do not pass the address of plane variable.
-		void SetCollider(ACollider* newColl) override;
 
 		Mesh* GetMesh() override;
 

@@ -25,13 +25,6 @@ namespace sark{
 		return NULL;
 	}
 
-	void DirectionalLight::SetCollider(ACollider* newColl){
-		if (newColl != NULL){
-			LogWarn("directional light can't have collider");
-			delete newColl;
-		}
-	}
-
 	Mesh* DirectionalLight::GetMesh(){
 		return NULL;
 	}

@@ -117,11 +117,6 @@ namespace sark{
 		// get collider. it is Nullable pointer.
 		virtual const ACollider* GetCollider() const = 0;
 		
-		// set new collider. or set NULL.
-		// you may pass new collider through memory allocation.
-		// *note: do not pass the address of plane variable.
-		virtual void SetCollider(ACollider* newColl) = 0;
-
 		// get mesh object of scene component.
 		// it can be NULL for the shapeless component like light.
 		virtual Mesh* GetMesh() = 0;
