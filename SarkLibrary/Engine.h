@@ -114,7 +114,7 @@ namespace sark{
 
 		void SetClearColor(const ColorRGBA& color);
 
-		void ResizeWindow(uinteger width, uinteger height, bool callOnInside = false);
+		void ResizeWindow(uinteger width, uinteger height);
 
 	public:
 		static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);

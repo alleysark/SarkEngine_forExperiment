@@ -196,12 +196,8 @@ namespace sark{
 		glClearColor(mClearColor.r, mClearColor.g, mClearColor.b, mClearColor.a);
 	}
 
-	void Engine::ResizeWindow(uinteger width, uinteger height, bool callOnInside){
-		mnWndWidth = width;
-		mnWndHeight = height;
-		mCurrentScene->OnScreenChanged(width, height);
-		if (!callOnInside)
-			SetWindowPos(mhWnd, NULL, 0, 0, width, height, SWP_NOMOVE | SWP_NOZORDER);
+	void Engine::ResizeWindow(uinteger width, uinteger height){
+		SetWindowPos(mhWnd, NULL, 0, 0, width, height, SWP_NOMOVE | SWP_NOZORDER);
 	}
 
 
@@ -251,7 +247,10 @@ namespace sark{
 			break;
 
 		case WM_SIZE:
-			Engine::instance->ResizeWindow(LOWORD(lParam), HIWORD(lParam), true);
+			Engine::instance->mnWndWidth = LOWORD(lParam);
+			Engine::instance->mnWndHeight = HIWORD(lParam);
+			Engine::instance->mCurrentScene->OnScreenChanged(
+				Engine::instance->mnWndWidth, Engine::instance->mnWndHeight);
 			break;
 		};
 		return DefWindowProc(hWnd, iMessage, wParam, lParam);
