@@ -54,6 +54,7 @@ namespace sark{
 	// whole shaders are compiled as 'version'. shader objects are attached
 	// and are linked into program. it'll return NULL if it failed.
 	ShaderProgram* ShaderChef::MakeProgram(CompileVersion version,
+		const std::vector<AttributePair>& bindingAttrs,
 		const std::vector<const char*>& vertexSourceNames,
 		const std::vector<const char*>& fragmentSourceNames)
 	{
@@ -87,8 +88,12 @@ namespace sark{
 		glAttachShader(progObj, fragObj);
 
 		// bind pre-defined attribute semantics
-		for (int attrLoca = 0; attrLoca < AttributeSemantic::COUNT; attrLoca++){
-			glBindAttribLocation(progObj, attrLoca, AttributeSemanticNames[attrLoca]);
+		// and copy the sementic list.
+		uinteger bndAttrSz = bindingAttrs.size();
+		ShaderProgram::AttributeList attrs(bndAttrSz);
+		for (uinteger i = 0; i < bndAttrSz; i++){
+			glBindAttribLocation(progObj, bindingAttrs[i].semantic, bindingAttrs[i].name);
+			attrs.push_back(bindingAttrs[i].semantic);
 		}
 
 		// link program and check link error
@@ -105,7 +110,7 @@ namespace sark{
 		glDeleteShader(vtxObj);
 		glDeleteShader(fragObj);
 
-		ShaderProgram* shaderProg = new ShaderProgram(progObj);
+		ShaderProgram* shaderProg = new ShaderProgram(progObj, attrs);
 		return shaderProg;
 		#undef CLEAR_OBJS
 	}
@@ -114,6 +119,7 @@ namespace sark{
 	// whole shaders are compiled as 'version'. shader objects are attached
 	// and are linked into program. it'll return NULL if it failed.
 	ShaderProgram* ShaderChef::MakeProgram(CompileVersion version,
+		const std::vector<AttributePair>& bindingAttrs,
 		const std::vector<const char*>& vertexSourceNames,
 		const std::vector<const char*>& geometrySourceNames,
 		const std::vector<const char*>& fragmentSourceNames)
@@ -156,8 +162,12 @@ namespace sark{
 		glAttachShader(progObj, fragObj);
 
 		// bind pre-defined attribute semantics
-		for (int attrLoca = 0; attrLoca < AttributeSemantic::COUNT; attrLoca++){
-			glBindAttribLocation(progObj, attrLoca, AttributeSemanticNames[attrLoca]);
+		// and copy the sementic list.
+		uinteger bndAttrSz = bindingAttrs.size();
+		ShaderProgram::AttributeList attrs(bndAttrSz);
+		for (uinteger i = 0; i < bndAttrSz; i++){
+			glBindAttribLocation(progObj, bindingAttrs[i].semantic, bindingAttrs[i].name);
+			attrs.push_back(bindingAttrs[i].semantic);
 		}
 
 		// link program and check link error
@@ -176,7 +186,7 @@ namespace sark{
 		glDeleteShader(geoObj);
 		glDeleteShader(fragObj);
 
-		ShaderProgram* shaderProg = new ShaderProgram(progObj);
+		ShaderProgram* shaderProg = new ShaderProgram(progObj, attrs);
 		return shaderProg;
 		#undef CLEAR_OBJS
 	}

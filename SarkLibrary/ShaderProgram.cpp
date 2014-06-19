@@ -7,8 +7,8 @@ namespace sark{
 
 	// shader program is created from ShaderDictionary
 	// with full liked shaders.
-	ShaderProgram::ShaderProgram(ObjectHandle hProgram)
-		: mhProgram(hProgram)
+	ShaderProgram::ShaderProgram(ObjectHandle hProgram, const AttributeList& bindedAttrs)
+		: mhProgram(hProgram), mBindedAttrs(bindedAttrs)
 	{}
 
 	ShaderProgram::~ShaderProgram(){
@@ -28,6 +28,10 @@ namespace sark{
 		glUseProgram(0);
 	}
 
+	// get binded attributes into this shader.
+	const ShaderProgram::AttributeList& ShaderProgram::GetBindedAttributes() const{
+		return mBindedAttrs;
+	}
 
 	// get uniform location by variable name
 	ShaderProgram::Location ShaderProgram::GetUniformLocation(const std::string& name){

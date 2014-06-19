@@ -8,10 +8,9 @@
 #include <GL/glew.h>
 
 #include "core.h"
+#include "ShaderProgram.h"
 
 namespace sark{
-
-	class ShaderProgram;
 
 
 	// shader chef class (similar to factory).
@@ -32,6 +31,11 @@ namespace sark{
 		};
 
 		typedef std::hash_map<const std::string, std::string> IngredientDict;
+
+		struct AttributePair{
+			AttributeSemantic semantic; // location
+			const char* name;
+		};
 
 	private:
 		// cooking ingredients; shader source string
@@ -61,6 +65,7 @@ namespace sark{
 		// whole shaders are compiled as 'version'. shader objects are attached
 		// and are linked into program. it'll return NULL if it failed.
 		ShaderProgram* MakeProgram(CompileVersion version,
+			const std::vector<AttributePair>& bindingAttrs,
 			const std::vector<const char*>& vertexSourceNames,
 			const std::vector<const char*>& fragmentSourceNames);
 		
@@ -68,6 +73,7 @@ namespace sark{
 		// whole shaders are compiled as 'version'. shader objects are attached
 		// and are linked into program. it'll return NULL if it failed.
 		ShaderProgram* MakeProgram(CompileVersion version,
+			const std::vector<AttributePair>& bindingAttrs,
 			const std::vector<const char*>& vertexSourceNames,
 			const std::vector<const char*>& geometrySourceNames,
 			const std::vector<const char*>& fragmentSourceNames);

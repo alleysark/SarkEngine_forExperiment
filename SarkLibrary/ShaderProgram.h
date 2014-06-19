@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 #include <GL/glew.h>
 #include "core.h"
 
@@ -22,6 +23,10 @@ namespace sark{
 			TEXCOORD1,
 			TEXCOORD2,
 			TEXCOORD3,
+			TEXCOORD4,
+			TEXCOORD5,
+			TEXCOORD6,
+			TEXCOORD7,
 			INDICES,
 
 			//for counting semantic.
@@ -30,7 +35,7 @@ namespace sark{
 	};
 	typedef _AttributeSemantic_wrapper::AttributeSemantic AttributeSemantic;
 	
-	// attribute semantic names.
+	// recommended attribute semantic names.
 	static const char* AttributeSemanticNames[AttributeSemantic::COUNT] = {
 		"position",
 		"normal",
@@ -39,6 +44,10 @@ namespace sark{
 		"texcoord1",
 		"texcoord2",
 		"texcoord3",
+		"texcoord4",
+		"texcoord5",
+		"texcoord6",
+		"texcoord7",
 		"indices"
 	};
 
@@ -49,6 +58,7 @@ namespace sark{
 	public:	
 		typedef GLint Location;
 		typedef std::map<const std::string, Location> LocationDictionary;
+		typedef std::vector<AttributeSemantic> AttributeList;
 
 	private:
 		// program handler
@@ -57,10 +67,13 @@ namespace sark{
 		// locations of uniform/attribute variable are cached in this container
 		LocationDictionary mLocationDict;
 
+		// binded attributes
+		AttributeList mBindedAttrs;
+
 	public:
 		// shader program is created from ShaderDictionary
-		// with full liked shaders.
-		ShaderProgram(ObjectHandle hProgram);
+		// with full liked shaders and binded attributes.
+		ShaderProgram(ObjectHandle hProgram, const AttributeList& bindedAttrs);
 
 		~ShaderProgram();
 
@@ -70,6 +83,9 @@ namespace sark{
 		// after using shader program, user should've Unuse()
 		// to disable this shader program.
 		void Unuse() const;
+
+		// get binded attributes into this shader.
+		const AttributeList& GetBindedAttributes() const;
 
 	private:
 		// get uniform location by variable name
