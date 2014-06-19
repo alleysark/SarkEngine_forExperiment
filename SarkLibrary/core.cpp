@@ -1624,6 +1624,9 @@ namespace sark{
 	const Quaternion Quaternion::Slerp(const Quaternion& q0, const Quaternion& q1, real t){
 		// the angle ¥Õ of q0 and q1, ¥Õ = acos(q0¡¤q1)
 		real phi = math::acos(q0.Dot(q1));
+		if (math::real_equal(phi, 0.f))
+			return q0;
+
 		real sin_phi = math::sin(phi);
 		return (math::sin(phi*(1.f - t)) / sin_phi)*q0 + (math::sin(phi*t) / sin_phi)*q1;
 	}
