@@ -50,184 +50,134 @@ namespace sark{
 		return true;
 	}
 
-	// cook a shader program from registered shader source ingredients.
+	// cook a shader program from given recipe.
 	// whole shaders are compiled as 'version'. shader objects are attached
 	// and are linked into program. it'll return NULL if it failed.
-	ShaderProgram* ShaderChef::MakeProgram(CompileVersion version,
-		const std::vector<AttributePair>& bindingAttrs,
-		const std::vector<const char*>& vertexSourceNames,
-		const std::vector<const char*>& fragmentSourceNames)
-	{
-		#define CLEAR_OBJS(pobj, vobj, fobj) do{\
-				if (pobj != 0) glDeleteProgram(pobj); \
-				if (vobj != 0) glDeleteShader(vobj); \
-				if (fobj != 0) glDeleteShader(fobj); \
+	ShaderProgram* ShaderChef::CookShaderProgram(const Recipe& recipe){
+		ObjectHandle progObj = 0,
+			vtxObj = 0, tcsObj = 0, tesObj = 0, geoObj = 0, fragObj = 0;
+
+		#define CLEAR_SHOBJS() do{\
+				if (vtxObj != 0) glDeleteShader(vtxObj); \
+				if (tcsObj != 0) glDeleteShader(tcsObj); \
+				if (tesObj != 0) glDeleteShader(tesObj); \
+				if (geoObj != 0) glDeleteShader(geoObj); \
+				if (fragObj != 0) glDeleteShader(fragObj); \
 			}while (0)
 
 		// create program object
-		ObjectHandle progObj = glCreateProgram();
+		progObj = glCreateProgram();
 		if (progObj == 0)
 			return NULL;
 
 		// create vertex shader object
-		ObjectHandle vtxObj = CreateShader(GL_VERTEX_SHADER, version, vertexSourceNames);
-		if (vtxObj == 0){
-			CLEAR_OBJS(progObj, vtxObj, 0);
+		if (recipe.vertexShader.empty()) {
+			LogWarn("vertex shader is essential ingredient");
+			glDeleteProgram(progObj);
+			CLEAR_SHOBJS();
 			return NULL;
+		}
+
+		vtxObj = CreateShader(GL_VERTEX_SHADER, recipe.vertexShader);
+		if (vtxObj == 0){
+			LogWarn("failed to create vertex shader");
+			glDeleteProgram(progObj);
+			CLEAR_SHOBJS();
+			return NULL;
+		}
+
+		// create tessellation control shader
+		if (!recipe.tessControlShader.empty()) {
+			tcsObj = CreateShader(GL_TESS_CONTROL_SHADER, recipe.tessControlShader);
+			if (tcsObj == 0) {
+				LogWarn("failed to create tessellation control shader");
+				glDeleteProgram(progObj);
+				CLEAR_SHOBJS();
+				return NULL;
+			}
+		}
+
+		// create tessellation evaluation shader
+		if (!recipe.tessEvaluationShader.empty()) {
+			tesObj = CreateShader(GL_TESS_EVALUATION_SHADER, recipe.tessEvaluationShader);
+			if (tesObj == 0) {
+				LogWarn("failed to create tessellation evaluation shader");
+				glDeleteProgram(progObj);
+				CLEAR_SHOBJS();
+				return NULL;
+			}
+		}
+
+		// create geometry shader
+		if (!recipe.geometryShader.empty()) {
+			geoObj = CreateShader(GL_GEOMETRY_SHADER, recipe.geometryShader);
+			if (geoObj == 0) {
+				LogWarn("failed to create geometry shader");
+				glDeleteProgram(progObj);
+				CLEAR_SHOBJS();
+				return NULL;
+			}
 		}
 
 		// create fragment shader object
-		ObjectHandle fragObj = CreateShader(GL_FRAGMENT_SHADER, version, fragmentSourceNames);
+		fragObj = CreateShader(GL_FRAGMENT_SHADER, recipe.fragmentShader);
 		if (fragObj == 0){
-			CLEAR_OBJS(progObj, vtxObj, fragObj);
+			LogWarn("failed to create fragment shader");
+			glDeleteProgram(progObj);
+			CLEAR_SHOBJS();
 			return NULL;
 		}
 
-		// attach shader object
+		// attach shader objects
 		glAttachShader(progObj, vtxObj);
+		if (tcsObj != 0) glAttachShader(progObj, tcsObj);
+		if (tesObj != 0) glAttachShader(progObj, tesObj);
+		if (geoObj != 0) glAttachShader(progObj, geoObj);
 		glAttachShader(progObj, fragObj);
 
 		// bind pre-defined attribute semantics
 		// and copy the sementic list.
-		uinteger bndAttrSz = bindingAttrs.size();
-		ShaderProgram::AttributeList attrs(bndAttrSz);
-		for (uinteger i = 0; i < bndAttrSz; i++){
-			glBindAttribLocation(progObj, bindingAttrs[i].semantic, bindingAttrs[i].name);
-			attrs.push_back(bindingAttrs[i].semantic);
+		uinteger attribSz = recipe.attributes.size();
+		ShaderProgram::AttributeList attrs(attribSz);
+		for (uinteger i = 0; i < attribSz; i++){
+			glBindAttribLocation(progObj, recipe.attributes[i].semantic, recipe.attributes[i].name);
+			attrs.push_back(recipe.attributes[i].semantic);
 		}
 
 		// link program and check link error
 		glLinkProgram(progObj);
 		if (!CheckProgram(progObj)){
-			CLEAR_OBJS(progObj, vtxObj, fragObj);
+			glDeleteProgram(progObj);
+			CLEAR_SHOBJS(progObj, vtxObj, fragObj);
 			return NULL;
 		}
 
-		// detach and delete shader objects
-		// to clarify shader object deletion.
+		// detach used shader objects
 		glDetachShader(progObj, vtxObj);
+		if (tcsObj != 0) glDetachShader(progObj, tcsObj);
+		if (tesObj != 0) glDetachShader(progObj, tesObj);
+		if (geoObj != 0) glDetachShader(progObj, geoObj);
 		glDetachShader(progObj, fragObj);
-		glDeleteShader(vtxObj);
-		glDeleteShader(fragObj);
+
+		// clear all shader objects
+		CLEAR_SHOBJS();
 
 		ShaderProgram* shaderProg = new ShaderProgram(progObj, attrs);
+
 		return shaderProg;
-		#undef CLEAR_OBJS
-	}
-
-	// cook a shader program from registered shader source ingredients.
-	// whole shaders are compiled as 'version'. shader objects are attached
-	// and are linked into program. it'll return NULL if it failed.
-	ShaderProgram* ShaderChef::MakeProgram(CompileVersion version,
-		const std::vector<AttributePair>& bindingAttrs,
-		const std::vector<const char*>& vertexSourceNames,
-		const std::vector<const char*>& geometrySourceNames,
-		const std::vector<const char*>& fragmentSourceNames)
-	{
-		#define CLEAR_OBJS(pobj, vobj, gobj, fobj) do{\
-				if (pobj != 0) glDeleteProgram(pobj); \
-				if (vobj != 0) glDeleteShader(vobj); \
-				if (gobj != 0) glDeleteShader(gobj); \
-				if (fobj != 0) glDeleteShader(fobj); \
-			}while (0)
-
-		// create program object
-		ObjectHandle progObj = glCreateProgram();
-		if (progObj == 0)
-			return NULL;
-
-		// create vertex shader object
-		ObjectHandle vtxObj = CreateShader(GL_VERTEX_SHADER, version, vertexSourceNames);
-		if (vtxObj == 0){
-			CLEAR_OBJS(progObj, vtxObj, 0, 0);
-			return NULL;
-		}
-
-		// create geometry shader object
-		ObjectHandle geoObj = CreateShader(GL_GEOMETRY_SHADER, version, geometrySourceNames);
-		if (geoObj != 0){
-			CLEAR_OBJS(progObj, vtxObj, geoObj, 0);
-		}
-
-		// create fragment shader object
-		ObjectHandle fragObj = CreateShader(GL_FRAGMENT_SHADER, version, fragmentSourceNames);
-		if (fragObj == 0){
-			CLEAR_OBJS(progObj, vtxObj, geoObj, fragObj);
-			return NULL;
-		}
-
-		// attach shader object
-		glAttachShader(progObj, vtxObj);
-		glAttachShader(progObj, geoObj);
-		glAttachShader(progObj, fragObj);
-
-		// bind pre-defined attribute semantics
-		// and copy the sementic list.
-		uinteger bndAttrSz = bindingAttrs.size();
-		ShaderProgram::AttributeList attrs(bndAttrSz);
-		for (uinteger i = 0; i < bndAttrSz; i++){
-			glBindAttribLocation(progObj, bindingAttrs[i].semantic, bindingAttrs[i].name);
-			attrs.push_back(bindingAttrs[i].semantic);
-		}
-
-		// link program and check link error
-		glLinkProgram(progObj);
-		if (!CheckProgram(progObj)){
-			CLEAR_OBJS(progObj, vtxObj, geoObj, fragObj);
-			return NULL;
-		}
-
-		// detach and delete shader objects
-		// to clarify shader object deletion.
-		glDetachShader(progObj, vtxObj);
-		glDetachShader(progObj, geoObj);
-		glDetachShader(progObj, fragObj);
-		glDeleteShader(vtxObj);
-		glDeleteShader(geoObj);
-		glDeleteShader(fragObj);
-
-		ShaderProgram* shaderProg = new ShaderProgram(progObj, attrs);
-		return shaderProg;
-		#undef CLEAR_OBJS
-	}
-
-	// clear all registered shader sources.
-	void ShaderChef::Clear(){
-		mIngredients.clear();
+		#undef CLEAR_SHOBJS
 	}
 
 	// create shader object
-	ObjectHandle ShaderChef::CreateShader(GLenum shaderType,
-		const CompileVersion& version, const std::vector<const char*>& sourceNames)
-	{
+	ObjectHandle ShaderChef::CreateShader(GLenum shaderType, const std::string& source) {
 		// create shader object
 		ObjectHandle shObj = glCreateShader(shaderType);
 		if (shObj == 0)
 			return 0;
 
-		std::vector<const char*>::const_iterator itr;
-		std::vector<const char*>::const_iterator end;
-		IngredientDict::const_iterator findItr;
-		
-		// construct source chunk
-		uinteger count = sourceNames.size() + 1;
-		const char** sources = new const char*[count];
-		sources[0] = GetVersionString(version);
-		itr = sourceNames.begin();
-		end = sourceNames.end();
-		for (uinteger i = 1; itr != end; itr++, i++){
-			findItr = mIngredients.find((*itr));
-			if (findItr == mIngredients.cend()){
-				delete[] sources;
-				glDeleteShader(shObj);
-				return 0;
-			}
-			sources[i] = findItr->second.c_str();
-		}
-
 		// set shader source
-		glShaderSource(shObj, count, sources, NULL);
-		delete[] sources;
+		const char* raw_str = source.c_str();
+		glShaderSource(shObj, 1, &raw_str, NULL);
 
 		// compile shader object
 		glCompileShader(shObj);
@@ -239,24 +189,6 @@ namespace sark{
 		}
 
 		return shObj;
-	}
-
-	// get version string
-	const char* ShaderChef::GetVersionString(const CompileVersion& version){
-		switch (version){
-		case VERSION_330:
-		default:
-			return "#version 330\r\n";
-
-		case VERSION_400:
-			return "#version 400\r\n";
-		case VERSION_410:
-			return "#version 410\r\n";
-		case VERSION_420:
-			return "#version 420\r\n";
-		case VERSION_430:
-			return "#version 430\r\n";
-		}
 	}
 
 	// check shader after compilation. it'll log the info if there are compilation errors.
@@ -272,7 +204,6 @@ namespace sark{
 				glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);
 				LogError(infoLog);
 				delete[] infoLog;
-				
 			}
 			return false;
 		}

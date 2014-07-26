@@ -19,23 +19,31 @@ namespace sark{
 	//
 	// *note: it's better to clear whole registered sources when
 	// there is no more requirement of making shader program.
-	class ShaderChef{
+	class ShaderChef {
 	public:
-		enum CompileVersion{
-			VERSION_330,
-			VERSION_400,
-			VERSION_410,
-			VERSION_420,
-			VERSION_430,
-			VERSION_440
-		};
-
 		typedef std::hash_map<const std::string, std::string> IngredientDict;
 
-		struct AttributePair{
+		struct AttributePair {
 			AttributeSemantic semantic; // location
 			const char* name;
 		};
+
+
+		// recipe for shader cooking
+		struct Recipe {
+			std::vector<AttributePair> attributes;
+
+			std::string vertexShader;
+
+			std::string tessControlShader;
+
+			std::string tessEvaluationShader;
+
+			std::string geometryShader;
+
+			std::string fragmentShader;
+		};
+
 
 	private:
 		// cooking ingredients; shader source string
@@ -61,33 +69,14 @@ namespace sark{
 		// it does not compile source.
 		bool RegisterShaderSourceFromFile(const std::string& name, const std::string& filename);
 
-		// cook a shader program from registered shader source ingredients.
+		// cook a shader program from given recipe.
 		// whole shaders are compiled as 'version'. shader objects are attached
 		// and are linked into program. it'll return NULL if it failed.
-		ShaderProgram* MakeProgram(CompileVersion version,
-			const std::vector<AttributePair>& bindingAttrs,
-			const std::vector<const char*>& vertexSourceNames,
-			const std::vector<const char*>& fragmentSourceNames);
-		
-		// cook a shader program from registered shader source ingredients.
-		// whole shaders are compiled as 'version'. shader objects are attached
-		// and are linked into program. it'll return NULL if it failed.
-		ShaderProgram* MakeProgram(CompileVersion version,
-			const std::vector<AttributePair>& bindingAttrs,
-			const std::vector<const char*>& vertexSourceNames,
-			const std::vector<const char*>& geometrySourceNames,
-			const std::vector<const char*>& fragmentSourceNames);
-
-		// clear all registered shader sources.
-		void Clear();
+		ShaderProgram* CookShaderProgram(const Recipe& recipe);
 
 	private:
 		// create and compile shader object
-		ObjectHandle CreateShader(GLenum shaderType,
-			const CompileVersion& version, const std::vector<const char*>& sourceNames);
-
-		// get version string
-		const char* GetVersionString(const CompileVersion& version);
+		ObjectHandle CreateShader(GLenum shaderType, const std::string& source);
 
 		// check shader after compil. it'll log the info if there are compilation errors.
 		bool CheckShader(ObjectHandle obj);
