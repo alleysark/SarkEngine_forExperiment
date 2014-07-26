@@ -150,15 +150,16 @@ public:
 
 		// ---------------------------------------------------------------------
 		// make shader program
-		ShaderChef::GetInstance()->RegisterShaderSourceFromFile("test_vs", "D:/DOWN/test_vs.glsl");
-		ShaderChef::GetInstance()->RegisterShaderSourceFromFile("test_fs", "D:/DOWN/test_fs.glsl");
-		renderer = ShaderChef::GetInstance()->MakeProgram(
-			ShaderChef::VERSION_330,
-			{ { AttributeSemantic::POSITION, "position" },
+		ShaderChef::Recipe recipe;
+		recipe.attributes = {
+			{ AttributeSemantic::POSITION, "position" },
 			{ AttributeSemantic::NORMAL, "normal" },
-			{ AttributeSemantic::TEXCOORD0, "texcoord0" } },
-			{ "test_vs" }, { "test_fs" });
-		ShaderChef::GetInstance()->Clear();
+			{ AttributeSemantic::TEXCOORD0, "texcoord0" }
+		};
+		recipe.vertexShader = "version 440;\n void main(){}";
+		recipe.fragmentShader = "version 440:\n void main(){}";
+
+		renderer = ShaderChef::GetInstance()->CookShaderProgram(recipe);
 
 		// load texture resource
 		gpEngine->GetResourceManager().SetBasePath("D:\\DOWN\\");
@@ -345,14 +346,16 @@ public:
 	Texture* tex;
 
 	TestScene(){
-		ShaderChef::GetInstance()->RegisterShaderSourceFromFile("test_vs", "D:/DOWN/test_vs.glsl");
-		ShaderChef::GetInstance()->RegisterShaderSourceFromFile("test_fs", "D:/DOWN/test_fs.glsl");
-		renderer = ShaderChef::GetInstance()->MakeProgram(ShaderChef::VERSION_330, 
-		{ { AttributeSemantic::POSITION, "position" },
-		{ AttributeSemantic::NORMAL, "normal" },
-		{ AttributeSemantic::TEXCOORD0, "texcoord0" } }, 
-		{ "test_vs" }, { "test_fs" });
-		ShaderChef::GetInstance()->Clear();
+		ShaderChef::Recipe recipe;
+		recipe.attributes = {
+			{ AttributeSemantic::POSITION, "position" },
+			{ AttributeSemantic::NORMAL, "normal" },
+			{ AttributeSemantic::TEXCOORD0, "texcoord0" }
+		};
+		recipe.vertexShader = "version 440;\n void main(){}";
+		recipe.fragmentShader = "version 440:\n void main(){}";
+
+		renderer = ShaderChef::GetInstance()->CookShaderProgram(recipe);
 
 		mLayers.push_back(Layer());
 		mCameras.push_back(Camera(Position3(0, 40, 30), Position3(0, 0, 0)));
@@ -546,7 +549,14 @@ public:
 	ShaderProgram* mShadowRenderer;
 
 	ShadowmapTestScene(){
-		ShaderChef::GetInstance()->RegisterShaderSource("test_vs",
+		ShaderChef::Recipe recipe;
+		recipe.attributes = {
+			{ AttributeSemantic::POSITION, "position" },
+			{ AttributeSemantic::NORMAL, "normal" },
+			{ AttributeSemantic::TEXCOORD0, "texcoord0" }
+		};
+		recipe.vertexShader =
+			"#version 440						\n"
 			"in vec3 position;					\n"
 			"in vec3 normal;					\n"
 			"in vec2 texcoord0;					\n"
@@ -561,8 +571,9 @@ public:
 			"	norm = (transpose(inverse(matWorld))*vec4(normal, 0)).xyz;	\n"
 			"	texcoord = texcoord0;										\n"
 			"	gl_Position = matProjection * matView * wpos;				\n"
-			"}");
-		ShaderChef::GetInstance()->RegisterShaderSource("test_fs",
+			"}";
+		recipe.fragmentShader =
+			"#version 440										\n"
 			"struct DirLight{									\n"
 			"	vec4 amb;										\n"
 			"	vec4 dif;										\n"
@@ -626,13 +637,9 @@ public:
 			"	fragColor = cosNL*light.dif*texDif * shd		\n"
 			"				+ sc*light.spec*mtrl.spec * shd		\n"
 			"				+ light.amb*mtrl.amb;				\n"
-			"}");
-		renderer = ShaderChef::GetInstance()->MakeProgram(ShaderChef::VERSION_440, 
-		{ { AttributeSemantic::POSITION, "position" },
-		{ AttributeSemantic::NORMAL, "normal" },
-		{ AttributeSemantic::TEXCOORD0, "texcoord0" } }, 
-		{ "test_vs" }, { "test_fs" });
-		ShaderChef::GetInstance()->Clear();
+			"}";
+
+		renderer = ShaderChef::GetInstance()->CookShaderProgram(recipe);
 
 		mLayers.push_back(Layer());
 		mCameras.push_back(Camera(Position3(0, 20, 20), Position3(0, 0, 0)));
@@ -682,22 +689,23 @@ public:
 
 
 		//-------------------------------------
-		ShaderChef::GetInstance()->RegisterShaderSource("shadow_vs",
+		recipe.attributes = { { AttributeSemantic::POSITION, "position" } };
+		recipe.vertexShader =
+			"#version 440												\n"
 			"in vec3 position;											\n"
 			"uniform mat4 matWorld;										\n"
 			"uniform mat4 matLightVP;									\n"
 			"void main(){												\n"
 			"	gl_Position = matLightVP * matWorld * vec4(position, 1);\n"
-			"}");
-		ShaderChef::GetInstance()->RegisterShaderSource("shadow_fs",
+			"}";
+		recipe.fragmentShader =
+			"#version 440					\n"
 			"out float fragDepth;			\n"
 			"void main(){					\n"
 			"	fragDepth = gl_FragCoord.z;	\n"
-			"}");
-		mShadowRenderer = ShaderChef::GetInstance()->MakeProgram(ShaderChef::VERSION_440, 
-		{ { AttributeSemantic::POSITION, "position" } }, 
-		{ "shadow_vs" }, { "shadow_fs" });
-		ShaderChef::GetInstance()->Clear();
+			"}";
+
+		mShadowRenderer = ShaderChef::GetInstance()->CookShaderProgram(recipe);
 
 		// shadow map frame buffer
 		mShadowMap = new FrameBuffer();
@@ -1142,7 +1150,16 @@ public:
 	AnimatedModel* animModel;
 
 	TmpScene(){
-		ShaderChef::GetInstance()->RegisterShaderSource("test_vs",
+		ShaderChef::Recipe recipe;
+		recipe.attributes = {
+			{ AttributeSemantic::POSITION, "position" },
+			{ AttributeSemantic::TEXCOORD0, "texcoord0" },
+			{ AttributeSemantic::NORMAL, "normal" },
+			{ AttributeSemantic::TEXCOORD1, "matIndex" },
+			{ AttributeSemantic::TEXCOORD2, "weights" }
+		};
+		recipe.vertexShader =
+			"#version 440				\n"
 			"in vec3 position;			\n"
 			"in vec2 texcoord0;			\n"
 			"in vec3 normal;			\n"
@@ -1167,22 +1184,16 @@ public:
 			"		norm +=	weights[i] * n;									\n"
 			"	}																\n"
 			"	gl_Position = matProjection * matView * matWorld * vec4(blendedPos, 1);\n"
-			"}");
-		ShaderChef::GetInstance()->RegisterShaderSource("test_fs",
+			"}";
+		recipe.fragmentShader =
+			"#version 440				\n"
 			"out vec4 fragColor;		\n"
 			"in vec3 norm;				\n"
 			"void main(){				\n"
 			"	fragColor = vec4(1,1,1, 1);	\n"
-			"}");
-		renderer = ShaderChef::GetInstance()->MakeProgram(
-			ShaderChef::VERSION_440, 
-			{ { AttributeSemantic::POSITION, "position" },
-			{ AttributeSemantic::TEXCOORD0, "texcoord0" },
-			{ AttributeSemantic::NORMAL, "normal" },
-			{ AttributeSemantic::TEXCOORD1, "matIndex" },
-			{ AttributeSemantic::TEXCOORD2, "weights" } },
-			{ "test_vs" }, { "test_fs" });
-		ShaderChef::GetInstance()->Clear();
+			"}";
+
+		renderer = ShaderChef::GetInstance()->CookShaderProgram(recipe);
 
 		mLayers.push_back(Layer());
 		mCameras.push_back(Camera(Position3(0, 0, 20), Position3(0, 0, 0)));
@@ -1299,6 +1310,7 @@ public:
 	}
 };
 
+
 //---------------------------------------------------------------------
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdShow){
 	// ============ initialization ===============
@@ -1319,7 +1331,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 	}, Input::Keyboard::CODE_SPACE);
 	
 	// add custom scene
-	gpEngine->AddScene("scMain", new PhysicsSimulationScene(), true);
+	gpEngine->AddScene("scMain", new TmpScene(), true);
 
 	gpEngine->SetClearColor(ColorRGBA(0.12f, 0.12f, 0.12f, 1.0f));
 	gpEngine->ResizeWindow(600, 400);
