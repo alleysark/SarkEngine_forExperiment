@@ -432,10 +432,7 @@ namespace sark{
 	{
 		// existence check
 		if (mAttribFeats[attribSemantic] == NULL){
-			std::string err_str = "there is no buffer for the attribute '";
-			err_str += AttributeSemanticNames[attribSemantic];
-			err_str += "'";
-			LogWarn(err_str);
+			LogWarn("there is no buffer for the specified attribute");
 			return AttributeAccessor<_AttribType>();
 		}
 		

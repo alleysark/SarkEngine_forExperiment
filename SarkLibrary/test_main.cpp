@@ -36,7 +36,7 @@ public:
 		LAYER_PICKABLE = 1
 	};
 
-	ShaderProgram* renderer;
+	std::shared_ptr<ShaderProgram> renderer;
 
 	DirectionalLight* mLight;
 
@@ -150,7 +150,7 @@ public:
 
 		// ---------------------------------------------------------------------
 		// make shader program
-		ShaderChef::Recipe recipe;
+		ShaderProgram::Recipe recipe;
 		recipe.attributes = {
 			{ AttributeSemantic::POSITION, "position" },
 			{ AttributeSemantic::NORMAL, "normal" },
@@ -159,7 +159,7 @@ public:
 		recipe.vertexShader = "version 440;\n void main(){}";
 		recipe.fragmentShader = "version 440:\n void main(){}";
 
-		renderer = ShaderChef::GetInstance()->CookShaderProgram(recipe);
+		renderer = ShaderChef::CookShaderProgram(recipe);
 
 		// load texture resource
 		gpEngine->GetResourceManager().SetBasePath("D:\\DOWN\\");
@@ -178,7 +178,6 @@ public:
 	}
 
 	~PhysicsSimulationScene(){
-		delete renderer;
 		delete samp;
 		delete tex;
 	}
@@ -334,7 +333,7 @@ public:
 
 class TestScene : public AScene{
 public:
-	ShaderProgram* renderer;
+	std::shared_ptr<ShaderProgram> renderer;
 
 	// dynamic light list
 	DirectionalLight* mLight;
@@ -346,7 +345,7 @@ public:
 	Texture* tex;
 
 	TestScene(){
-		ShaderChef::Recipe recipe;
+		ShaderProgram::Recipe recipe;
 		recipe.attributes = {
 			{ AttributeSemantic::POSITION, "position" },
 			{ AttributeSemantic::NORMAL, "normal" },
@@ -355,7 +354,7 @@ public:
 		recipe.vertexShader = "version 440;\n void main(){}";
 		recipe.fragmentShader = "version 440:\n void main(){}";
 
-		renderer = ShaderChef::GetInstance()->CookShaderProgram(recipe);
+		renderer = ShaderChef::CookShaderProgram(recipe);
 
 		mLayers.push_back(Layer());
 		mCameras.push_back(Camera(Position3(0, 40, 30), Position3(0, 0, 0)));
@@ -397,7 +396,6 @@ public:
 	}
 
 	~TestScene(){
-		delete renderer;
 		delete samp;
 		delete tex;
 	}
@@ -532,7 +530,7 @@ public:
 
 class ShadowmapTestScene : public AScene{
 public:
-	ShaderProgram* renderer;
+	std::shared_ptr<ShaderProgram> renderer;
 
 	RigidCube* mObj;
 	RigidSphere* mSphere;
@@ -546,10 +544,10 @@ public:
 	// shadow map
 	FrameBuffer* mShadowMap;
 	Sampler* mShSamp;
-	ShaderProgram* mShadowRenderer;
+	std::shared_ptr<ShaderProgram> mShadowRenderer;
 
 	ShadowmapTestScene(){
-		ShaderChef::Recipe recipe;
+		ShaderProgram::Recipe recipe;
 		recipe.attributes = {
 			{ AttributeSemantic::POSITION, "position" },
 			{ AttributeSemantic::NORMAL, "normal" },
@@ -639,7 +637,7 @@ public:
 			"				+ light.amb*mtrl.amb;				\n"
 			"}";
 
-		renderer = ShaderChef::GetInstance()->CookShaderProgram(recipe);
+		renderer = ShaderChef::CookShaderProgram(recipe);
 
 		mLayers.push_back(Layer());
 		mCameras.push_back(Camera(Position3(0, 20, 20), Position3(0, 0, 0)));
@@ -705,7 +703,7 @@ public:
 			"	fragDepth = gl_FragCoord.z;	\n"
 			"}";
 
-		mShadowRenderer = ShaderChef::GetInstance()->CookShaderProgram(recipe);
+		mShadowRenderer = ShaderChef::CookShaderProgram(recipe);
 
 		// shadow map frame buffer
 		mShadowMap = new FrameBuffer();
@@ -740,11 +738,9 @@ public:
 	}
 
 	~ShadowmapTestScene(){
-		delete renderer;
 		delete samp;
 		delete tex;
 
-		delete mShadowRenderer;
 		delete mShadowMap;
 		delete mShSamp;
 	}
@@ -1138,19 +1134,14 @@ public:
 	}
 };
 
-
-
-
-
-
 class TmpScene : public AScene{
 public:
-	ShaderProgram* renderer;
+	std::shared_ptr<ShaderProgram> renderer;
 
 	AnimatedModel* animModel;
 
 	TmpScene(){
-		ShaderChef::Recipe recipe;
+		ShaderProgram::Recipe recipe;
 		recipe.attributes = {
 			{ AttributeSemantic::POSITION, "position" },
 			{ AttributeSemantic::TEXCOORD0, "texcoord0" },
@@ -1193,7 +1184,7 @@ public:
 			"	fragColor = vec4(1,1,1, 1);	\n"
 			"}";
 
-		renderer = ShaderChef::GetInstance()->CookShaderProgram(recipe);
+		renderer = ShaderChef::CookShaderProgram(recipe);
 
 		mLayers.push_back(Layer());
 		mCameras.push_back(Camera(Position3(0, 0, 20), Position3(0, 0, 0)));
@@ -1311,6 +1302,182 @@ public:
 };
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+class TestScene2 : public AScene{
+public:
+	std::shared_ptr<ShaderProgram> renderer;
+
+	// dynamic light list
+	DirectionalLight* mLight;
+
+	TestScene2(){
+		ShaderProgram::Recipe recipe;
+		recipe.attributes = {
+			{ AttributeSemantic::POSITION, "position" },
+			{ AttributeSemantic::NORMAL, "normal" }
+		};
+		recipe.uniforms = {
+			ShaderProgram::UniformInfo("matWorld"),
+			ShaderProgram::UniformInfo("matView"),
+			ShaderProgram::UniformInfo("matProj")
+		};
+		recipe.vertexShader =
+			"#version 440 \n"
+			"in vec3 position; \n"
+			"in vec3 normal; \n"
+			"uniform mat4 matWorld; \n"
+			"uniform mat4 matView; \n"
+			"uniform mat4 matProj; \n"
+			"void main() { \n"
+			"	gl_Position = matProj * matView * matWorld * vec4(position, 1.0); \n"
+			"}";
+			
+		recipe.fragmentShader =
+			"#version 440 \n"
+			"out vec4 fragColor; \n"
+			"void main() { \n"
+			"	fragColor = vec4(1,1,1,1); \n"
+			"}";
+
+		renderer = ShaderChef::CookShaderProgram(recipe);
+
+		mLayers.push_back(Layer());
+		mCameras.push_back(Camera(Position3(0, 40, 30), Position3(0, 0, 0)));
+		mMainCam = &mCameras[0];
+
+		StaticModel* model = new StaticModel("", NULL, true);
+		ArrayBuffer& arrbuf = model->GetMesh()->GetArrayBuffer();
+		arrbuf.GenAttributeBuffer<Position3>(AttributeSemantic::POSITION, {
+			Vector3(0, 5, 0), Vector3(-7, -3, 0), Vector3(7, -3, 0)
+		});
+		arrbuf.GenAttributeBuffer<Normal>(AttributeSemantic::NORMAL, {
+			Normal(0, 0, 1), Normal(0, 0, 1), Normal(0, 0, 1)
+		});
+		arrbuf.GenAttributeBuffer<TriangleFace16>(AttributeSemantic::INDICES, {
+			TriangleFace16(0, 1, 2)
+		});
+		arrbuf.SetDrawMode(ArrayBuffer::DrawMode::TRIANGLES);
+
+		model->SetCollider(std::unique_ptr<ACollider>(new OBoxCollider(model, 0, Vector3(7, 5, 0.1))));
+		AddSceneComponent(model);
+		mLayers[0].Push(model);
+
+		mLight = new DirectionalLight(
+			ColorRGBA(0.3, 0.3, 0.3, 1),
+			ColorRGBA(0.9, 0.9, 0.9, 1),
+			ColorRGBA(0.9, 0.9, 0.9, 1));
+		mLight->GetTransform().Rotate(0, math::deg2rad(-45), 0);
+		AddSceneComponent(mLight);
+
+		glDisable(GL_CULL_FACE);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+
+	~TestScene2(){}
+
+	void OnEnter() override{
+		// mouse handlers
+		static Position2 prvPos;
+		static ASceneComponent* graspComponent = NULL;
+
+		Input::mouse.RegisterMouseHandler(
+			Input::Mouse::EVENT_LBUTTON_DRAG,
+			[&](const Position2& pos, real ext)->void{
+			Vector2 mv = pos - prvPos;
+			if (graspComponent == NULL){
+				mMainCam->Yaw(mv.x / 180.f);
+				mMainCam->Pitch(mv.y / 180.f);
+			}
+			else{
+				graspComponent->GetTransform().RotateMore(mMainCam->GetBasisV(), mv.x / 180.f);
+				graspComponent->GetTransform().RotateMore(mMainCam->GetBasisU(), mv.y / 180.f);
+			}
+			prvPos = pos;
+		});
+		Input::mouse.RegisterMouseHandler(
+			Input::Mouse::EVENT_LBUTTON_DOWN,
+			[&](const Position2& pos, real ext)->void{
+			prvPos = pos;
+
+			Ray ray = mMainCam->ScreenToWorldRay(pos);
+
+			mLayers[0].Sort(mMainCam->GetEye());
+			Layer::ReplicaArrayIterator itr = mLayers[0].Begin();
+			Layer::ReplicaArrayIterator end = mLayers[0].End();
+			for (; itr != end; itr++){
+				const ACollider* bs = (*itr)->GetCollider();
+
+				if (bs == NULL)
+					continue;
+				if (ray.IntersectWith(bs))
+					graspComponent = (*itr);
+			}
+		});
+		Input::mouse.RegisterMouseHandler(
+			Input::Mouse::EVENT_LBUTTON_UP,
+			[&](const Position2& pos, real ext)->void{
+
+		});
+		Input::mouse.RegisterMouseHandler(
+			Input::Mouse::EVENT_WHEEL,
+			[&](const Position2& pos, real ext)->void{
+			mMainCam->MoveForward(ext);
+		});
+	}
+
+	void OnLeave() override{}
+
+	void Update(){
+	}
+
+	void Render(){
+		//----------------
+		glMultTransposeMatrixf(mMainCam->GetViewMatrix().GetRawMatrix());
+		//----------------
+
+		renderer->Use();
+		renderer->SetUniform("matView", mMainCam->GetViewMatrix());
+		renderer->SetUniform("matProj", mMainCam->GetProjMatrix());
+
+		ComponentMap::iterator itr = mComponents.begin();
+		ComponentMap::iterator end = mComponents.end();
+		for (; itr != end; itr++){
+			renderer->SetUniform("matWorld",
+				itr->second->GetTransform().GetMatrix());
+
+			itr->second->Render();
+		}
+		renderer->Unuse();
+	}
+
+	// main scene camera view setting
+	void OnScreenChanged(uinteger width, uinteger height) override{
+		mMainCam->SetViewport(0, 0, width, height);
+		mMainCam->Perspective(60, (real)width / (real)height, 0.1f, 1000.f);
+
+		//----------------
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glMultTransposeMatrixf(mMainCam->GetProjMatrix().GetRawMatrix());
+		glMatrixMode(GL_MODELVIEW);
+		//----------------
+	}
+};
+
+
+
+
 //---------------------------------------------------------------------
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdShow){
 	// ============ initialization ===============
@@ -1331,7 +1498,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 	}, Input::Keyboard::CODE_SPACE);
 	
 	// add custom scene
-	gpEngine->AddScene("scMain", new TmpScene(), true);
+	gpEngine->AddScene("scMain", new TestScene2(), true);
 
 	gpEngine->SetClearColor(ColorRGBA(0.12f, 0.12f, 0.12f, 1.0f));
 	gpEngine->ResizeWindow(600, 400);

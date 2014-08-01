@@ -5,8 +5,8 @@
 #include <map>
 #include <vector>
 #include <GL/glew.h>
-#include "core.h"
 
+#include "core.h"
 namespace sark{
 
 	class Sampler;
@@ -14,19 +14,16 @@ namespace sark{
 
 
 	// attribute semantics for programmable pipeline.
-	struct _AttributeSemantic_wrapper{
-		enum AttributeSemantic{
+	struct _AttributeSemantic_wrapper {
+		enum AttributeSemantic {
 			POSITION = 0,
 			NORMAL,
+			TANGENT,
 			COLOR,
-			TEXCOORD0,
-			TEXCOORD1,
-			TEXCOORD2,
-			TEXCOORD3,
-			TEXCOORD4,
-			TEXCOORD5,
-			TEXCOORD6,
-			TEXCOORD7,
+
+			TEXCOORD0, TEXCOORD1, TEXCOORD2, TEXCOORD3,
+			TEXCOORD4, TEXCOORD5, TEXCOORD6, TEXCOORD7,
+
 			INDICES,
 
 			//for counting semantic.
@@ -34,22 +31,10 @@ namespace sark{
 		};
 	};
 	typedef _AttributeSemantic_wrapper::AttributeSemantic AttributeSemantic;
+
+
 	
-	// recommended attribute semantic names.
-	static const char* AttributeSemanticNames[AttributeSemantic::COUNT] = {
-		"position",
-		"normal",
-		"color",
-		"texcoord0",
-		"texcoord1",
-		"texcoord2",
-		"texcoord3",
-		"texcoord4",
-		"texcoord5",
-		"texcoord6",
-		"texcoord7",
-		"indices"
-	};
+
 
 
 	// programmable shader program.
@@ -57,25 +42,67 @@ namespace sark{
 	class ShaderProgram{
 	public:	
 		typedef GLint Location;
-		typedef std::map<const std::string, Location> LocationDictionary;
-		typedef std::vector<AttributeSemantic> AttributeList;
+
+
+		struct AttributeInfo {
+			AttributeSemantic semantic; // location
+			const char* name;
+
+			AttributeInfo(){}
+			AttributeInfo(AttributeSemantic _semantic, const char* _name)
+				: semantic(_semantic), name(_name) {}
+		};
+
+		struct UniformInfo {
+			Location location; //for shader program
+			const char* name;
+			UniformInfo(){}
+			UniformInfo(const char* _name) : name(_name) {}
+		};
+
+		// shader create recipe
+		struct Recipe {
+			// recipe ID
+			integer id;
+
+			std::vector<AttributeInfo> attributes;
+
+			std::vector<UniformInfo> uniforms;
+
+			std::string vertexShader;
+
+			std::string tessControlShader;
+
+			std::string tessEvaluationShader;
+
+			std::string geometryShader;
+
+			std::string fragmentShader;
+		};
+
+
 
 	private:
+		integer mId;
+
 		// program handler
 		ObjectHandle mhProgram;
 
-		// locations of uniform/attribute variable are cached in this container
-		LocationDictionary mLocationDict;
+		// bounded attributes
+		std::vector<AttributeInfo> mAttribs;
 
-		// binded attributes
-		AttributeList mBindedAttrs;
+		// available uniform variables
+		std::vector<UniformInfo> mUniforms;
 
 	public:
 		// shader program is created from ShaderDictionary
 		// with full liked shaders and binded attributes.
-		ShaderProgram(ObjectHandle hProgram, const AttributeList& bindedAttrs);
+		ShaderProgram(ObjectHandle hProgram, const Recipe& recipe);
 
 		~ShaderProgram();
+
+		// get recipe id
+		integer GetID() const;
 
 		// before rendering, user should've Use() to use shader program.
 		void Use() const;
@@ -84,15 +111,12 @@ namespace sark{
 		// to disable this shader program.
 		void Unuse() const;
 
-		// get binded attributes into this shader.
-		const AttributeList& GetBindedAttributes() const;
-
 	private:
+		// get attribute location by name
+		Location GetAttributeLocation(const std::string& name);
+
 		// get uniform location by variable name
 		Location GetUniformLocation(const std::string& name);
-
-		// get attribute location by variable name
-		Location GetAttributeLocation(const std::string& name);
 
 	public:
 		//========================================================

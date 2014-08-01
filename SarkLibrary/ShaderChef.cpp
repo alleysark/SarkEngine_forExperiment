@@ -5,55 +5,26 @@
 
 namespace sark{
 
+	std::list<std::shared_ptr<ShaderProgram>> ShaderChef::mSpList;
+
 	ShaderChef::ShaderChef(){}
 	ShaderChef::ShaderChef(const ShaderChef&){}
 
 	ShaderChef::~ShaderChef(){}
 
-	ShaderChef* ShaderChef::instance = NULL;
-
-	ShaderChef* ShaderChef::GetInstance(){
-		if (instance == NULL)
-			instance = new ShaderChef();
-		return instance;
-	}
-
-	// register shader source string.
-	bool ShaderChef::RegisterShaderSource(const std::string& name,
-		const std::string& source)
-	{
-		IngredientDict::iterator itr = mIngredients.find(name);
-		if (itr != mIngredients.end())
-			return false;
-
-		mIngredients[name] = source;
-		return true;
-	}
-
-	// register shader source from file
-	bool ShaderChef::RegisterShaderSourceFromFile(const std::string& name,
-		const std::string& filename)
-	{
-		IngredientDict::iterator itr = mIngredients.find(name);
-		if (itr != mIngredients.end())
-			return false;
-
-		std::ifstream fin;
-		fin.open(filename, std::ios::beg);
-		if (!fin.is_open()){
-			return false;
-		}
-		
-		mIngredients[name] = std::string((std::istreambuf_iterator<char>(fin)),
-			std::istreambuf_iterator<char>());
-		fin.close();
-		return true;
-	}
 
 	// cook a shader program from given recipe.
 	// whole shaders are compiled as 'version'. shader objects are attached
 	// and are linked into program. it'll return NULL if it failed.
-	ShaderProgram* ShaderChef::CookShaderProgram(const Recipe& recipe){
+	std::shared_ptr<ShaderProgram> ShaderChef::CookShaderProgram(const ShaderProgram::Recipe& recipe){
+		// check if required shader program is already exist
+		for (std::list<std::shared_ptr<ShaderProgram>>::const_iterator citr = mSpList.cbegin();
+			citr != mSpList.cend(); citr++) {
+			if ((*citr)->GetID() == recipe.id) {
+				return (*citr);
+			}
+		}
+
 		ObjectHandle progObj = 0,
 			vtxObj = 0, tcsObj = 0, tesObj = 0, geoObj = 0, fragObj = 0;
 
@@ -138,10 +109,8 @@ namespace sark{
 		// bind pre-defined attribute semantics
 		// and copy the sementic list.
 		uinteger attribSz = recipe.attributes.size();
-		ShaderProgram::AttributeList attrs(attribSz);
 		for (uinteger i = 0; i < attribSz; i++){
 			glBindAttribLocation(progObj, recipe.attributes[i].semantic, recipe.attributes[i].name);
-			attrs.push_back(recipe.attributes[i].semantic);
 		}
 
 		// link program and check link error
@@ -162,7 +131,8 @@ namespace sark{
 		// clear all shader objects
 		CLEAR_SHOBJS();
 
-		ShaderProgram* shaderProg = new ShaderProgram(progObj, attrs);
+		std::shared_ptr<ShaderProgram> shaderProg(new ShaderProgram(progObj, recipe));
+		mSpList.push_back(shaderProg);
 
 		return shaderProg;
 		#undef CLEAR_SHOBJS

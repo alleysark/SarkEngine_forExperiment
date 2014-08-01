@@ -7,14 +7,23 @@ namespace sark{
 
 	// shader program is created from ShaderDictionary
 	// with full liked shaders.
-	ShaderProgram::ShaderProgram(ObjectHandle hProgram, const AttributeList& bindedAttrs)
-		: mhProgram(hProgram), mBindedAttrs(bindedAttrs)
-	{}
+	ShaderProgram::ShaderProgram(ObjectHandle hProgram, const ShaderProgram::Recipe& recipe)
+		: mhProgram(hProgram), mId(recipe.id), mAttribs(recipe.attributes), mUniforms(recipe.uniforms)
+	{
+		// init locations
+		for (uint32 i = 0, sz = mUniforms.size(); i < sz; i++) {
+			mUniforms[i].location = glGetUniformLocation(mhProgram, mUniforms[i].name);
+		}
+	}
 
 	ShaderProgram::~ShaderProgram(){
 		glDeleteProgram(mhProgram);
 		mhProgram = 0;
-		mLocationDict.clear();
+	}
+
+	// get recipe id
+	integer ShaderProgram::GetID() const {
+		return mId;
 	}
 
 	// before rendering, user should've Use() to use shader program.
@@ -28,39 +37,23 @@ namespace sark{
 		glUseProgram(0);
 	}
 
-	// get binded attributes into this shader.
-	const ShaderProgram::AttributeList& ShaderProgram::GetBindedAttributes() const{
-		return mBindedAttrs;
+	// get attribute location by name
+	ShaderProgram::Location ShaderProgram::GetAttributeLocation(const std::string& name){
+		for (uinteger i = 0, sz = mAttribs.size(); i < sz; i++) {
+			if (name == mAttribs[i].name)
+				return mAttribs[i].semantic;
+		}
+		return -1;
 	}
 
 	// get uniform location by variable name
 	ShaderProgram::Location ShaderProgram::GetUniformLocation(const std::string& name){
-		LocationDictionary::iterator find = mLocationDict.find(name);
-		if (find != mLocationDict.end())
-			return find->second;
-
-		Location loca = glGetUniformLocation(mhProgram, name.c_str());
-		if (loca == -1){
-			LogWarn("inappropriate uniform variable name");
-			return -1;
+		for (uinteger i = 0, sz = mUniforms.size(); i < sz; i++) {
+			if (name == mUniforms[i].name)
+				return mUniforms[i].location;
 		}
-		return (mLocationDict[name] = loca);
+		return -1;
 	}
-
-	// get attribute location by variable name
-	ShaderProgram::Location ShaderProgram::GetAttributeLocation(const std::string& name){
-		LocationDictionary::iterator find = mLocationDict.find(name);
-		if (find != mLocationDict.end())
-			return find->second;
-		
-		Location loca = glGetAttribLocation(mhProgram, name.c_str());
-		if (loca == -1){
-			LogWarn("inappropriate attribute variable name");
-			return -1;
-		}
-		return (mLocationDict[name] = loca);
-	}
-
 
 
 

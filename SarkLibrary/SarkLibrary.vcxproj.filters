@@ -13,17 +13,8 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\core-util">
-      <UniqueIdentifier>{329ea97f-2bc6-4288-ba7b-59ced0cefed7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\core-system">
       <UniqueIdentifier>{62c7536c-76c9-487c-b20e-b34e65fe4bad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\core-util\scene components">
-      <UniqueIdentifier>{8f984233-3096-4005-b83b-ac8490020791}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\core-util\resource">
-      <UniqueIdentifier>{762811da-a4f6-472d-be20-c24b39bc36c5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\core-system\physics">
       <UniqueIdentifier>{ae3a8600-9a41-47a3-b605-41641abb4fad}</UniqueIdentifier>
@@ -33,6 +24,21 @@
     </Filter>
     <Filter Include="Header Files\core-system\physics\collider">
       <UniqueIdentifier>{65e18056-62ba-4d90-97a8-a500a6773f04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core-system\shader">
+      <UniqueIdentifier>{06b4c28f-3b31-4b2c-84e5-aef6d2f21fa6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core-system\util">
+      <UniqueIdentifier>{ee7b0453-e6cd-45a2-a72a-22ebf0b13662}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\extras">
+      <UniqueIdentifier>{329ea97f-2bc6-4288-ba7b-59ced0cefed7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\extras\scene components">
+      <UniqueIdentifier>{8f984233-3096-4005-b83b-ac8490020791}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\extras\resource">
+      <UniqueIdentifier>{762811da-a4f6-472d-be20-c24b39bc36c5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -45,32 +51,20 @@
     <ClCompile Include="Engine.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>Header Files\core-system</Filter>
-    </ClCompile>
-    <ClCompile Include="Timer.cpp">
-      <Filter>Header Files\core-system</Filter>
-    </ClCompile>
     <ClCompile Include="RigidCube.cpp">
-      <Filter>Header Files\core-util\scene components</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug.cpp">
-      <Filter>Header Files\core-util</Filter>
+      <Filter>Header Files\extras\scene components</Filter>
     </ClCompile>
     <ClCompile Include="RigidSphere.cpp">
-      <Filter>Header Files\core-util\scene components</Filter>
+      <Filter>Header Files\extras\scene components</Filter>
     </ClCompile>
     <ClCompile Include="DirectionalLight.cpp">
-      <Filter>Header Files\core-util\scene components</Filter>
-    </ClCompile>
-    <ClCompile Include="resources.cpp">
-      <Filter>Header Files\core-util\resource</Filter>
+      <Filter>Header Files\extras\scene components</Filter>
     </ClCompile>
     <ClCompile Include="PNGResource.cpp">
-      <Filter>Header Files\core-util\resource</Filter>
+      <Filter>Header Files\extras\resource</Filter>
     </ClCompile>
     <ClCompile Include="BMPResource.cpp">
-      <Filter>Header Files\core-util\resource</Filter>
+      <Filter>Header Files\extras\resource</Filter>
     </ClCompile>
     <ClCompile Include="ALight.cpp">
       <Filter>Header Files\core-system\rendering</Filter>
@@ -100,12 +94,6 @@
       <Filter>Header Files\core-system\rendering</Filter>
     </ClCompile>
     <ClCompile Include="Sampler.cpp">
-      <Filter>Header Files\core-system\rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="ShaderChef.cpp">
-      <Filter>Header Files\core-system\rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="ShaderProgram.cpp">
       <Filter>Header Files\core-system\rendering</Filter>
     </ClCompile>
     <ClCompile Include="Texture.cpp">
@@ -144,6 +132,24 @@
     <ClCompile Include="StaticModel.cpp">
       <Filter>Header Files\core-system\rendering</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderChef.cpp">
+      <Filter>Header Files\core-system\shader</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderProgram.cpp">
+      <Filter>Header Files\core-system\shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Header Files\core-system\util</Filter>
+    </ClCompile>
+    <ClCompile Include="resources.cpp">
+      <Filter>Header Files\core-system\util</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Header Files\core-system\util</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug.cpp">
+      <Filter>Header Files\core-system\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -152,32 +158,20 @@
     <ClInclude Include="Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Input.h">
-      <Filter>Header Files\core-system</Filter>
-    </ClInclude>
-    <ClInclude Include="Timer.h">
-      <Filter>Header Files\core-system</Filter>
-    </ClInclude>
     <ClInclude Include="RigidCube.h">
-      <Filter>Header Files\core-util\scene components</Filter>
-    </ClInclude>
-    <ClInclude Include="Debug.h">
-      <Filter>Header Files\core-util</Filter>
+      <Filter>Header Files\extras\scene components</Filter>
     </ClInclude>
     <ClInclude Include="RigidSphere.h">
-      <Filter>Header Files\core-util\scene components</Filter>
+      <Filter>Header Files\extras\scene components</Filter>
     </ClInclude>
     <ClInclude Include="DirectionalLight.h">
-      <Filter>Header Files\core-util\scene components</Filter>
-    </ClInclude>
-    <ClInclude Include="resources.h">
-      <Filter>Header Files\core-util\resource</Filter>
+      <Filter>Header Files\extras\scene components</Filter>
     </ClInclude>
     <ClInclude Include="PNGResource.h">
-      <Filter>Header Files\core-util\resource</Filter>
+      <Filter>Header Files\extras\resource</Filter>
     </ClInclude>
     <ClInclude Include="BMPResource.h">
-      <Filter>Header Files\core-util\resource</Filter>
+      <Filter>Header Files\extras\resource</Filter>
     </ClInclude>
     <ClInclude Include="ALight.h">
       <Filter>Header Files\core-system\rendering</Filter>
@@ -210,12 +204,6 @@
       <Filter>Header Files\core-system\rendering</Filter>
     </ClInclude>
     <ClInclude Include="Sampler.h">
-      <Filter>Header Files\core-system\rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderChef.h">
-      <Filter>Header Files\core-system\rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderProgram.h">
       <Filter>Header Files\core-system\rendering</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
@@ -253,6 +241,24 @@
     </ClInclude>
     <ClInclude Include="StaticModel.h">
       <Filter>Header Files\core-system\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderChef.h">
+      <Filter>Header Files\core-system\shader</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderProgram.h">
+      <Filter>Header Files\core-system\shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Header Files\core-system\util</Filter>
+    </ClInclude>
+    <ClInclude Include="resources.h">
+      <Filter>Header Files\core-system\util</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Header Files\core-system\util</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Header Files\core-system\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
