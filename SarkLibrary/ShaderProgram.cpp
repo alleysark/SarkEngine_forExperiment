@@ -8,13 +8,8 @@ namespace sark{
 	// shader program is created from ShaderDictionary
 	// with full liked shaders.
 	ShaderProgram::ShaderProgram(ObjectHandle hProgram, const ShaderProgram::Recipe& recipe)
-		: mhProgram(hProgram), mId(recipe.id), mAttribs(recipe.attributes), mUniforms(recipe.uniforms)
-	{
-		// init locations
-		for (uint32 i = 0, sz = mUniforms.size(); i < sz; i++) {
-			mUniforms[i].location = glGetUniformLocation(mhProgram, mUniforms[i].name);
-		}
-	}
+		: mhProgram(hProgram), mId(recipe.id), mAttribs(recipe.attributes)
+	{ }
 
 	ShaderProgram::~ShaderProgram(){
 		glDeleteProgram(mhProgram);
@@ -48,11 +43,18 @@ namespace sark{
 
 	// get uniform location by variable name
 	ShaderProgram::Location ShaderProgram::GetUniformLocation(const std::string& name){
-		for (uinteger i = 0, sz = mUniforms.size(); i < sz; i++) {
-			if (name == mUniforms[i].name)
-				return mUniforms[i].location;
+		UniformMap::const_iterator find = mUniforms.find(name);
+		if (find == mUniforms.cend()) {
+			Location loc = glGetUniformLocation(mhProgram, name.c_str());
+			if (loc == -1) {
+				LogWarn("There isn't an uniform variable the name of " + name);
+			}
+			else {
+				mUniforms[name] = loc;
+			}
+			return loc;
 		}
-		return -1;
+		return find->second;
 	}
 
 

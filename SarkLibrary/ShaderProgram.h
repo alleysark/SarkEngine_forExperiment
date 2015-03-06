@@ -42,7 +42,7 @@ namespace sark{
 	class ShaderProgram{
 	public:	
 		typedef GLint Location;
-
+		typedef std::map<std::string, Location> UniformMap;
 
 		struct AttributeInfo {
 			AttributeSemantic semantic; // location
@@ -92,7 +92,7 @@ namespace sark{
 		std::vector<AttributeInfo> mAttribs;
 
 		// available uniform variables
-		std::vector<UniformInfo> mUniforms;
+		UniformMap mUniforms;
 
 	public:
 		// shader program is created from ShaderDictionary
