@@ -53,21 +53,12 @@ namespace sark{
 				: semantic(_semantic), name(_name) {}
 		};
 
-		struct UniformInfo {
-			Location location; //for shader program
-			const char* name;
-			UniformInfo(){}
-			UniformInfo(const char* _name) : name(_name) {}
-		};
-
 		// shader create recipe
 		struct Recipe {
 			// recipe ID
 			integer id;
 
 			std::vector<AttributeInfo> attributes;
-
-			std::vector<UniformInfo> uniforms;
 
 			std::string vertexShader;
 
