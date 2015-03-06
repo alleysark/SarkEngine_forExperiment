@@ -96,6 +96,7 @@
     <ClCompile Include="GJK_EPA.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="OBJResource.cpp" />
     <ClCompile Include="OBoxCollider.cpp" />
     <ClCompile Include="PNGResource.cpp" />
     <ClCompile Include="Ray.cpp" />
@@ -134,6 +135,7 @@
     <ClInclude Include="ACollider.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="OBJResource.h" />
     <ClInclude Include="OBoxCollider.h" />
     <ClInclude Include="PNGResource.h" />
     <ClInclude Include="primitives.hpp" />

@@ -150,6 +150,9 @@
     <ClCompile Include="Debug.cpp">
       <Filter>Header Files\core-system\util</Filter>
     </ClCompile>
+    <ClCompile Include="OBJResource.cpp">
+      <Filter>Header Files\extras\resource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -259,6 +262,9 @@
     </ClInclude>
     <ClInclude Include="Debug.h">
       <Filter>Header Files\core-system\util</Filter>
+    </ClInclude>
+    <ClInclude Include="OBJResource.h">
+      <Filter>Header Files\extras\resource</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
