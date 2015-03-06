@@ -60,6 +60,16 @@ namespace sark{
 			return false;
 		}
 
+		// compute center of mass
+		const Vector3 ComputeCenterOfMass(const std::vector<Vector3>& points) {
+			Vector3 com;
+			for (auto itr = points.cbegin(); itr != points.cend(); itr++) {
+				com += (*itr);
+			}
+			com /= points.size();
+			return com;
+		}
+
 		// ======================================================
 		//		intersection check functions of basic shapes
 		//

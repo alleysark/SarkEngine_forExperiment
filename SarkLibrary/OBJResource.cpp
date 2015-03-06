@@ -3,6 +3,7 @@
 #include "StaticModel.h"
 #include "ArrayBuffer.h"
 #include "Mesh.h"
+#include "tools.h"
 #include <fstream>
 #include <string>
 #include <iterator>
@@ -36,8 +37,20 @@ namespace sark {
 		return mTexcoords;
 	}
 
-	// make model from this
-	StaticModel* OBJResource::MakeModel(const std::string& name, ASceneComponent* parent, bool activate) {
+	// make this model resource to be center
+	void OBJResource::MakeItCenter() {
+		Vector3 center = tool::ComputeCenterOfMass(mVertices);
+		
+		auto itr = mVertices.begin(), end = mVertices.end();
+		for (; itr != end; itr++) {
+			(*itr) -= center;
+		}
+	}
+
+	// create model component from this resource
+	AModel* OBJResource::CreateModel(const std::string& name, 
+		ASceneComponent* parent, bool activate) const
+	{
 		StaticModel* model = new StaticModel(name, parent, activate);
 
 		ArrayBuffer& arrbuf = model->GetMesh()->GetArrayBuffer();

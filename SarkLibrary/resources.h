@@ -12,6 +12,8 @@ namespace sark{
 	class IResource;
 	template<class ImpResourceType> class IResourceLoader;
 
+	class AModel;
+	class ASceneComponent;
 
 	// resource management class.
 	// for resource loading, caching, releasing, etc..
@@ -107,6 +109,20 @@ namespace sark{
 
 		// get raw data of pixels
 		virtual const void* GetPixels() const = 0;
+	};
+
+	// 3d model resource interface
+	class IModelResource : public IResource {
+	public:
+		IModelResource(){}
+		virtual ~IModelResource(){}
+
+		// make this model resource to be center
+		virtual void MakeItCenter() = 0;
+
+		// create model component from this resource
+		virtual AModel* CreateModel(const std::string& name = "",
+			ASceneComponent* parent = NULL, bool activate = true) const = 0;
 	};
 
 }

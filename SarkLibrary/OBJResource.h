@@ -8,11 +8,8 @@
 
 namespace sark {
 
-	class StaticModel;
-	class ASceneComponent;
-
 	// OBJ model format resource.
-	class OBJResource : public IResource, public IResourceLoader<OBJResource> {
+	class OBJResource : public IModelResource, public IResourceLoader<OBJResource> {
 	private:
 		// vertex array
 		std::vector<Vector3> mVertices;
@@ -42,9 +39,12 @@ namespace sark {
 		// get texture coordinates of the object
 		std::vector<Vector2> GetTexcoords() const;
 		
-		// make model from this
-		StaticModel* MakeModel(const std::string& name = "", 
-			ASceneComponent* parent = NULL, bool activate = true);
+		// make this model resource to be center
+		void MakeItCenter() override;
+
+		// create model component from this resource
+		AModel* CreateModel(const std::string& name = "",
+			ASceneComponent* parent = NULL, bool activate = true) const override;
 
 		// load obj resource.
 		static OBJResource* LoadImp(const std::string& path);
