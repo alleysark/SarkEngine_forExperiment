@@ -36,6 +36,9 @@ namespace sark{
 			const std::vector<Vector3>& pointsA, const std::vector<Vector3>& pointsB,
 			const Vector3& axis);
 
+		// compute center of mass
+		const Vector3 ComputeCenterOfMass(const std::vector<Vector3>& points);
+
 		// ======================================================
 		//		intersection check functions of basic shapes
 		// ======================================================
