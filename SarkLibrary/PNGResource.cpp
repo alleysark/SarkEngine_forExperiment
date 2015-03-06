@@ -8,37 +8,6 @@ namespace sark{
 	PNGResource::PNGResource()
 		: mWidth(0), mHeight(0), mPixels(NULL)
 	{}
-	PNGResource::PNGResource(const PNGResource& png)
-		: mWidth(png.mWidth), mHeight(png.mHeight),
-		mFormat(png.mFormat), mPixelType(png.mPixelType)
-	{
-		integer channelCnt, channelByte;
-		if (png.mFormat == Texture::Format::RGB){
-			channelCnt = 3;
-		}
-		else if (png.mFormat == Texture::Format::RGBA){
-			channelCnt= 4;
-		}
-		else{
-			LogWarn("PNGResource only supports RGB and RGBA color type");
-			return;
-		}
-
-		if (png.mPixelType == Texture::PixelType::UNSIGNED_BYTE){
-			channelByte = 1;
-		}
-		else if (png.mPixelType == Texture::PixelType::UNSIGNED_SHORT){
-			channelByte = 2;
-		}
-		else{
-			LogWarn("invalid pixel type");
-			return;
-		}
-
-		integer size = png.mWidth * png.mHeight * (channelCnt * channelByte);
-		mPixels = new uint8[size];
-		memcpy(mPixels, png.mPixels, size);
-	}
 
 	PNGResource::~PNGResource(){
 		if (mPixels != NULL){

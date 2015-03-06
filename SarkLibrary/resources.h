@@ -58,11 +58,17 @@ namespace sark{
 	// resource interface.
 	// user defined resource should have inherit it(or sub interfaces)
 	// and IResourceLoader.
+	// resource is uncopiable object
 	class IResource{
 	public:
 		IResource(){}
 		virtual ~IResource(){}
+		
+	private:
+		IResource(const IResource&);
+		IResource& operator=(const IResource&);
 	};
+
 
 	// resource loader static-interface as <crtp pattern>.
 	// user defined resource should have inherit this and IResource.
@@ -102,5 +108,6 @@ namespace sark{
 		// get raw data of pixels
 		virtual const void* GetPixels() const = 0;
 	};
+
 }
 #endif

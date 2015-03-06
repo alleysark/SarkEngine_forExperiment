@@ -26,7 +26,6 @@ namespace sark{
 
 	public:
 		PNGResource();
-		PNGResource(const PNGResource& png);
 
 		~PNGResource();
 
