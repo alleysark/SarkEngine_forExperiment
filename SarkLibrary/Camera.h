@@ -94,10 +94,10 @@ namespace sark{
 
 	public:
 		// get view transformation matrix
-		const Matrix4& GetViewMatrix();
+		const Matrix4& GetViewMatrix() const;
 
 		// get projection transformation matrix
-		const Matrix4& GetProjMatrix();
+		const Matrix4& GetProjMatrix() const;
 
 
 		// is this view orthographic view?

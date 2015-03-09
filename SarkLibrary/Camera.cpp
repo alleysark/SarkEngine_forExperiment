@@ -96,12 +96,12 @@ namespace sark{
 	Camera::~Camera(){}
 
 	// get view transformation matrix
-	const Matrix4& Camera::GetViewMatrix(){
+	const Matrix4& Camera::GetViewMatrix() const {
 		return mViewMatrix;
 	}
 
 	// get projection transformation matrix
-	const Matrix4& Camera::GetProjMatrix(){
+	const Matrix4& Camera::GetProjMatrix() const {
 		return mVolume.projMatrix;
 	}
 
