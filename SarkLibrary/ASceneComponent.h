@@ -115,7 +115,7 @@ namespace sark{
 		Transform& GetTransform();
 
 		// get collider. it is Nullable pointer.
-		virtual const ACollider* GetCollider() const = 0;
+		virtual ACollider* GetCollider() = 0;
 		
 		// get mesh object of scene component.
 		// it can be NULL for the shapeless component like light.

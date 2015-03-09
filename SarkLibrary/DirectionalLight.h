@@ -27,7 +27,7 @@ namespace sark{
 
 		// directional light doesn't have collider.
 		// so it simply returns NULL.
-		const ACollider* GetCollider() const override;
+		ACollider* GetCollider() override;
 
 		Mesh* GetMesh() override;
 

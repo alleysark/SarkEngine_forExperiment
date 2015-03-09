@@ -1,5 +1,6 @@
 #include "AModel.h"
 #include "Mesh.h"
+#include "Material.h"
 #include "RigidBody.h"
 #include "ACollider.h"
 
@@ -22,7 +23,7 @@ namespace sark{
 	}
 
 	// get collider. it is Nullable pointer.
-	const ACollider* AModel::GetCollider() const{
+	ACollider* AModel::GetCollider() {
 		return mCollider;
 	}
 
@@ -42,6 +43,15 @@ namespace sark{
 	// get mesh object of scene component.
 	Mesh* AModel::GetMesh(){
 		return mMesh;
+	}
+
+	std::shared_ptr<Material> AModel::GetMaterial() {
+		return mMaterialRef;
+	}
+
+	// set material
+	void AModel::SetMaterial(std::shared_ptr<Material> material) {
+		mMaterialRef = material;
 	}
 
 	// get rigid body. it can be NULL for the non-rigid body.

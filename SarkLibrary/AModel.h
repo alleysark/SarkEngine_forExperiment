@@ -4,19 +4,24 @@
 #include <memory>
 #include "core.h"
 #include "ASceneComponent.h"
+#include "IUncopiable.hpp"
 
 namespace sark{
 
 	class Mesh;
+	class Material;
 	class RigidBody;
 	class ACollider;
 
 	// renderable model component.
 	// for simplification, it uses single mesh model.
-	class AModel : public ASceneComponent{
+	class AModel : public ASceneComponent, IUncopiable {
 	protected:
 		// single mesh.
 		Mesh* mMesh;
+		
+		// material reference
+		std::shared_ptr<Material> mMaterialRef;
 
 		// model can be rigid body.
 		RigidBody* mRigidBody;
@@ -29,14 +34,9 @@ namespace sark{
 
 		virtual ~AModel();
 
-	private:
-		// it is non-copiable class.
-		AModel(const AModel&);
-		AModel& operator=(const AModel&);
-
 	public:
 		// get collider. it is Nullable pointer.
-		const ACollider* GetCollider() const override;
+		ACollider* GetCollider() override;
 
 		// set new collider or empty unique_ptr.
 		// you may pass new collider through memory allocation
@@ -45,6 +45,12 @@ namespace sark{
 
 		// get mesh object of scene component.
 		Mesh* GetMesh() override;
+
+		// get material reference of model
+		std::shared_ptr<Material> GetMaterial();
+
+		// set material
+		void SetMaterial(std::shared_ptr<Material> material);
 
 		// get rigid body. it can be NULL for the non-rigid body.
 		RigidBody* GetRigidBody() override;

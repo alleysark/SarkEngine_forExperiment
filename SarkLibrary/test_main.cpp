@@ -7,6 +7,7 @@
 #include "RigidSphere.h"
 #include "BMPResource.h"
 #include "PNGResource.h"
+#include "OBJResource.h"
 #include "Debug.h"
 #include "Sampler.h"
 #include "Texture.h"
@@ -18,6 +19,7 @@
 #include "OBoxCollider.h"
 #include "SphereCollider.h"
 #include "RigidBody.h"
+#include "tools.h"
 using namespace sark;
 
 #pragma comment(lib, "opengl32.lib")
@@ -351,8 +353,74 @@ public:
 			{ AttributeSemantic::NORMAL, "normal" },
 			{ AttributeSemantic::TEXCOORD0, "texcoord0" }
 		};
-		recipe.vertexShader = "version 440;\n void main(){}";
-		recipe.fragmentShader = "version 440:\n void main(){}";
+		recipe.vertexShader =
+			"#version 440						\n"
+			"in vec3 position;					\n"
+			"in vec3 normal;					\n"
+			"in vec2 texcoord0;					\n"
+			"uniform mat4 matWorld;				\n"
+			"uniform mat4 matView;				\n"
+			"uniform mat4 matProjection;		\n"
+			"out vec4 wpos;						\n"
+			"out vec3 norm;						\n"
+			"out vec2 texcoord;					\n"
+			"void main(){													\n"
+			"	wpos = matWorld * vec4(position, 1);						\n"
+			"	norm = (transpose(inverse(matWorld))*vec4(normal, 0)).xyz;	\n"
+			"	texcoord = texcoord0;										\n"
+			"	gl_Position = matProjection * matView * wpos;				\n"
+			"}";
+		recipe.fragmentShader =
+			"#version 440										\n"
+			"struct DirLight{									\n"
+			"	vec4 amb;										\n"
+			"	vec4 dif;										\n"
+			"	vec4 spec;										\n"
+			"	vec3 dir;										\n"
+			"};													\n"
+			"struct Material{									\n"
+			"	vec4 amb;										\n"
+			"	vec4 dif;										\n"
+			"	vec4 spec;										\n"
+			"	float shi;										\n"
+			"};													\n"
+			"													\n"
+			"uniform mat4 matWorld;								\n"
+			"uniform mat4 matView;								\n"
+			"uniform mat4 matProjection;						\n"
+			"uniform vec3 weye;									\n"
+			"uniform DirLight light;							\n"
+			"uniform sampler2D texSamp;							\n"
+			"													\n"
+			"in vec4 wpos;										\n"
+			"in vec3 norm;										\n"
+			"in vec2 texcoord;									\n"
+			"													\n"
+			"out vec4 fragColor;								\n"
+			"													\n"
+			"vec4 globalAmb = vec4(0.1, 0.1, 0.1, 1);			\n"
+			"Material mtrl = Material(vec4(0.9, 0.9, 0.9, 1),	\n"
+			"					vec4(1, 1, 1, 1),				\n"
+			"					vec4(0.9, 0.9, 0.9, 1), 16.0);	\n"
+			"													\n"
+			"void main(){										\n"
+			"	vec3 n = normalize(norm);						\n"
+			"	vec3 v = normalize(weye - wpos.xyz);			\n"
+			"	vec3 l = -light.dir;							\n"
+			"	float sc=0;										\n"
+			"	float cosNL = max(dot(n,l), 0.05);				\n"
+			"	vec4 texDif;									\n"
+			"													\n"
+			"	if(cosNL > 0.05 ){								\n"
+			"		vec3 r = 2*cosNL*n - l;						\n"
+			"		sc = pow(max(dot(r,v),0), mtrl.shi);		\n"
+			"	}												\n"
+			"													\n"
+			"	texDif = texture(texSamp, texcoord);			\n"
+			"	fragColor = cosNL*light.dif*texDif				\n"
+			"				+ sc*light.spec*mtrl.spec			\n"
+			"				+ light.amb*mtrl.amb;				\n"
+			"}";
 
 		renderer = ShaderChef::CookShaderProgram(recipe);
 
@@ -360,8 +428,8 @@ public:
 		mCameras.push_back(Camera(Position3(0, 40, 30), Position3(0, 0, 0)));
 		mMainCam = &mCameras[0];
 
-		mObj = new RigidCube(10, 10, 10, 0.1, 0, 0, true);
-		mObj->SetCollider(std::unique_ptr<ACollider>(new OBoxCollider(mObj, Vector3(0), Vector3(5, 5, 5))));
+		mObj = new RigidCube(10, 10, 10, 0.1, 0, 0, false);
+		mObj->SetCollider(std::unique_ptr<ACollider>(new OBoxCollider(mObj, Vector3(0), 5)));
 		mLayers[0].Push(mObj);
 		mObj->GetTransform().Translate(0, 0, 0);
 		AddSceneComponent(mObj);
@@ -372,6 +440,20 @@ public:
 		mSphere->GetTransform().Translate(20, 0, 0);
 		AddSceneComponent(mSphere);
 
+		// obj test
+		OBJResource* obj = gpEngine->GetResourceManager().Load<OBJResource>("D:\\Down\\bunny_tex.obj");
+		if (obj == NULL) {
+			LogError("Failed to load object");
+		}
+		obj->MakeItCenter();
+		StaticModel* model = static_cast<StaticModel*>(obj->CreateModel());
+		const Vector3 center = tool::ComputeCenterOfMass(obj->GetVertices());
+		model->SetCollider(std::unique_ptr<ACollider>(new OBoxCollider(model, center, Vector3(10,10,10))));
+		model->GetTransform().Scale(100, 100, 100);
+		mLayers[0].Push(model);
+		AddSceneComponent(model);
+
+
 		mLight = new DirectionalLight(
 			ColorRGBA(0.3, 0.3, 0.3, 1),
 			ColorRGBA(0.9, 0.9, 0.9, 1),
@@ -380,10 +462,10 @@ public:
 		AddSceneComponent(mLight);
 
 		// load texture resource
-		gpEngine->GetResourceManager().SetBasePath("D:\\DOWN\\");
-		PNGResource* png = gpEngine->GetResourceManager().Load<PNGResource>("test.png");
-		if (png == NULL)
-			return;
+		PNGResource* png = gpEngine->GetResourceManager().Load<PNGResource>("D:\\Down\\test.png");
+		if (png == NULL) {
+			LogError("Failed to load texture");
+		}
 		// create texture
 		tex = new Texture(Texture::TEX_2D, png, Texture::InternalFormat::FOUR);
 
@@ -620,7 +702,7 @@ public:
 			"	shCoord.x = (shCoord.x + 1.0) / 2.0;			\n"
 			"	shCoord.y = (shCoord.y + 1.0) / 2.0;			\n"
 			"	shCoord.z = (shCoord.z + 1.0) / 2.0;			\n"
-			"	shDepth = texture(shadowTexSamp, shCoord.xy);	\n"
+			"	shDepth = texture(shadowTexSamp, shCoord.xy).x;	\n"
 			"													\n"
 			"	if(shDepth+0.005 < shCoord.z){					\n"
 			"		shd = 0.3;									\n"
@@ -670,8 +752,7 @@ public:
 		AddSceneComponent(mLight);
 
 		// load texture resource
-		gpEngine->GetResourceManager().SetBasePath("D:\\DOWN\\");
-		PNGResource* png = gpEngine->GetResourceManager().Load<PNGResource>("test.png");
+		PNGResource* png = gpEngine->GetResourceManager().Load<PNGResource>("D:\\Down\\test.png");
 		if (png == NULL)
 			return;
 
@@ -1306,14 +1387,6 @@ public:
 
 
 
-
-
-
-
-
-
-
-
 class TestScene2 : public AScene{
 public:
 	std::shared_ptr<ShaderProgram> renderer;
@@ -1324,40 +1397,81 @@ public:
 	TestScene2(){
 		ShaderProgram::Recipe recipe;
 		recipe.attributes = {
-			{ AttributeSemantic::POSITION, "position" },
-			{ AttributeSemantic::NORMAL, "normal" }
-		};
-		recipe.uniforms = {
-			ShaderProgram::UniformInfo("matWorld"),
-			ShaderProgram::UniformInfo("matView"),
-			ShaderProgram::UniformInfo("matProj")
+				{ AttributeSemantic::POSITION, "position" },
+				{ AttributeSemantic::NORMAL, "normal" }
 		};
 		recipe.vertexShader =
-			"#version 440 \n"
-			"in vec3 position; \n"
-			"in vec3 normal; \n"
-			"uniform mat4 matWorld; \n"
-			"uniform mat4 matView; \n"
-			"uniform mat4 matProj; \n"
-			"void main() { \n"
-			"	gl_Position = matProj * matView * matWorld * vec4(position, 1.0); \n"
+			"#version 440						\n"
+			"in vec3 position;					\n"
+			"in vec3 normal;					\n"
+			"uniform mat4 matWorld;				\n"
+			"uniform mat4 matView;				\n"
+			"uniform mat4 matProjection;		\n"
+			"out vec4 wpos;						\n"
+			"out vec3 norm;						\n"
+			"void main(){													\n"
+			"	wpos = matWorld * vec4(position, 1);						\n"
+			"	norm = (transpose(inverse(matWorld))*vec4(normal, 0)).xyz;	\n"
+			"	gl_Position = matProjection * matView * wpos;				\n"
 			"}";
-			
 		recipe.fragmentShader =
-			"#version 440 \n"
-			"out vec4 fragColor; \n"
-			"void main() { \n"
-			"	fragColor = vec4(1,1,1,1); \n"
+			"#version 440										\n"
+			"struct DirLight{									\n"
+			"	vec4 amb;										\n"
+			"	vec4 dif;										\n"
+			"	vec4 spec;										\n"
+			"	vec3 dir;										\n"
+			"};													\n"
+			"struct Material{									\n"
+			"	vec4 amb;										\n"
+			"	vec4 dif;										\n"
+			"	vec4 spec;										\n"
+			"	float shi;										\n"
+			"};													\n"
+			"													\n"
+			"uniform mat4 matWorld;								\n"
+			"uniform mat4 matView;								\n"
+			"uniform mat4 matProjection;						\n"
+			"uniform vec3 weye;									\n"
+			"uniform DirLight light;							\n"
+			"													\n"
+			"in vec4 wpos;										\n"
+			"in vec3 norm;										\n"
+			"													\n"
+			"out vec4 fragColor;								\n"
+			"													\n"
+			"Material mtrl = Material(vec4(0.3, 0.3, 0.3, 1),	\n"
+			"					vec4(0.7,0.7,0.7,1),			\n"
+			"					vec4(0.9, 0.9, 0.9, 1), 16.0);	\n"
+			"													\n"
+			"void main(){										\n"
+			"	vec3 n = normalize(norm);						\n"
+			"	vec3 v = normalize(weye - wpos.xyz);			\n"
+			"	vec3 l = -light.dir;							\n"
+			"	float sc=0;										\n"
+			"	float cosNL = max(dot(n,l), 0.05);				\n"
+			"													\n"
+			"	if(cosNL > 0.05 ){								\n"
+			"		vec3 r = 2*cosNL*n - l;						\n"
+			"		sc = pow(max(dot(r,v),0), mtrl.shi);		\n"
+			"	}												\n"
+			"													\n"
+			"	fragColor = cosNL*light.dif*mtrl.dif			\n"
+			"				+ sc*light.spec*mtrl.spec			\n"
+			"				+ light.amb*mtrl.amb;				\n"
 			"}";
-
 		renderer = ShaderChef::CookShaderProgram(recipe);
 
 		mLayers.push_back(Layer());
 		mCameras.push_back(Camera(Position3(0, 40, 30), Position3(0, 0, 0)));
 		mMainCam = &mCameras[0];
 
+		RigidCube* model = new RigidCube(10, 10, 10, 0, 0, 0, false);
+		
+		/*
 		StaticModel* model = new StaticModel("", NULL, true);
 		ArrayBuffer& arrbuf = model->GetMesh()->GetArrayBuffer();
+		
 		arrbuf.GenAttributeBuffer<Position3>(AttributeSemantic::POSITION, {
 			Vector3(0, 5, 0), Vector3(-7, -3, 0), Vector3(7, -3, 0)
 		});
@@ -1368,8 +1482,9 @@ public:
 			TriangleFace16(0, 1, 2)
 		});
 		arrbuf.SetDrawMode(ArrayBuffer::DrawMode::TRIANGLES);
+		*/
 
-		model->SetCollider(std::unique_ptr<ACollider>(new OBoxCollider(model, 0, Vector3(7, 5, 0.1))));
+		model->SetCollider(std::unique_ptr<ACollider>(new OBoxCollider(model, 0, Vector3(5,5,5))));
 		AddSceneComponent(model);
 		mLayers[0].Push(model);
 
@@ -1379,9 +1494,6 @@ public:
 			ColorRGBA(0.9, 0.9, 0.9, 1));
 		mLight->GetTransform().Rotate(0, math::deg2rad(-45), 0);
 		AddSceneComponent(mLight);
-
-		glDisable(GL_CULL_FACE);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
 	~TestScene2(){}
@@ -1448,7 +1560,13 @@ public:
 
 		renderer->Use();
 		renderer->SetUniform("matView", mMainCam->GetViewMatrix());
-		renderer->SetUniform("matProj", mMainCam->GetProjMatrix());
+		renderer->SetUniform("matProjection", mMainCam->GetProjMatrix());
+
+		renderer->SetUniform("eyePos", mMainCam->GetEye());
+		renderer->SetUniform("light.amb", mLight->GetAmbient());
+		renderer->SetUniform("light.dif", mLight->GetDiffuse());
+		renderer->SetUniform("light.spec", mLight->GetSpecular());
+		renderer->SetUniform("light.dir", mLight->GetTransform().GetDirection());
 
 		ComponentMap::iterator itr = mComponents.begin();
 		ComponentMap::iterator end = mComponents.end();
@@ -1476,8 +1594,6 @@ public:
 };
 
 
-
-
 //---------------------------------------------------------------------
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdShow){
 	// ============ initialization ===============
@@ -1491,21 +1607,17 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 		gpEngine->Halt();
 	}, Input::Keyboard::CODE_ESC);
 
-	Input::keyboard.RegisterKeyCombHandler([]()->void{
-		if (!gpEngine->Pause()){
-			gpEngine->Resume();
-		}
-	}, Input::Keyboard::CODE_SPACE);
 	
 	// add custom scene
-	gpEngine->AddScene("scMain", new TestScene2(), true);
+	gpEngine->AddScene("scMain", new TestScene(), true);
 
+	// initialize global settings
 	gpEngine->SetClearColor(ColorRGBA(0.12f, 0.12f, 0.12f, 1.0f));
-	gpEngine->ResizeWindow(600, 400);
+	gpEngine->ResizeWindow(1200, 800);
 
 	// ============= run engine loop =============
-	gpEngine->GetTimer().FixateFlow(true);
-	gpEngine->GetTimer().SetFixedDeltaTime(1.f / 30.f);
+//	gpEngine->GetTimer().FixateFlow(true);
+//	gpEngine->GetTimer().SetFixedDeltaTime(1.f / 30.f);
 	gpEngine->Run();
 
 	// ======= release engine and user data ======

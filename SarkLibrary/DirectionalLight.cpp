@@ -21,7 +21,7 @@ namespace sark{
 
 	// directional light doesn't have collider.
 	// so it simply returns NULL.
-	const ACollider* DirectionalLight::GetCollider() const{
+	ACollider* DirectionalLight::GetCollider() {
 		return NULL;
 	}
 

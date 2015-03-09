@@ -80,6 +80,8 @@
   <ItemGroup>
     <ClCompile Include="AABoxCollider.cpp" />
     <ClCompile Include="ACollider.cpp" />
+    <ClCompile Include="BasicScene.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="AModel.cpp" />
     <ClCompile Include="ArrayBuffer.cpp" />
     <ClCompile Include="ASceneComponent.cpp" />
@@ -119,6 +121,8 @@
   <ItemGroup>
     <ClInclude Include="AABoxCollider.h" />
     <ClInclude Include="ALight.h" />
+    <ClInclude Include="BasicScene.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="AModel.h" />
     <ClInclude Include="ArrayBuffer.h" />
     <ClInclude Include="ASceneComponent.h" />
@@ -154,6 +158,7 @@
     <ClInclude Include="Timer.h" />
     <ClInclude Include="tools.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="IUncopiable.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

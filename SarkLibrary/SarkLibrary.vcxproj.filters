@@ -40,6 +40,9 @@
     <Filter Include="Header Files\extras\resource">
       <UniqueIdentifier>{762811da-a4f6-472d-be20-c24b39bc36c5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\core-system\interfaces">
+      <UniqueIdentifier>{aa0e7160-f05f-4a17-8322-18165925913a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_main.cpp">
@@ -153,6 +156,12 @@
     <ClCompile Include="OBJResource.cpp">
       <Filter>Header Files\extras\resource</Filter>
     </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="BasicScene.cpp">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -265,6 +274,15 @@
     </ClInclude>
     <ClInclude Include="OBJResource.h">
       <Filter>Header Files\extras\resource</Filter>
+    </ClInclude>
+    <ClInclude Include="IUncopiable.hpp">
+      <Filter>Header Files\core-system\interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files\core-system\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicScene.h">
+      <Filter>Header Files\core-system\rendering</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
