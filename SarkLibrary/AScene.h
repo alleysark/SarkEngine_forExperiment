@@ -92,6 +92,10 @@ namespace sark{
 		// so, every derived class have to ensure release all of "your resources".
 		virtual ~AScene();
 
+		// get main camera
+		Camera* GetMainCamera();
+		const Camera* GetMainCamera() const;
+
 		// clear whole scene components
 		void ClearSceneComponents();
 

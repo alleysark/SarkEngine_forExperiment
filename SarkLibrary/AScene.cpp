@@ -92,6 +92,15 @@ namespace sark{
 		ClearSceneComponents();
 	}
 
+	// get main camera
+	Camera* AScene::GetMainCamera() {
+		return mMainCam;
+	}
+
+	const Camera* AScene::GetMainCamera() const {
+		return mMainCam;
+	}
+
 	// clear whole scene components
 	void AScene::ClearSceneComponents(){
 		ComponentMap::iterator itr = mComponents.begin();
