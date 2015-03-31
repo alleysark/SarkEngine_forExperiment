@@ -60,7 +60,7 @@ namespace sark{
 
 		const void* GetPixels() const override;
 
-		static BMPResource* LoadImp(const std::string& name);
+		static s_ptr<BMPResource> LoadImp(const std::string& name);
 	};
 	
 }

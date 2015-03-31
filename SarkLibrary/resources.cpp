@@ -7,10 +7,6 @@ namespace sark{
 	{}
 
 	ResourceManager::~ResourceManager(){
-		ResourceMap::iterator itr = mResources.begin();
-		ResourceMap::iterator end = mResources.end();
-		for (; itr != end; itr++)
-			delete itr->second;
 		mResources.clear();
 	}
 

@@ -46,7 +46,7 @@ namespace sark{
 		return mPixels;
 	}
 
-	BMPResource* BMPResource::LoadImp(const std::string& name){
+	s_ptr<BMPResource> BMPResource::LoadImp(const std::string& name){
 		BITMAPFILEHEADER bmpFileHead;
 		BITMAPINFOHEADER bmpInfoHead;
 		memset(&bmpFileHead, 0, sizeof(BITMAPFILEHEADER));
@@ -76,7 +76,7 @@ namespace sark{
 				return NULL;
 		}
 
-		BMPResource* bmp = new BMPResource();
+		s_ptr<BMPResource> bmp = s_ptr<BMPResource>(new BMPResource());
 		bmp->mWidth = bmpInfoHead.biWidth;
 		bmp->mHeight = bmpInfoHead.biHeight;
 		bmp->mPixels = new uint8[bmp->mWidth * bmp->mHeight * 3];

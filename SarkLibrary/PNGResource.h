@@ -43,7 +43,7 @@ namespace sark{
 
 		// load png resource.
 		// implementation reference: http://zarb.org/~gc/html/libpng.html
-		static PNGResource* LoadImp(const std::string& name);
+		static s_ptr<PNGResource> LoadImp(const std::string& name);
 	};
 }
 #endif

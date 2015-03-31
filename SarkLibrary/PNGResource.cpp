@@ -39,7 +39,7 @@ namespace sark{
 		return mPixels;
 	}
 
-	PNGResource* PNGResource::LoadImp(const std::string& name){
+	s_ptr<PNGResource> PNGResource::LoadImp(const std::string& name){
 		png_structp png_ptr = NULL;
 		png_infop info_ptr = NULL;
 		FILE *fp = NULL;
@@ -137,7 +137,7 @@ namespace sark{
 		}
 
 		// read image
-		PNGResource* png = new PNGResource();
+		s_ptr<PNGResource> png = s_ptr<PNGResource>(new PNGResource());
 		png->mWidth = width;
 		png->mHeight = height;
 		png->mFormat = pngPixelFormat;

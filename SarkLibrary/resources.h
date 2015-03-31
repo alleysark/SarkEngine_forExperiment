@@ -20,7 +20,7 @@ namespace sark{
 	// resources can be cached by its name when it is already loaded before using
 	class ResourceManager{
 	public:
-		typedef std::map<std::string, IResource*> ResourceMap;
+		typedef std::map<std::string, s_ptr<IResource>> ResourceMap;
 
 	private:
 		// resources are stored
@@ -40,13 +40,13 @@ namespace sark{
 		void SetBasePath(const std::string& pathName);
 
 		template<class ResourceType>
-		ResourceType* Load(const std::string& name){
+		s_ptr<ResourceType> Load(const std::string& name){
 			ResourceMap::iterator itr = mResources.find(name);
 			if (itr != mResources.end()){
-				return dynamic_cast<ResourceType*>(itr->second);
+				return std::dynamic_pointer_cast<ResourceType>(itr->second);
 			}
 
-			ResourceType* resc = ResourceType::Load(mBasePath + name);
+			s_ptr<ResourceType> resc = ResourceType::Load(mBasePath + name);
 			if (resc == NULL){
 				return NULL;
 			}
@@ -77,13 +77,13 @@ namespace sark{
 	template<class ImpResourceType>
 	class IResourceLoader{
 	public:
-		static ImpResourceType* Load(const std::string& path){
+		static s_ptr<ImpResourceType> Load(const std::string& path){
 			return ImpResourceType::LoadImp(path);
 		}
 
 		// do not forget to implementing static method 'LoadImp'.
 		// it'll emit error if you are not.
-		// static ImpResourceType* LoadImp(const std::string& path) = 0;
+		// static s_ptr<ImpResourceType> LoadImp(const std::string& path) = 0;
 	};
 
 	// texture resource interface

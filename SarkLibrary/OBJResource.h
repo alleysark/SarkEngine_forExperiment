@@ -47,7 +47,7 @@ namespace sark {
 			ASceneComponent* parent = NULL, bool activate = true) const override;
 
 		// load obj resource.
-		static OBJResource* LoadImp(const std::string& path);
+		static s_ptr<OBJResource> LoadImp(const std::string& path);
 	};
 
 }

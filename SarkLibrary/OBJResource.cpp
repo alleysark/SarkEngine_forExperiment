@@ -69,7 +69,7 @@ namespace sark {
 	}
 
 	// load obj resource.
-	OBJResource* OBJResource::LoadImp(const std::string& path) {
+	s_ptr<OBJResource> OBJResource::LoadImp(const std::string& path) {
 		std::ifstream fin(path.c_str());
 		if (!fin.is_open()) {
 			LogError("cannot open file " + path);
@@ -151,7 +151,7 @@ namespace sark {
 			}
 		}
 
-		OBJResource* obj = new OBJResource();
+		s_ptr<OBJResource> obj = s_ptr<OBJResource>(new OBJResource());
 		obj->mVertices = vertices;
 		obj->mFaces = faces;
 		obj->mNormals = normals;
