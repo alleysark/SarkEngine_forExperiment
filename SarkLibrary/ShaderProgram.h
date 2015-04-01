@@ -7,7 +7,7 @@
 #include <GL/glew.h>
 
 #include "core.h"
-namespace sark{
+namespace sark {
 
 	class Sampler;
 	class Texture;
@@ -39,7 +39,7 @@ namespace sark{
 
 	// programmable shader program.
 	// it'll be created by ShaderDictionary 
-	class ShaderProgram{
+	class ShaderProgram {
 	public:	
 		typedef GLint Location;
 		typedef std::map<std::string, Location> UniformMap;
@@ -48,7 +48,7 @@ namespace sark{
 			AttributeSemantic semantic; // location
 			const char* name;
 
-			AttributeInfo(){}
+			AttributeInfo() {}
 			AttributeInfo(AttributeSemantic _semantic, const char* _name)
 				: semantic(_semantic), name(_name) {}
 		};
@@ -115,13 +115,13 @@ namespace sark{
 		//========================================================
 
 		//---------------------
-		//		sampler
+		//		texture
 		//---------------------
 
-		// set sampler with texture into the uniform sampler 'name'
+		// set texture into the uniform texture sampler 'name'
 		// as active texture unit 'activeTex'
-		void SetSampler(const std::string& name,
-			const Sampler* sampler, const Texture* texture, uint16 activeTex = 0);
+		void SetTexture(const std::string& name,
+			const Texture* texture, uint16 activeTex = 0);
 
 
 		//---------------------

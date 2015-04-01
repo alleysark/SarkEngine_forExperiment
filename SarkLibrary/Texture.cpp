@@ -2,7 +2,7 @@
 #include "resources.h"
 #include "Debug.h"
 
-namespace sark{
+namespace sark {
 
 	// generate texture from fully given texture properties.
 	// height for 2D, depth for 3D texture only.
@@ -15,7 +15,7 @@ namespace sark{
 		glGenTextures(1, &mTexId);
 
 		glBindTexture(mDimension, mTexId);
-		switch (mDimension){
+		switch (mDimension) {
 		case TEX_1D:
 			glTexImage1D(TEX_1D, mipmapLevel, internalFormat,
 				width, (border ? 1 : 0),
@@ -35,7 +35,7 @@ namespace sark{
 			break;
 		}
 
-		if (genMipMap){
+		if (genMipMap) {
 			glGenerateMipmap(mDimension);
 		}
 		glBindTexture(mDimension, 0);
@@ -43,7 +43,7 @@ namespace sark{
 
 	// generate texture from given parameter.
 	// please ensure that it is called with proper dimensional texture resource.
-	Texture::Texture(Dimension dimension, const ITextureResource* texResource,
+	Texture::Texture(Dimension dimension, s_ptr<const ITextureResource> texResource,
 		InternalFormat internalFormat, bool border, uint32 mipmapLevel, bool genMipMap)
 		: Texture(dimension, mipmapLevel, internalFormat,
 		texResource->GetWidth(), texResource->GetHeight(), texResource->GetDepth(),
@@ -51,25 +51,34 @@ namespace sark{
 	{}
 
 	// delete texture object
-	Texture::~Texture(){
-		if (mTexId != 0){
+	Texture::~Texture() {
+		if (mTexId != 0) {
 			glDeleteTextures(1, &mTexId);
 			mTexId = 0;
 		}
 	}
 
 	// get texture handle id
-	const ObjectHandle Texture::GetHandleID() const{
+	const ObjectHandle Texture::GetHandleID() const {
 		return mTexId;
 	}
 
+	// get sampler
+	Sampler& Texture::GetSampler() {
+		return mSampler;
+	}
+	const Sampler& Texture::GetSampler() const {
+		return mSampler;
+	}
+
 	// bind texture
-	void Texture::Bind() const{
+	void Texture::Bind(uint16 activeTex) const {
 		glBindTexture(mDimension, mTexId);
+		mSampler.Bind(activeTex);
 	}
 
 	// unbind texture
-	void Texture::Unbind() const{
+	void Texture::Unbind() const {
 		glBindTexture(mDimension, 0);
 	}
 

@@ -38,12 +38,12 @@ public:
 		LAYER_PICKABLE = 1
 	};
 
-	std::shared_ptr<ShaderProgram> renderer;
+	s_ptr<ShaderProgram> renderer;
 
 	DirectionalLight* mLight;
 
-	Sampler* samp;
-	Texture* tex;
+	s_ptr<Sampler> samp;
+	s_ptr<Texture> tex;
 
 	ConvexHull* makeBoxConvexHull(RigidCube* cube){
 		real w = cube->GetWidth() / 2.f;
@@ -94,8 +94,8 @@ public:
 		mLayers.push_back(Layer()); //layer for physics simulation
 		mLayers.push_back(Layer()); //layer for pickable components.
 
-		mCameras.push_back(Camera(Position3(0, 30, 30), Position3(0, 15, 0)));
-		mMainCam = &mCameras[0];
+		mCameras.push_back(new Camera(Position3(0, 30, 30), Position3(0, 15, 0)));
+		mMainCam = mCameras[0];
 
 		// --------------------------- sphere ---------------------------------
 		/*
@@ -107,36 +107,36 @@ public:
 		*/
 
 		// ----------------------------- box ----------------------------------
-		RigidCube* box = new RigidCube(5, 10, 5, 1, 0, 0, true);
-		box->SetCollider(std::unique_ptr<ACollider>(makeBoxConvexHull(box)));
+		auto box = new RigidCube(5, 10, 5, 1, 0, 0, true);
+		box->SetCollider(makeBoxConvexHull(box));
 		mLayers[LAYER_PHYSICS].Push(box);
 		mLayers[LAYER_PICKABLE].Push(box);
 		box->GetTransform().Translate(0, 30, 0);
 		AddSceneComponent(box);
 
 		// ----------------------------- room ---------------------------------
-		RigidCube* wall = new RigidCube(50, 1, 50, 0, 0, 0, false);
-		wall->SetCollider(std::unique_ptr<ACollider>(makeBoxConvexHull(wall)));
+		auto wall = new RigidCube(50, 1, 50, 0, 0, 0, false);
+		wall->SetCollider(makeBoxConvexHull(wall));
 		mLayers[LAYER_PHYSICS].Push(wall);
 		wall->GetTransform().Translate(0, 0, 0);
 		AddSceneComponent(wall);
 
 		wall = new RigidCube(50, 1, 50, 0, 0, 0, false);
-		wall->SetCollider(std::unique_ptr<ACollider>(makeBoxConvexHull(wall)));
+		wall->SetCollider(makeBoxConvexHull(wall));
 		mLayers[LAYER_PHYSICS].Push(wall);
 		wall->GetTransform().Rotate(0, math::deg2rad(90), math::deg2rad(90));
 		wall->GetTransform().Translate(-25, 25.5f, 0);
 		AddSceneComponent(wall);
 
 		wall = new RigidCube(50, 1, 50, 0, 0, 0, false);
-		wall->SetCollider(std::unique_ptr<ACollider>(makeBoxConvexHull(wall)));
+		wall->SetCollider(makeBoxConvexHull(wall));
 		mLayers[LAYER_PHYSICS].Push(wall);
 		wall->GetTransform().Rotate(0, math::deg2rad(90), math::deg2rad(-90));
 		wall->GetTransform().Translate(25, 25.5f, 0);
 		AddSceneComponent(wall);
 
 		wall = new RigidCube(50, 1, 50, 0, 0, 0, false);
-		wall->SetCollider(std::unique_ptr<ACollider>(makeBoxConvexHull(wall)));
+		wall->SetCollider(makeBoxConvexHull(wall));
 		mLayers[LAYER_PHYSICS].Push(wall);
 		wall->GetTransform().Rotate(0, math::deg2rad(90), 0);
 		wall->GetTransform().Translate(0, 25.5f, -25);
@@ -165,41 +165,38 @@ public:
 
 		// load texture resource
 		gpEngine->GetResourceManager().SetBasePath("D:\\DOWN\\");
-		PNGResource* png = gpEngine->GetResourceManager().Load<PNGResource>("test.png");
+		s_ptr<PNGResource> png = gpEngine->GetResourceManager().Load<PNGResource>("test.png");
 		if (png == NULL)
 			return;
 		// create texture
-		tex = new Texture(Texture::TEX_2D, png, Texture::InternalFormat::FOUR);
+		tex = s_ptr<Texture>(new Texture(Texture::TEX_2D, png, Texture::InternalFormat::FOUR));
 
 		// create sampler
-		samp = new Sampler();
+		samp = s_ptr<Sampler>(new Sampler());
 		samp->SetState(Sampler::WRAP_S, Sampler::WrapMode::CLAMP_TO_EDGE);
 		samp->SetState(Sampler::WRAP_T, Sampler::WrapMode::CLAMP_TO_EDGE);
 		samp->SetState(Sampler::MIN_FILTER, Sampler::Filter::LINEAR);
 		samp->SetState(Sampler::MAG_FILTER, Sampler::Filter::LINEAR);
 	}
 
-	~PhysicsSimulationScene(){
-		delete samp;
-		delete tex;
-	}
+	~PhysicsSimulationScene() {}
 
-	void OnEnter() override{
+	void OnEnter() override {
 		// mouse handlers
 		static Position2 prvPos;
-		static ASceneComponent* graspComponent = NULL;
+		static ASceneComponent* graspComponent;
 
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_DRAG,
 			[&](const Position2& pos, real ext)->void{
 			Vector2 mv = pos - prvPos;
-			if (graspComponent == NULL){
-				mMainCam->Yaw(mv.x / 180.f);
-				mMainCam->Pitch(mv.y / 180.f);
-			}
-			else{
+			if (graspComponent != NULL) {
 				graspComponent->GetTransform().RotateMore(mMainCam->GetBasisV(), mv.x / 180.f);
 				graspComponent->GetTransform().RotateMore(mMainCam->GetBasisU(), mv.y / 180.f);
+			}
+			else {
+				mMainCam->Yaw(mv.x / 180.f);
+				mMainCam->Pitch(mv.y / 180.f);
 			}
 			prvPos = pos;
 		});
@@ -214,10 +211,10 @@ public:
 			Layer::ReplicaArrayIterator itr = mLayers[LAYER_PICKABLE].Begin();
 			Layer::ReplicaArrayIterator end = mLayers[LAYER_PICKABLE].End();
 			for (; itr != end; itr++){
-				const ACollider* bs = (*itr)->GetCollider();
-
+				auto bs = (*itr)->GetCollider();
 				if (bs == NULL)
 					continue;
+
 				if (ray.IntersectWith(bs))
 					graspComponent = (*itr);
 			}
@@ -225,7 +222,7 @@ public:
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_UP,
 			[&](const Position2& pos, real ext)->void{
-			if (graspComponent != NULL){
+			if (!graspComponent){
 				graspComponent = NULL;
 			}
 		});
@@ -238,7 +235,7 @@ public:
 			Layer::ReplicaArrayIterator itr = mLayers[LAYER_PICKABLE].Begin();
 			Layer::ReplicaArrayIterator end = mLayers[LAYER_PICKABLE].End();
 			for (; itr != end; itr++){
-				const ACollider* bs = (*itr)->GetCollider();
+				auto bs = (*itr)->GetCollider();
 
 				if (bs == NULL)
 					continue;
@@ -318,24 +315,11 @@ public:
 		}
 		renderer->Unuse();
 	}
-
-	// main scene camera view setting
-	void OnScreenChanged(uinteger width, uinteger height) override{
-		mMainCam->SetViewport(0, 0, width, height);
-		mMainCam->Perspective(60, (real)width / (real)height, 0.1f, 1000.f);
-
-		//----------------
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glMultTransposeMatrixf(mMainCam->GetProjMatrix().GetRawMatrix());
-		glMatrixMode(GL_MODELVIEW);
-		//----------------
-	}
 };
 
 class TestScene : public AScene{
 public:
-	std::shared_ptr<ShaderProgram> renderer;
+	s_ptr<ShaderProgram> renderer;
 
 	// dynamic light list
 	DirectionalLight* mLight;
@@ -343,8 +327,8 @@ public:
 	RigidCube* mObj;
 	RigidSphere* mSphere;
 
-	Sampler* samp;
-	Texture* tex;
+	s_ptr<Sampler> samp;
+	s_ptr<Texture> tex;
 
 	TestScene(){
 		ShaderProgram::Recipe recipe;
@@ -425,30 +409,30 @@ public:
 		renderer = ShaderChef::CookShaderProgram(recipe);
 
 		mLayers.push_back(Layer());
-		mCameras.push_back(Camera(Position3(0, 40, 30), Position3(0, 0, 0)));
-		mMainCam = &mCameras[0];
+		mCameras.push_back(new Camera(Position3(0, 40, 30), Position3(0, 0, 0)));
+		mMainCam = mCameras[0];
 
 		mObj = new RigidCube(10, 10, 10, 0.1, 0, 0, false);
-		mObj->SetCollider(std::unique_ptr<ACollider>(new OBoxCollider(mObj, Vector3(0), 5)));
+		mObj->SetCollider(new OBoxCollider(mObj, Vector3(0), 5));
 		mLayers[0].Push(mObj);
 		mObj->GetTransform().Translate(0, 0, 0);
 		AddSceneComponent(mObj);
 
 		mSphere = new RigidSphere(10, 40, 40, 0, 0, 0, false);
-		mSphere->SetCollider(std::unique_ptr<ACollider>(new SphereCollider(mSphere, Vector3(0), 10)));
+		mSphere->SetCollider(new SphereCollider(mSphere, Vector3(0), 10));
 		mLayers[0].Push(mSphere);
 		mSphere->GetTransform().Translate(20, 0, 0);
 		AddSceneComponent(mSphere);
 
 		// obj test
-		OBJResource* obj = gpEngine->GetResourceManager().Load<OBJResource>("D:\\Down\\bunny_tex.obj");
+		auto obj = gpEngine->GetResourceManager().Load<OBJResource>("D:\\Down\\bunny_tex.obj");
 		if (obj == NULL) {
 			LogError("Failed to load object");
 		}
 		obj->MakeItCenter();
-		StaticModel* model = static_cast<StaticModel*>(obj->CreateModel());
+		auto model = obj->CreateModel();
 		const Vector3 center = tool::ComputeCenterOfMass(obj->GetVertices());
-		model->SetCollider(std::unique_ptr<ACollider>(new OBoxCollider(model, center, Vector3(10,10,10))));
+		model->SetCollider(new OBoxCollider(model, center, Vector3(10,10,10)));
 		model->GetTransform().Scale(100, 100, 100);
 		mLayers[0].Push(model);
 		AddSceneComponent(model);
@@ -462,42 +446,39 @@ public:
 		AddSceneComponent(mLight);
 
 		// load texture resource
-		PNGResource* png = gpEngine->GetResourceManager().Load<PNGResource>("D:\\Down\\test.png");
+		auto png = gpEngine->GetResourceManager().Load<PNGResource>("D:\\Down\\test.png");
 		if (png == NULL) {
 			LogError("Failed to load texture");
 		}
 		// create texture
-		tex = new Texture(Texture::TEX_2D, png, Texture::InternalFormat::FOUR);
+		tex = s_ptr<Texture>(new Texture(Texture::TEX_2D, png, Texture::InternalFormat::FOUR));
 
 		// create sampler
-		samp = new Sampler();
+		samp = s_ptr<Sampler>(new Sampler());
 		samp->SetState(Sampler::WRAP_S, Sampler::WrapMode::CLAMP_TO_EDGE);
 		samp->SetState(Sampler::WRAP_T, Sampler::WrapMode::CLAMP_TO_EDGE);
 		samp->SetState(Sampler::MIN_FILTER, Sampler::Filter::LINEAR);
 		samp->SetState(Sampler::MAG_FILTER, Sampler::Filter::LINEAR);
 	}
 
-	~TestScene(){
-		delete samp;
-		delete tex;
-	}
+	~TestScene(){}
 
 	void OnEnter() override{
 		// mouse handlers
 		static Position2 prvPos;
-		static ASceneComponent* graspComponent = NULL;
+		static ASceneComponent* graspComponent;
 
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_DRAG,
 			[&](const Position2& pos, real ext)->void{
 			Vector2 mv = pos - prvPos;
-			if (graspComponent == NULL){
-				mMainCam->Yaw(mv.x / 180.f);
-				mMainCam->Pitch(mv.y / 180.f);
-			}
-			else{
+			if (graspComponent != NULL) {
 				graspComponent->GetTransform().RotateMore(mMainCam->GetBasisV(), mv.x / 180.f);
 				graspComponent->GetTransform().RotateMore(mMainCam->GetBasisU(), mv.y / 180.f);
+			}
+			else {
+				mMainCam->Yaw(mv.x / 180.f);
+				mMainCam->Pitch(mv.y / 180.f);
 			}
 			prvPos = pos;
 		});
@@ -512,10 +493,10 @@ public:
 			Layer::ReplicaArrayIterator itr = mLayers[0].Begin();
 			Layer::ReplicaArrayIterator end = mLayers[0].End();
 			for (; itr != end; itr++){
-				const ACollider* bs = (*itr)->GetCollider();
-
+				auto bs = (*itr)->GetCollider();
 				if (bs == NULL)
 					continue;
+
 				if (ray.IntersectWith(bs))
 					graspComponent = (*itr);
 			}
@@ -523,7 +504,7 @@ public:
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_UP,
 			[&](const Position2& pos, real ext)->void{
-			if (graspComponent != NULL){
+			if (!graspComponent){
 				graspComponent = NULL;
 			}
 		});
@@ -595,38 +576,25 @@ public:
 		}
 		renderer->Unuse();
 	}
-
-	// main scene camera view setting
-	void OnScreenChanged(uinteger width, uinteger height) override{
-		mMainCam->SetViewport(0, 0, width, height);
-		mMainCam->Perspective(60, (real)width / (real)height, 0.1f, 1000.f);
-
-		//----------------
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glMultTransposeMatrixf(mMainCam->GetProjMatrix().GetRawMatrix());
-		glMatrixMode(GL_MODELVIEW);
-		//----------------
-	}
 };
 
 class ShadowmapTestScene : public AScene{
 public:
-	std::shared_ptr<ShaderProgram> renderer;
+	s_ptr<ShaderProgram> renderer;
 
 	RigidCube* mObj;
 	RigidSphere* mSphere;
 
-	Sampler* samp;
-	Texture* tex;
+	s_ptr<Sampler> samp;
+	s_ptr<Texture> tex;
 
 	// dynamic light list
 	DirectionalLight* mLight;
 
 	// shadow map
-	FrameBuffer* mShadowMap;
-	Sampler* mShSamp;
-	std::shared_ptr<ShaderProgram> mShadowRenderer;
+	s_ptr<FrameBuffer> mShadowMap;
+	s_ptr<Sampler> mShSamp;
+	s_ptr<ShaderProgram> mShadowRenderer;
 
 	ShadowmapTestScene(){
 		ShaderProgram::Recipe recipe;
@@ -722,9 +690,9 @@ public:
 		renderer = ShaderChef::CookShaderProgram(recipe);
 
 		mLayers.push_back(Layer());
-		mCameras.push_back(Camera(Position3(0, 20, 20), Position3(0, 0, 0)));
+		mCameras.push_back(new Camera(Position3(0, 20, 20), Position3(0, 0, 0)));
 
-		RigidCube* ground = new RigidCube("ground", NULL, true, 1000, 1, 200);
+		auto ground = new RigidCube("ground", NULL, true, 1000, 1, 200);
 		ground->GetTransform().Translate(0, -30, 0);
 		AddSceneComponent(ground);
 
@@ -734,12 +702,12 @@ public:
 		AddSceneComponent(ground);
 
 		mObj = new RigidCube("obj1", NULL, false, 10, 10, 10);
-		mObj->SetCollider(std::unique_ptr<ACollider>(new OBoxCollider(mObj, 0, { 5, 5, 5 })));
+		mObj->SetCollider(new OBoxCollider(mObj, 0, { 5, 5, 5 }));
 		AddSceneComponent(mObj);
 		mLayers[0].Push(mObj);
 
 		mSphere = new RigidSphere("obj2", mObj, false, 10, 40, 40);
-		mSphere->SetCollider(std::unique_ptr<ACollider>(new SphereCollider(mSphere, 0, 10)));
+		mSphere->SetCollider(new SphereCollider(mSphere, 0, 10));
 		mSphere->GetTransform().Translate(20, 0, 0);
 		AddSceneComponent(mSphere);
 		mLayers[0].Push(mSphere);
@@ -752,15 +720,15 @@ public:
 		AddSceneComponent(mLight);
 
 		// load texture resource
-		PNGResource* png = gpEngine->GetResourceManager().Load<PNGResource>("D:\\Down\\test.png");
+		auto png = gpEngine->GetResourceManager().Load<PNGResource>("D:\\Down\\test.png");
 		if (png == NULL)
 			return;
 
 		// create texture
-		tex = new Texture(Texture::TEX_2D, png, Texture::InternalFormat::THREE);
+		tex = s_ptr<Texture>(new Texture(Texture::TEX_2D, png, Texture::InternalFormat::THREE));
 
 		// create sampler
-		samp = new Sampler();
+		samp = s_ptr<Sampler>(new Sampler());
 		samp->SetState(Sampler::WRAP_S, Sampler::WrapMode::CLAMP_TO_EDGE);
 		samp->SetState(Sampler::WRAP_T, Sampler::WrapMode::CLAMP_TO_EDGE);
 		samp->SetState(Sampler::MIN_FILTER, Sampler::Filter::LINEAR);
@@ -787,12 +755,12 @@ public:
 		mShadowRenderer = ShaderChef::CookShaderProgram(recipe);
 
 		// shadow map frame buffer
-		mShadowMap = new FrameBuffer();
+		mShadowMap = s_ptr<FrameBuffer>(new FrameBuffer());
 		mShadowMap->Bind();
 		mShadowMap->AttachTexture(
-			new Texture(Texture::TEX_2D, 0,
+			s_ptr<Texture>(new Texture(Texture::TEX_2D, 0,
 			Texture::InternalFormat::DEPTH_COMPONENT, 1024, 1024, 0, false,
-			Texture::Format::DEPTH_COMPONENT, Texture::PixelType::UNSIGNED_BYTE, NULL),
+			Texture::Format::DEPTH_COMPONENT, Texture::PixelType::UNSIGNED_BYTE, NULL)),
 			FrameBuffer::AttachmentPoint::DEPTH_ATTACHMENT);
 		glDrawBuffer(GL_NONE);//we won't bind a color texture with the currently bound FBO
 		glReadBuffer(GL_NONE);
@@ -803,45 +771,37 @@ public:
 		}
 		mShadowMap->Unbind();
 
-		mShSamp = new Sampler();
+		mShSamp = s_ptr<Sampler>(new Sampler());
 		mShSamp->SetState(Sampler::WRAP_S, Sampler::WrapMode::CLAMP);
 		mShSamp->SetState(Sampler::WRAP_T, Sampler::WrapMode::CLAMP);
 		mShSamp->SetState(Sampler::MIN_FILTER, Sampler::Filter::NEAREST);
 		mShSamp->SetState(Sampler::MAG_FILTER, Sampler::Filter::NEAREST);
 		
-		mCameras.push_back(
-			Camera(Position3(0,0,0), mLight->GetTransform().GetDirection())
-			);
-		mCameras[1].Orthographic(-200, 200, -200, 200, -500, 500);
-		mCameras[1].SetViewport(0, 0, 1024, 1024);
+		mCameras.push_back(new Camera(Position3(0,0,0), mLight->GetTransform().GetDirection()));
+		mCameras[1]->Orthographic(-200, 200, -200, 200, -500, 500);
+		mCameras[1]->SetViewport(0, 0, 1024, 1024);
 
-		mMainCam = &mCameras[0];
+		mMainCam = mCameras[0];
 	}
 
-	~ShadowmapTestScene(){
-		delete samp;
-		delete tex;
-
-		delete mShadowMap;
-		delete mShSamp;
-	}
+	~ShadowmapTestScene() {}
 
 	void OnEnter() override{
 		// mouse handlers
 		static Position2 prvPos;
-		static ASceneComponent* graspComponent = NULL;
+		static ASceneComponent* graspComponent;
 
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_DRAG,
 			[&](const Position2& pos, real ext)->void{
 			Vector2 mv = pos - prvPos;
-			if (graspComponent == NULL){
-				mMainCam->Yaw(mv.x / 180.f);
-				mMainCam->Pitch(mv.y / 180.f);
-			}
-			else{
+			if (graspComponent != NULL) {
 				graspComponent->GetTransform().RotateMore(mMainCam->GetBasisV(), mv.x / 180.f);
 				graspComponent->GetTransform().RotateMore(mMainCam->GetBasisU(), mv.y / 180.f);
+			}
+			else {
+				mMainCam->Yaw(mv.x / 180.f);
+				mMainCam->Pitch(mv.y / 180.f);
 			}
 			prvPos = pos;
 		});
@@ -856,20 +816,18 @@ public:
 			Layer::ReplicaArrayIterator itr = mLayers[0].Begin();
 			Layer::ReplicaArrayIterator end = mLayers[0].End();
 			for (; itr != end; itr++){
-				const ACollider* bs = (*itr)->GetCollider();
-
+				auto bs = (*itr)->GetCollider();
 				if (bs == NULL)
 					continue;
-				if (ray.IntersectWith(bs)){
+
+				if (ray.IntersectWith(bs))
 					graspComponent = (*itr);
-					break;
-				}
 			}
 		});
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_UP,
 			[&](const Position2& pos, real ext)->void{
-			if (graspComponent != NULL){
+			if (!graspComponent){
 				graspComponent = NULL;
 			}
 		});
@@ -912,13 +870,13 @@ public:
 	}
 
 	void Render(){
-		Matrix4 lightVP = mCameras[1].GetProjMatrix() * mCameras[1].GetViewMatrix();
+		Matrix4 lightVP = mCameras[1]->GetProjMatrix() * mCameras[1]->GetViewMatrix();
 		ComponentMap::iterator itr;
 		ComponentMap::iterator end;
 
 		// ------1st--------
 		mShadowMap->Bind();
-		mCameras[1].SetViewport();
+		mCameras[1]->SetViewport();
 		glColorMask(0, 0, 0, 0);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_CULL_FACE);
@@ -964,13 +922,6 @@ public:
 			itr->second->Render();
 		}
 		renderer->Unuse();
-	}
-
-	// main scene camera view setting
-	void OnScreenChanged(uinteger width, uinteger height) override{
-		//mMainCam = &mCameras[0];
-		mMainCam->SetViewport(0, 0, width, height);
-		mMainCam->Perspective(60, (real)width / (real)height, 0.1f, 1000.f);
 	}
 };
 
@@ -1217,7 +1168,7 @@ public:
 
 class TmpScene : public AScene{
 public:
-	std::shared_ptr<ShaderProgram> renderer;
+	s_ptr<ShaderProgram> renderer;
 
 	AnimatedModel* animModel;
 
@@ -1268,8 +1219,8 @@ public:
 		renderer = ShaderChef::CookShaderProgram(recipe);
 
 		mLayers.push_back(Layer());
-		mCameras.push_back(Camera(Position3(0, 0, 20), Position3(0, 0, 0)));
-		mMainCam = &mCameras[0];
+		mCameras.push_back(new Camera(Position3(0, 0, 20), Position3(0, 0, 0)));
+		mMainCam = mCameras[0];
 
 		// create test animated model
 		animModel = new AnimatedModel("", NULL, true);
@@ -1353,10 +1304,6 @@ public:
 	}
 
 	void Render(){
-		//----------------
-		glMultTransposeMatrixf(mMainCam->GetViewMatrix().GetRawMatrix());
-		//----------------
-
 		renderer->Use();
 		renderer->SetUniform("matView", mMainCam->GetViewMatrix());
 		renderer->SetUniform("matProjection", mMainCam->GetProjMatrix());
@@ -1367,19 +1314,6 @@ public:
 
 		renderer->Unuse();
 	}
-
-	// main scene camera view setting
-	void OnScreenChanged(uinteger width, uinteger height) override{
-		mMainCam->SetViewport(0, 0, width, height);
-		mMainCam->Perspective(60, (real)width / (real)height, 0.1f, 1000.f);
-
-		//----------------
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glMultTransposeMatrixf(mMainCam->GetProjMatrix().GetRawMatrix());
-		glMatrixMode(GL_MODELVIEW);
-		//----------------
-	}
 };
 
 
@@ -1389,7 +1323,7 @@ public:
 
 class TestScene2 : public AScene{
 public:
-	std::shared_ptr<ShaderProgram> renderer;
+	s_ptr<ShaderProgram> renderer;
 
 	// dynamic light list
 	DirectionalLight* mLight;
@@ -1463,10 +1397,10 @@ public:
 		renderer = ShaderChef::CookShaderProgram(recipe);
 
 		mLayers.push_back(Layer());
-		mCameras.push_back(Camera(Position3(0, 40, 30), Position3(0, 0, 0)));
-		mMainCam = &mCameras[0];
+		mCameras.push_back(new Camera(Position3(0, 40, 30), Position3(0, 0, 0)));
+		mMainCam = mCameras[0];
 
-		RigidCube* model = new RigidCube(10, 10, 10, 0, 0, 0, false);
+		auto model = new RigidCube(10, 10, 10, 0, 0, 0, false);
 		
 		/*
 		StaticModel* model = new StaticModel("", NULL, true);
@@ -1484,7 +1418,7 @@ public:
 		arrbuf.SetDrawMode(ArrayBuffer::DrawMode::TRIANGLES);
 		*/
 
-		model->SetCollider(std::unique_ptr<ACollider>(new OBoxCollider(model, 0, Vector3(5,5,5))));
+		model->SetCollider(new OBoxCollider(model, 0, Vector3(5,5,5)));
 		AddSceneComponent(model);
 		mLayers[0].Push(model);
 
@@ -1501,19 +1435,19 @@ public:
 	void OnEnter() override{
 		// mouse handlers
 		static Position2 prvPos;
-		static ASceneComponent* graspComponent = NULL;
+		static ASceneComponent* graspComponent;
 
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_DRAG,
 			[&](const Position2& pos, real ext)->void{
 			Vector2 mv = pos - prvPos;
-			if (graspComponent == NULL){
-				mMainCam->Yaw(mv.x / 180.f);
-				mMainCam->Pitch(mv.y / 180.f);
-			}
-			else{
+			if (graspComponent != NULL) {
 				graspComponent->GetTransform().RotateMore(mMainCam->GetBasisV(), mv.x / 180.f);
 				graspComponent->GetTransform().RotateMore(mMainCam->GetBasisU(), mv.y / 180.f);
+			}
+			else {
+				mMainCam->Yaw(mv.x / 180.f);
+				mMainCam->Pitch(mv.y / 180.f);
 			}
 			prvPos = pos;
 		});
@@ -1528,10 +1462,10 @@ public:
 			Layer::ReplicaArrayIterator itr = mLayers[0].Begin();
 			Layer::ReplicaArrayIterator end = mLayers[0].End();
 			for (; itr != end; itr++){
-				const ACollider* bs = (*itr)->GetCollider();
-
+				auto bs = (*itr)->GetCollider();
 				if (bs == NULL)
 					continue;
+
 				if (ray.IntersectWith(bs))
 					graspComponent = (*itr);
 			}
@@ -1539,7 +1473,9 @@ public:
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_UP,
 			[&](const Position2& pos, real ext)->void{
-
+			if (!graspComponent){
+				graspComponent = NULL;
+			}
 		});
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_WHEEL,
@@ -1554,10 +1490,6 @@ public:
 	}
 
 	void Render(){
-		//----------------
-		glMultTransposeMatrixf(mMainCam->GetViewMatrix().GetRawMatrix());
-		//----------------
-
 		renderer->Use();
 		renderer->SetUniform("matView", mMainCam->GetViewMatrix());
 		renderer->SetUniform("matProjection", mMainCam->GetProjMatrix());
@@ -1577,19 +1509,6 @@ public:
 			itr->second->Render();
 		}
 		renderer->Unuse();
-	}
-
-	// main scene camera view setting
-	void OnScreenChanged(uinteger width, uinteger height) override{
-		mMainCam->SetViewport(0, 0, width, height);
-		mMainCam->Perspective(60, (real)width / (real)height, 0.1f, 1000.f);
-
-		//----------------
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glMultTransposeMatrixf(mMainCam->GetProjMatrix().GetRawMatrix());
-		glMatrixMode(GL_MODELVIEW);
-		//----------------
 	}
 };
 

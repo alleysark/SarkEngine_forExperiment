@@ -3,23 +3,25 @@
 
 #include <GL/glew.h>
 #include "core.h"
+#include "Sampler.h"
+#include "IUncopiable.hpp"
 
-namespace sark{
+namespace sark {
 
 	class ITextureResource;
 
 	// texture object.
 	// be careful not to confuse Texture with ITextureResource.
-	class Texture{
+	class Texture : public IUncopiable {
 	public:
-		enum Dimension{
+		enum Dimension {
 			TEX_1D = GL_TEXTURE_1D,
 			TEX_2D = GL_TEXTURE_2D,
 			TEX_3D = GL_TEXTURE_3D
 		};
 
-		struct _InternalFormatWrapper{
-			enum InternalFormat{
+		struct _InternalFormatWrapper {
+			enum InternalFormat {
 				// most common internal formats
 				ONE = 1, TWO = 2, THREE = 3, FOUR = 4,
 
@@ -66,8 +68,8 @@ namespace sark{
 		};
 		typedef enum _InternalFormatWrapper::InternalFormat InternalFormat;
 
-		struct _FormatWrapper{
-			enum Format{
+		struct _FormatWrapper {
+			enum Format {
 				// most common formats
 				RGB = GL_RGB,
 				RGBA = GL_RGBA,
@@ -87,8 +89,8 @@ namespace sark{
 		};
 		typedef enum _FormatWrapper::Format Format;
 
-		struct _PixelTypeWrapper{
-			enum PixelType{
+		struct _PixelTypeWrapper {
+			enum PixelType {
 				// most common pixel type
 				UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
 
@@ -124,6 +126,9 @@ namespace sark{
 		// dimension
 		Dimension mDimension;
 
+		// sampler for this texture
+		Sampler mSampler;
+
 	private:
 		Texture();
 
@@ -137,7 +142,7 @@ namespace sark{
 
 		// generate texture from given texture resource with other properties.
 		// please ensure that it should be called with proper dimensional texture resource.
-		Texture(Dimension dimension, const ITextureResource* texResource,
+		Texture(Dimension dimension, s_ptr<const ITextureResource> texResource,
 			InternalFormat internalFormat = InternalFormat::FOUR,
 			bool border = false, uint32 mipmapLevel = 0, bool genMipMap = false);
 
@@ -147,8 +152,12 @@ namespace sark{
 		// get texture handle id
 		const ObjectHandle GetHandleID() const;
 
-		// bind texture
-		void Bind() const;
+		// get sampler
+		Sampler& GetSampler();
+		const Sampler& GetSampler() const;
+
+		// bind texture and sampler
+		void Bind(uint16 activeTex = 0) const;
 
 		// unbind texture
 		void Unbind() const;

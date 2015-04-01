@@ -111,6 +111,10 @@ namespace sark{
 
 	// release application
 	void Engine::ReleaseApp(){
+		for (auto sc = mScenes.begin(); sc != mScenes.end(); sc++) {
+			delete sc->second;
+		}
+		mScenes.clear();
 		DisableGLContext();
 	}
 
@@ -179,6 +183,7 @@ namespace sark{
 		}
 		return true;
 	}
+
 	bool Engine::SetCurrentScene(const std::string& sceneName){
 		SceneContainer::const_iterator find = mScenes.find(sceneName);
 		if (find == mScenes.cend())
@@ -189,6 +194,10 @@ namespace sark{
 		mCurrentScene = find->second;
 		mCurrentScene->OnEnter();
 		return true;
+	}
+
+	AScene* Engine::GetCurrentScene() {
+		return mCurrentScene;
 	}
 
 	void Engine::SetClearColor(const ColorRGBA& color){

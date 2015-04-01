@@ -5,7 +5,8 @@
 
 namespace sark{
 
-	StaticModel::StaticModel(const std::string& name, ASceneComponent* parent, bool activate)
+	StaticModel::StaticModel(const std::string& name, 
+		ASceneComponent* parent, bool activate)
 		: AModel(name, parent, activate)
 	{}
 

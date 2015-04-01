@@ -110,7 +110,10 @@ namespace sark{
 		// ---------- configuration methods ------------
 	public:
 		bool AddScene(const std::string& sceneName, AScene* scene, bool asCurrent = false);
+		
 		bool SetCurrentScene(const std::string& sceneName);
+		
+		AScene* GetCurrentScene();
 
 		void SetClearColor(const ColorRGBA& color);
 

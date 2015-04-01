@@ -80,7 +80,8 @@ namespace sark{
 	}
 
 	// create sphere from given properties
-	RigidSphere::RigidSphere(const std::string& name, ASceneComponent* parent, bool activate,
+	RigidSphere::RigidSphere(
+		const std::string& name, ASceneComponent* parent, bool activate,
 		real radius, uinteger slice, uinteger stack,
 		real invMass,
 		const Vector3& velocity, const Vector3& angularVelocity,
@@ -99,12 +100,6 @@ namespace sark{
 	}
 
 	RigidSphere::~RigidSphere(){
-		if (mMesh != NULL)
-			delete mMesh;
-		if (mRigidBody != NULL)
-			delete mRigidBody;
-		if (mCollider != NULL)
-			delete mCollider;
 	}
 
 	// get radius of sphere.

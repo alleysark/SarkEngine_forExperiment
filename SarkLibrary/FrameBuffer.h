@@ -3,10 +3,9 @@
 
 #include <vector>
 #include "core.h"
+#include "Texture.h"
 
 namespace sark{
-
-	class Texture;
 
 	// frame buffer object.
 	// it can define additional render target.
@@ -67,7 +66,7 @@ namespace sark{
 		bool CheckStatus();
 
 		// get texture at index of 'idx'
-		const Texture* GetTextureAt(uinteger idx);
+		Texture* GetTextureAt(uinteger idx);
 
 		// bind this frame buffer object
 		void Bind() const;

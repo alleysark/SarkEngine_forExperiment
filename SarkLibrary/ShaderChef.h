@@ -10,17 +10,15 @@
 
 #include "core.h"
 #include "ShaderProgram.h"
+#include "IUncopiable.hpp"
 
-namespace sark{
+namespace sark {
 
 	// shader chef class (shader creation helper)
 	// it cooks shader program from given recipe.
-	class ShaderChef {
+	class ShaderChef : public IUncopiable {
 	private:
-		static std::list<std::shared_ptr<ShaderProgram>> mSpList;
-
 		ShaderChef();
-		ShaderChef(const ShaderChef&);
 
 	public:
 		~ShaderChef();
@@ -28,7 +26,7 @@ namespace sark{
 		// cook a shader program from given recipe.
 		// whole shaders are compiled as 'version'. shader objects are attached
 		// and are linked into program. it'll return NULL if it failed.
-		static std::shared_ptr<ShaderProgram> CookShaderProgram(const ShaderProgram::Recipe& recipe);
+		static ShaderProgram* CookShaderProgram(const ShaderProgram::Recipe& recipe);
 
 	private:
 		// create and compile shader object

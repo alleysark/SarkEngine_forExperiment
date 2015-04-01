@@ -16,10 +16,10 @@ namespace sark{
 
 	// pure abstract scene components class.
 	// all scene components have unique component id
-	class ASceneComponent{
+	class ASceneComponent {
 	public:
 		typedef uint32 ComponentID;
-		typedef std::list<ASceneComponent*> ChildComponentContainer;
+		typedef std::list<ASceneComponent*> ChildContainer;
 
 	private:
 		static ComponentID _nextComponentID;
@@ -40,7 +40,7 @@ namespace sark{
 		// child scene components of this component.
 		// scene component can be composed as hierarchical structure.
 		// please do not make the circle in the family-tree.
-		ChildComponentContainer mChildren;
+		ChildContainer mChildren;
 
 		// local scene component transform object
 		Transform mTransform;
@@ -63,13 +63,7 @@ namespace sark{
 		// every derived class have to ensure release of your resources.
 		virtual ~ASceneComponent();
 
-		// update interface
-		virtual void Update() = 0;
-
-		// render interface
-		virtual void Render() = 0;
-
-
+		
 		// get scene component ID
 		const ComponentID& GetComponentID() const;
 
@@ -90,21 +84,24 @@ namespace sark{
 		// get a child who is firstly matched with queried name
 		ASceneComponent* GetChild(const std::string& name);
 
-		// push a child into its children container as uniquely
-		bool PushChild(ASceneComponent* child);
+		// add a child into its children container as uniquely
+		bool AddChild(ASceneComponent* child);
 
-		// pull a child from its children container. it doesn't delete pulled child from memory
-		ASceneComponent* PullChild(const ComponentID& id);
+		// delete a child from its children container. it doesn't delete pulled child from memory
+		void DeleteChild(const ComponentID& id);
 
 
 		// get all the children who are matched with queried name
-		const ChildComponentContainer GetChildren(const std::string& name);
+		std::list<ASceneComponent*> GetChildren(const std::string& name);
 		// save all the children who are matched with queried name 
 		// into given list reference. it returns the size of result.
-		uint32 GetChildren(const std::string& name, ChildComponentContainer& refContainer);
+		uint32 GetChildren(const std::string& name, std::list<ASceneComponent*>& refContainer);
 
 		// get the children container
-		ChildComponentContainer& GetChildren();
+		ChildContainer& GetChildren();
+
+		// is this scene component child of given component?
+		bool IsChildOf(const ComponentID& id);
 
 
 		// it considers the Transform class as its friend 
@@ -113,6 +110,12 @@ namespace sark{
 
 		// get transform object of this component. it is local transform object.
 		Transform& GetTransform();
+
+		// update interface
+		virtual void Update() = 0;
+
+		// render interface
+		virtual void Render() = 0;
 
 		// get collider. it is Nullable pointer.
 		virtual ACollider* GetCollider() = 0;

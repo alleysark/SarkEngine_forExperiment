@@ -12,8 +12,8 @@ namespace sark {
 		mLayers.push_back(Layer()); //LAYER_LIGHT
 
 		// make basic camera and set as main
-		mCameras.push_back(Camera(Position3(0, 10, 15), Position3(0, 0, 0)));
-		mMainCam = &mCameras[0];
+		mCameras.push_back(new Camera(Position3(0, 10, 15), Position3(0, 0, 0)));
+		mMainCam = mCameras[0];
 	}
 
 	BasicScene::~BasicScene() {
@@ -53,9 +53,9 @@ namespace sark {
 		auto itr = mLayers[LAYER_MODEL_RENDER].Begin();
 		auto end = mLayers[LAYER_MODEL_RENDER].End();
 		for (; itr != end; itr++) {
-			AModel* model = dynamic_cast<AModel*>(*itr);
-			std::shared_ptr<Material> mtrl = model->GetMaterial();
-			mtrl->Prepare(this, model);
+			AModel* model = reinterpret_cast<AModel*>(*itr);
+			Material* mtrl = model->GetMaterial();
+			mtrl->Prepare(model);
 			model->Render();
 		}
 	}

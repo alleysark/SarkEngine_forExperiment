@@ -7,6 +7,7 @@ and declare useful functions additionally which are not included in 'math.h'
 */
 #include <math.h>
 
+#include <memory>
 #include <float.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -50,6 +51,14 @@ namespace sark{
 #endif
 
 	typedef GLuint ObjectHandle;
+
+
+	// standard shared pointer alias
+	template<class T>
+	using s_ptr = std::shared_ptr<T>;
+
+	template<class T>
+	using w_ptr = std::weak_ptr<T>;
 
 
 	// namespace of math library

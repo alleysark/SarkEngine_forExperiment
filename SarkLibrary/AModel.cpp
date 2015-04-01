@@ -27,17 +27,9 @@ namespace sark{
 		return mCollider;
 	}
 
-	// set new collider or empty unique_ptr.
-	void AModel::SetCollider(std::unique_ptr<ACollider>& newColl){
-		if (mCollider != NULL){
-			delete mCollider;
-			mCollider = NULL;
-		}
-
-		if (newColl){
-			mCollider = newColl.get();
-			newColl.release();
-		}
+	// set new collider or empty by null pointer
+	void AModel::SetCollider(ACollider* newColl){
+		mCollider = newColl;
 	}
 
 	// get mesh object of scene component.
@@ -45,13 +37,13 @@ namespace sark{
 		return mMesh;
 	}
 
-	std::shared_ptr<Material> AModel::GetMaterial() {
-		return mMaterialRef;
+	Material* AModel::GetMaterial() {
+		return mMaterial;
 	}
 
 	// set material
-	void AModel::SetMaterial(std::shared_ptr<Material> material) {
-		mMaterialRef = material;
+	void AModel::SetMaterial(Material* material) {
+		mMaterial = material;
 	}
 
 	// get rigid body. it can be NULL for the non-rigid body.
@@ -60,16 +52,8 @@ namespace sark{
 	}
 
 	// set new rigid body or empty unique_ptr.
-	void AModel::SetRigidBody(std::unique_ptr<RigidBody>& newBody){
-		if (mRigidBody != NULL){
-			delete mRigidBody;
-			mRigidBody = NULL;
-		}
-
-		if (newBody){
-			mRigidBody = newBody.get();
-			newBody.release();
-		}
+	void AModel::SetRigidBody(RigidBody* newBody){
+		mRigidBody = newBody;
 	}
 
 }

@@ -21,7 +21,7 @@ namespace sark{
 		Mesh* mMesh;
 		
 		// material reference
-		std::shared_ptr<Material> mMaterialRef;
+		Material* mMaterial;
 
 		// model can be rigid body.
 		RigidBody* mRigidBody;
@@ -38,31 +38,27 @@ namespace sark{
 		// get collider. it is Nullable pointer.
 		ACollider* GetCollider() override;
 
-		// set new collider or empty unique_ptr.
-		// you may pass new collider through memory allocation
-		// then setter is going to release given unique pointer.
-		void SetCollider(std::unique_ptr<ACollider>& newColl);
+		// set new collider or empty by null pointer
+		void SetCollider(ACollider* newColl);
 
 		// get mesh object of scene component.
 		Mesh* GetMesh() override;
 
 		// get material reference of model
-		std::shared_ptr<Material> GetMaterial();
+		Material* GetMaterial();
 
 		// set material
-		void SetMaterial(std::shared_ptr<Material> material);
+		void SetMaterial(Material* material);
 
 		// get rigid body. it can be NULL for the non-rigid body.
 		RigidBody* GetRigidBody() override;
 
-		// set new rigid body or empty unique_ptr.
-		// you may pass new rigid body through memory allocation
-		// then setter is going to release given unique pointer.
+		// set new rigid body or empty by null pointer
 		// 
 		// *note: if you already have rigid body object, you can modify
 		// its properties through the instance pointer from GetRigidBody().
 		// it's better then reallocation with entire properties.
-		void SetRigidBody(std::unique_ptr<RigidBody>& newBody);
+		void SetRigidBody(RigidBody* newBody);
 	};
 
 }

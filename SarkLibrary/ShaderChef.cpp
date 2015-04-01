@@ -3,32 +3,21 @@
 #include "Debug.h"
 #include <fstream>
 
-namespace sark{
+namespace sark {
 
-	std::list<std::shared_ptr<ShaderProgram>> ShaderChef::mSpList;
+	ShaderChef::ShaderChef() {}
 
-	ShaderChef::ShaderChef(){}
-	ShaderChef::ShaderChef(const ShaderChef&){}
-
-	ShaderChef::~ShaderChef(){}
+	ShaderChef::~ShaderChef() {}
 
 
 	// cook a shader program from given recipe.
 	// whole shaders are compiled as 'version'. shader objects are attached
 	// and are linked into program. it'll return NULL if it failed.
-	std::shared_ptr<ShaderProgram> ShaderChef::CookShaderProgram(const ShaderProgram::Recipe& recipe){
-		// check if required shader program is already exist
-		for (std::list<std::shared_ptr<ShaderProgram>>::const_iterator citr = mSpList.cbegin();
-			citr != mSpList.cend(); citr++) {
-			if ((*citr)->GetID() == recipe.id) {
-				return (*citr);
-			}
-		}
-
+	ShaderProgram* ShaderChef::CookShaderProgram(const ShaderProgram::Recipe& recipe) {
 		ObjectHandle progObj = 0,
 			vtxObj = 0, tcsObj = 0, tesObj = 0, geoObj = 0, fragObj = 0;
 
-		#define CLEAR_SHOBJS() do{\
+		#define CLEAR_SHOBJS() do {\
 				if (vtxObj != 0) glDeleteShader(vtxObj); \
 				if (tcsObj != 0) glDeleteShader(tcsObj); \
 				if (tesObj != 0) glDeleteShader(tesObj); \
@@ -50,7 +39,7 @@ namespace sark{
 		}
 
 		vtxObj = CreateShader(GL_VERTEX_SHADER, recipe.vertexShader);
-		if (vtxObj == 0){
+		if (vtxObj == 0) {
 			LogWarn("failed to create vertex shader");
 			glDeleteProgram(progObj);
 			CLEAR_SHOBJS();
@@ -92,7 +81,7 @@ namespace sark{
 
 		// create fragment shader object
 		fragObj = CreateShader(GL_FRAGMENT_SHADER, recipe.fragmentShader);
-		if (fragObj == 0){
+		if (fragObj == 0) {
 			LogWarn("failed to create fragment shader");
 			glDeleteProgram(progObj);
 			CLEAR_SHOBJS();
@@ -109,13 +98,13 @@ namespace sark{
 		// bind pre-defined attribute semantics
 		// and copy the sementic list.
 		uinteger attribSz = recipe.attributes.size();
-		for (uinteger i = 0; i < attribSz; i++){
+		for (uinteger i = 0; i < attribSz; i++) {
 			glBindAttribLocation(progObj, recipe.attributes[i].semantic, recipe.attributes[i].name);
 		}
 
 		// link program and check link error
 		glLinkProgram(progObj);
-		if (!CheckProgram(progObj)){
+		if (!CheckProgram(progObj)) {
 			glDeleteProgram(progObj);
 			CLEAR_SHOBJS(progObj, vtxObj, fragObj);
 			return NULL;
@@ -131,10 +120,7 @@ namespace sark{
 		// clear all shader objects
 		CLEAR_SHOBJS();
 
-		std::shared_ptr<ShaderProgram> shaderProg(new ShaderProgram(progObj, recipe));
-		mSpList.push_back(shaderProg);
-
-		return shaderProg;
+		return new ShaderProgram(progObj, recipe);
 		#undef CLEAR_SHOBJS
 	}
 
@@ -153,7 +139,7 @@ namespace sark{
 		glCompileShader(shObj);
 
 		// check compilation error
-		if (!CheckShader(shObj)){
+		if (!CheckShader(shObj)) {
 			glDeleteShader(shObj);
 			return 0;
 		}
@@ -162,13 +148,13 @@ namespace sark{
 	}
 
 	// check shader after compilation. it'll log the info if there are compilation errors.
-	bool ShaderChef::CheckShader(ObjectHandle obj){
+	bool ShaderChef::CheckShader(ObjectHandle obj) {
 		GLint state;
 		glGetShaderiv(obj, GL_COMPILE_STATUS, &state);
-		if (GL_FALSE == state){
+		if (GL_FALSE == state) {
 			int infologLength = 0;
 			glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
-			if (infologLength > 1){
+			if (infologLength > 1) {
 				int charsWritten = 0;
 				char *infoLog = new char[infologLength];
 				glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);
@@ -181,13 +167,13 @@ namespace sark{
 	}
 
 	// check program after linking. it'll log the info if there are compilation errors.
-	bool ShaderChef::CheckProgram(ObjectHandle obj){
+	bool ShaderChef::CheckProgram(ObjectHandle obj) {
 		GLint state;
 		glGetProgramiv(obj, GL_LINK_STATUS, &state);
 		if (GL_FALSE == state) {
 			int infologLength = 0;
 			glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
-			if (infologLength > 1){
+			if (infologLength > 1) {
 				int charsWritten = 0;
 				char *infoLog = new char[infologLength];
 				glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);

@@ -157,9 +157,9 @@ namespace sark{
 		STAIN_TRANSMATRIX(mAbsoluteTM);
 
 		if (mReference != NULL){
-			ASceneComponent::ChildComponentContainer::iterator itr
+			ASceneComponent::ChildContainer::iterator itr
 				= mReference->GetChildren().begin();
-			ASceneComponent::ChildComponentContainer::iterator end
+			ASceneComponent::ChildContainer::iterator end
 				= mReference->GetChildren().end();
 
 			for (; itr != end; itr++){

@@ -64,17 +64,16 @@ namespace sark{
 	//========================================================
 
 	//---------------------
-	//		sampler
+	//		texture
 	//---------------------
 
-	// set sampler with texture into the uniform sampler 'name'
+	// set texture into the uniform texture sampler 'name'
 	// as active texture unit 'activeTex'
-	void ShaderProgram::SetSampler(const std::string& name,
-		const Sampler* sampler, const Texture* texture, uint16 activeTex){
+	void ShaderProgram::SetTexture(const std::string& name,
+		const Texture* texture, uint16 activeTex){
 		glActiveTexture(GL_TEXTURE0 + activeTex);
-		texture->Bind();
+		texture->Bind(activeTex);
 		SetUniform(name, activeTex);
-		sampler->Bind(activeTex);
 	}
 
 

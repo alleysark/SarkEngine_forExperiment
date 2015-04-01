@@ -18,7 +18,7 @@ namespace sark{
 	// scene is composed of various types of scene components(objects, lights, sounds, etc..),
 	// various physics-systems, cameras to take the view or graphic interfaces.
 	// it has basic properties and functions of scene
-	class AScene{
+	class AScene {
 	public:
 		// layer of scene component.
 		// basically, components are contained in the component map of scene.
@@ -27,7 +27,7 @@ namespace sark{
 		// and it also be replicated other layers for the other purpose.
 		class Layer{
 		public:
-			typedef std::vector<ASceneComponent*> ReplicaArray;
+			typedef std::list<ASceneComponent*> ReplicaArray;
 			typedef ReplicaArray::iterator ReplicaArrayIterator;
 		private:
 			ReplicaArray mReplicas;
@@ -39,8 +39,6 @@ namespace sark{
 			// push component into this layer
 			void Push(ASceneComponent* component);
 
-			// pop component from this layer
-			void Pop(ASceneComponent* component);
 			// pop component from this layer
 			void Pop(const ASceneComponent::ComponentID& componentId);
 			// pop component from this layer
@@ -62,7 +60,7 @@ namespace sark{
 		typedef std::map<ASceneComponent::ComponentID, ASceneComponent*> ComponentMap;
 		typedef std::vector<Layer> LayerContainer;
 
-		typedef std::vector<Camera> CameraContainer;
+		typedef std::vector<Camera*> CameraContainer;
 
 	protected:
 		// map-like component container.
@@ -94,7 +92,6 @@ namespace sark{
 
 		// get main camera
 		Camera* GetMainCamera();
-		const Camera* GetMainCamera() const;
 
 		// clear whole scene components
 		void ClearSceneComponents();
@@ -102,8 +99,6 @@ namespace sark{
 		// add scene component
 		bool AddSceneComponent(ASceneComponent* sceneComponent);
 
-		// delete scene component by address
-		bool DeleteSceneComponent(ASceneComponent* sceneComponent);
 		// delete scene component by component id
 		bool DeleteSceneComponent(const ASceneComponent::ComponentID& componentId);
 		// delete all scene components by component name. it returns count of deleted components.
@@ -130,7 +125,7 @@ namespace sark{
 		virtual void OnLeave() = 0;
 
 		// main scene camera view setting
-		virtual void OnScreenChanged(uinteger width, uinteger height) = 0;
+		virtual void OnScreenChanged(uinteger width, uinteger height);
 	};
 
 }

@@ -36,7 +36,7 @@ namespace sark{
 		ASceneComponent* mReference;
 
 	public:
-		Transform(ASceneComponent* reference = NULL);
+		Transform(ASceneComponent* reference);
 		~Transform();
 
 		// get absolute transformation matrix

@@ -45,10 +45,12 @@ namespace sark{
 			if (indices1.Empty())
 				continue;
 
-			const ACollider* coll1 = (*itr)->GetCollider();
+			auto coll1 = (*itr)->GetCollider();
 
 			// compare component 1 and component 2.
-			for (jtr = itr + 1; jtr != end; jtr++){
+			jtr = itr;
+			jtr++;
+			for (; jtr != end; jtr++){
 				if ((*jtr)->GetRigidBody() == NULL
 					|| (*jtr)->GetMesh() == NULL)
 					continue;
@@ -66,7 +68,7 @@ namespace sark{
 
 				// broad phase.
 				if (coll1 != NULL){
-					const ACollider* coll2 = (*jtr)->GetCollider();
+					auto coll2 = (*jtr)->GetCollider();
 					if (coll2 != NULL){
 						if (coll1->IntersectWith(coll2) == false)
 							continue;
@@ -112,16 +114,18 @@ namespace sark{
 				|| (*itr)->GetCollider()->GetType() != ACollider::CONVEXHULL)
 				continue;
 
-			const ConvexHull* convex1 = reinterpret_cast<const ConvexHull*>((*itr)->GetCollider());
+			auto convex1 = reinterpret_cast<ConvexHull*>((*itr)->GetCollider());
 
 			// compare component 1 and component 2.
-			for (jtr = itr + 1; jtr != end; jtr++){
+			jtr = itr;
+			jtr++;
+			for (; jtr != end; jtr++){
 				if ((*jtr)->GetRigidBody() == NULL
 					|| (*jtr)->GetCollider() == NULL
 					|| (*jtr)->GetCollider()->GetType() != ACollider::CONVEXHULL)
 					continue;
 
-				const ConvexHull* convex2 = reinterpret_cast<const ConvexHull*>((*jtr)->GetCollider());
+				auto convex2 = reinterpret_cast<ConvexHull*>((*jtr)->GetCollider());
 
 				if (ConvexLevelDetection(convex1, convex2, CN, CP, depth)){
 					// *note: at this time, i just translate depth toward contact normal.

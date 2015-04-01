@@ -116,12 +116,6 @@ namespace sark{
 	}
 
 	RigidCube::~RigidCube(){
-		if (mMesh != NULL)
-			delete mMesh;
-		if (mRigidBody != NULL)
-			delete mRigidBody;
-		if (mCollider != NULL)
-			delete mCollider;
 	}
 
 	// get width of cube.

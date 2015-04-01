@@ -7,7 +7,8 @@ namespace sark{
 		: ALight("", NULL, true, LightType::DIRECTIONAL_LIGHT,
 		ambient, diffuse, specular, 1.f, 0.f, 0.f)
 	{}
-	DirectionalLight::DirectionalLight(const std::string& name, ASceneComponent* parent, bool activate,
+	DirectionalLight::DirectionalLight(
+		const std::string& name, ASceneComponent* parent, bool activate,
 		const ColorRGBA& ambient, const ColorRGBA& diffuse, const ColorRGBA& specular)
 		: ALight(name, parent, activate, LightType::DIRECTIONAL_LIGHT,
 		ambient, diffuse, specular, 1.f, 0.f, 0.f)

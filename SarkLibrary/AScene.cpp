@@ -20,22 +20,11 @@ namespace sark{
 	}
 
 	// pop component from this layer
-	void AScene::Layer::Pop(ASceneComponent* component){
-		ReplicaArray::iterator itr = mReplicas.begin();
-		ReplicaArray::iterator end = mReplicas.end();
-		for (; itr != end; itr++){
-			if ((*itr) == component){
-				mReplicas.erase(itr);
-				break;
-			}
-		}
-	}
-	// pop component from this layer
 	void AScene::Layer::Pop(const ASceneComponent::ComponentID& componentId){
 		ReplicaArray::iterator itr = mReplicas.begin();
 		ReplicaArray::iterator end = mReplicas.end();
-		for (; itr != end; itr++){
-			if ((*itr)->GetComponentID() == componentId){
+		for (; itr != end; itr++) {
+			if ((*itr)->GetComponentID() == componentId) {
 				mReplicas.erase(itr);
 				break;
 			}
@@ -52,15 +41,12 @@ namespace sark{
 		ReplicaArray::iterator itr = mReplicas.begin();
 		ReplicaArray::iterator end = mReplicas.end();
 		for (; itr != end; itr++){
-			(*itr)->rel_distance 
+			(*itr)->rel_distance
 				= ((*itr)->GetTransform().GetPosition() - position).MagnitudeSq();
 		}
 
-		// sort
-		std::sort(
-			mReplicas.begin(),
-			mReplicas.end(),
-			[](const ASceneComponent* lhs, const ASceneComponent* rhs)->bool{
+
+		mReplicas.sort([](ASceneComponent* lhs, ASceneComponent* rhs)->bool{
 			return (lhs->rel_distance < rhs->rel_distance);
 		});
 	}
@@ -97,22 +83,26 @@ namespace sark{
 		return mMainCam;
 	}
 
-	const Camera* AScene::GetMainCamera() const {
-		return mMainCam;
-	}
-
 	// clear whole scene components
-	void AScene::ClearSceneComponents(){
-		ComponentMap::iterator itr = mComponents.begin();
-		ComponentMap::iterator end = mComponents.end();
-		for (; itr != end; itr++){
-			delete itr->second;
+	void AScene::ClearSceneComponents() {
+		for (auto x = mComponents.begin(); x != mComponents.end(); x++) {
+			delete x->second;
 		}
 		mComponents.clear();
+
+		for (auto x = mCameras.begin(); x != mCameras.end(); x++) {
+			delete (*x);
+		}
+		mCameras.clear();
+		mMainCam = NULL;
+
+		for (auto layer = mLayers.begin(); layer != mLayers.end(); layer++) {
+			layer->Clear();
+		}
 	}
 
 	// add scene component
-	bool AScene::AddSceneComponent(ASceneComponent* sceneComponent){
+	bool AScene::AddSceneComponent(ASceneComponent* sceneComponent) {
 		if (sceneComponent == NULL)
 			return false;
 
@@ -121,20 +111,6 @@ namespace sark{
 			return false;
 	
 		mComponents.insert(find, ComponentMap::value_type(sceneComponent->GetComponentID(), sceneComponent));
-		return true;
-	}
-
-	// delete scene component by address
-	bool AScene::DeleteSceneComponent(ASceneComponent* sceneComponent){
-		if (sceneComponent == NULL)
-			return false;
-
-		// erase input thing from component map
-		ComponentMap::const_iterator find = mComponents.find(sceneComponent->GetComponentID());
-		if (find == mComponents.cend())
-			return false;
-		
-		mComponents.erase(find);
 		return true;
 	}
 
@@ -186,5 +162,10 @@ namespace sark{
 			}
 		}
 		return out;
+	}
+
+	void AScene::OnScreenChanged(uinteger width, uinteger height) {
+		mMainCam->SetViewport(0, 0, width, height);
+		mMainCam->Perspective(60, (real)width / (real)height, 0.1f, 1000.f);
 	}
 }
