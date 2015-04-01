@@ -7,16 +7,16 @@
 #include <list>
 #include <functional>
 
-namespace sark{
+namespace sark {
 
 	// input static class management input system as general
 	// *note: when you are trying to debugging this class, 
 	//			some problems can be occurred about window message skipping
-	class Input{
+	class Input {
 	public:
 
 		// --------------------------------------------
-		class Keyboard{
+		class Keyboard {
 		public:
 			typedef uint8 KeyCode;
 
@@ -145,9 +145,9 @@ namespace sark{
 
 
 		// ------------	mouse properties	------------------
-		class Mouse{
+		class Mouse {
 		public:
-			enum MouseState{
+			enum MouseState {
 				STATE_NONE = 0,
 
 				STATE_MOVEMENT = 1 << 0,
@@ -162,7 +162,7 @@ namespace sark{
 				STATE_WHEEL = 1 << 7,
 			};
 
-			enum MouseEvent{
+			enum MouseEvent {
 				EVENT_MOVE = 0,
 				
 				// drag: button down and move
@@ -219,14 +219,14 @@ namespace sark{
 			bool IsRDragging() const;
 
 		private:
-			inline void StateOn(const MouseState& state){
+			inline void StateOn(const MouseState& state) {
 				mActiveStates |= state;
 			}
-			inline void StateOff(const MouseState& state){
+			inline void StateOff(const MouseState& state) {
 				mActiveStates ^= state;
 			}
 
-			inline void TriggerEvent(MouseEvent evt, const uint32& x, const uint32& y, const real& extra){
+			inline void TriggerEvent(MouseEvent evt, const uint32& x, const uint32& y, const real& extra) {
 				if (mEventHandlers[evt])
 					mEventHandlers[evt](Position2(x, y), extra);
 			}
@@ -234,8 +234,8 @@ namespace sark{
 
 	private:
 		// it can't be instantiated
-		Input(){}
-		Input(const Input& input){}
+		Input() {}
+		Input(const Input& input) {}
 
 	public:
 		static Keyboard keyboard;

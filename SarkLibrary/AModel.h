@@ -6,7 +6,7 @@
 #include "ASceneComponent.h"
 #include "IUncopiable.hpp"
 
-namespace sark{
+namespace sark {
 
 	class Mesh;
 	class Material;

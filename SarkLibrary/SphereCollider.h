@@ -4,10 +4,10 @@
 #include "core.h"
 #include "ACollider.h"
 
-namespace sark{
+namespace sark {
 
 	// center and radius form of sphere
-	class SphereCollider : public ACollider{
+	class SphereCollider : public ACollider {
 	public:
 		// origin position of sphere
 		Vector3 pos;

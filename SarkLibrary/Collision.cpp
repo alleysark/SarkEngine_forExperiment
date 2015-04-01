@@ -6,12 +6,12 @@
 #include "tools.h"
 #include "Debug.h"
 
-namespace sark{
+namespace sark {
 
 	real Collision::C_RESTITUT = 0.3f;
 
 	// process the collisions.
-	void Collision::ProcessCollision(AScene::Layer& physLayer){
+	void Collision::ProcessCollision(AScene::Layer& physLayer) {
 		// temporal contact informations
 		Vector3 CN; // contact normal
 		Vector3 CP; // contact point
@@ -19,18 +19,18 @@ namespace sark{
 		AScene::Layer::ReplicaArrayIterator itr = physLayer.Begin();
 		AScene::Layer::ReplicaArrayIterator jtr;
 		AScene::Layer::ReplicaArrayIterator end = physLayer.End();
-		for (; itr != end; itr++){
+		for (; itr != end; itr++) {
 			if ((*itr)->GetRigidBody() == NULL
 				|| (*itr)->GetMesh() == NULL)
 				continue;
 
 			ArrayBuffer& arrbuf1 = (*itr)->GetMesh()->GetArrayBuffer();
-			if (arrbuf1.GetDrawMode() != ArrayBuffer::DrawMode::TRIANGLES){
+			if (arrbuf1.GetDrawMode() != ArrayBuffer::DrawMode::TRIANGLES) {
 				LogWarn("it supports only for the triangle mesh");
 				continue;
 			}
 
-			if (arrbuf1.GetDataCount(AttributeSemantic::INDICES) == 0){
+			if (arrbuf1.GetDataCount(AttributeSemantic::INDICES) == 0) {
 				LogWarn("it does not support indexless mesh");
 				continue;
 			}
@@ -50,26 +50,26 @@ namespace sark{
 			// compare component 1 and component 2.
 			jtr = itr;
 			jtr++;
-			for (; jtr != end; jtr++){
+			for (; jtr != end; jtr++) {
 				if ((*jtr)->GetRigidBody() == NULL
 					|| (*jtr)->GetMesh() == NULL)
 					continue;
 
 				ArrayBuffer& arrbuf2 = (*jtr)->GetMesh()->GetArrayBuffer();
-				if (arrbuf2.GetDrawMode() != ArrayBuffer::DrawMode::TRIANGLES){
+				if (arrbuf2.GetDrawMode() != ArrayBuffer::DrawMode::TRIANGLES) {
 					LogWarn("it supports only for the triangle mesh");
 					continue;
 				}
 
-				if (arrbuf2.GetDataCount(AttributeSemantic::INDICES) == 0){
+				if (arrbuf2.GetDataCount(AttributeSemantic::INDICES) == 0) {
 					LogWarn("it does not support indexless mesh");
 					continue;
 				}
 
 				// broad phase.
-				if (coll1 != NULL){
+				if (coll1 != NULL) {
 					auto coll2 = (*jtr)->GetCollider();
-					if (coll2 != NULL){
+					if (coll2 != NULL) {
 						if (coll1->IntersectWith(coll2) == false)
 							continue;
 					}
@@ -99,7 +99,7 @@ namespace sark{
 	}
 
 	// process the collisions about convexity objects.
-	void Collision::ProcessConvexCollision(AScene::Layer& physLayer){
+	void Collision::ProcessConvexCollision(AScene::Layer& physLayer) {
 		// temporal contact informations
 		Vector3 CN; // contact normal
 		Vector3 CP; // contact point
@@ -108,7 +108,7 @@ namespace sark{
 		AScene::Layer::ReplicaArrayIterator itr = physLayer.Begin();
 		AScene::Layer::ReplicaArrayIterator jtr;
 		AScene::Layer::ReplicaArrayIterator end = physLayer.End();
-		for (; itr != end; itr++){
+		for (; itr != end; itr++) {
 			if ((*itr)->GetRigidBody() == NULL
 				|| (*itr)->GetCollider() == NULL
 				|| (*itr)->GetCollider()->GetType() != ACollider::CONVEXHULL)
@@ -119,7 +119,7 @@ namespace sark{
 			// compare component 1 and component 2.
 			jtr = itr;
 			jtr++;
-			for (; jtr != end; jtr++){
+			for (; jtr != end; jtr++) {
 				if ((*jtr)->GetRigidBody() == NULL
 					|| (*jtr)->GetCollider() == NULL
 					|| (*jtr)->GetCollider()->GetType() != ACollider::CONVEXHULL)
@@ -127,7 +127,7 @@ namespace sark{
 
 				auto convex2 = reinterpret_cast<ConvexHull*>((*jtr)->GetCollider());
 
-				if (ConvexLevelDetection(convex1, convex2, CN, CP, depth)){
+				if (ConvexLevelDetection(convex1, convex2, CN, CP, depth)) {
 					// *note: at this time, i just translate depth toward contact normal.
 					// but it should be modified as correction impulse based method.
 					if (!(*itr)->GetRigidBody()->IsFixed())
@@ -152,12 +152,12 @@ namespace sark{
 		Position3 transA2, transB2, transC2;
 
 		// triangle mesh - triangle mesh intersection test
-		for (uinteger i = 0; i < count_1; i++){
+		for (uinteger i = 0; i < count_1; i++) {
 			const Position3& A1 = positions1[indices1[i].a];
 			const Position3& B1 = positions1[indices1[i].b];
 			const Position3& C1 = positions1[indices1[i].c];
 
-			for (uinteger j = 0; j < count_2; j++){
+			for (uinteger j = 0; j < count_2; j++) {
 				const Position3& A2 = positions2[indices2[j].a];
 				const Position3& B2 = positions2[indices2[j].b];
 				const Position3& C2 = positions2[indices2[j].c];
@@ -223,7 +223,7 @@ namespace sark{
 		real c = CN.Dot((v1 + w1.Cross(r1)) - (v2 + w2.Cross(r2)));
 		if (c > 0)
 			return;
-		else if (c == 0){
+		else if (c == 0) {
 			// resting state
 			return;
 		}

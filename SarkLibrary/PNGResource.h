@@ -4,7 +4,7 @@
 #include "core.h"
 #include "resources.h"
 
-namespace sark{
+namespace sark {
 
 	// PNG image format resource.
 	// all about PNG handlings are under the 'libpng' library.

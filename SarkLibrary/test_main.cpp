@@ -31,21 +31,19 @@ using namespace sark;
 
 Engine* gpEngine = Engine::GetInstance();
 
-class PhysicsSimulationScene : public AScene{
+class PhysicsSimulationScene : public AScene {
 public:
-	enum LayerType{
+	enum LayerType {
 		LAYER_PHYSICS = 0,
 		LAYER_PICKABLE = 1
 	};
 
-	s_ptr<ShaderProgram> renderer;
-
 	DirectionalLight* mLight;
 
-	s_ptr<Sampler> samp;
-	s_ptr<Texture> tex;
+	ShaderProgram* renderer;
+	Texture* tex;
 
-	ConvexHull* makeBoxConvexHull(RigidCube* cube){
+	ConvexHull* makeBoxConvexHull(RigidCube* cube) {
 		real w = cube->GetWidth() / 2.f;
 		real h = cube->GetHeight() / 2.f;
 		real d = cube->GetDepth() / 2.f;
@@ -65,24 +63,24 @@ public:
 		return new ConvexHull(cube, points, faces);
 	}
 
-	std::vector<Vector3> makeConvexPoints(ASceneComponent* comp){
+	std::vector<Vector3> makeConvexPoints(ASceneComponent* comp) {
 		ArrayBuffer::AttributeAccessor<Position3> poss 
 			= comp->GetMesh()->GetArrayBuffer().GetAttributeAccessor<Position3>(AttributeSemantic::POSITION);
 		ArrayBuffer::AttributeAccessor<TriangleFace16> faces 
 			= comp->GetMesh()->GetArrayBuffer().GetAttributeAccessor<TriangleFace16>(AttributeSemantic::INDICES);
 		std::vector<Vector3> points;
 		uinteger sz = faces.Count();
-		for (uinteger i = 0; i < sz; i++){
-			for (uinteger j = 0; j < 3; j++){
+		for (uinteger i = 0; i < sz; i++) {
+			for (uinteger j = 0; j < 3; j++) {
 				bool unique = true;
 				uinteger sz = points.size();
-				for (uinteger k = 0; k < sz; k++){
-					if (poss[faces[i].idx[j]] == points[k]){
+				for (uinteger k = 0; k < sz; k++) {
+					if (poss[faces[i].idx[j]] == points[k]) {
 						unique = false;
 						break;
 					}
 				}
-				if (unique){
+				if (unique) {
 					points.push_back(poss[faces[i].idx[j]]);
 				}
 			}
@@ -90,7 +88,7 @@ public:
 		return points;
 	}
 
-	PhysicsSimulationScene(){
+	PhysicsSimulationScene() {
 		mLayers.push_back(Layer()); //layer for physics simulation
 		mLayers.push_back(Layer()); //layer for pickable components.
 
@@ -158,8 +156,8 @@ public:
 			{ AttributeSemantic::NORMAL, "normal" },
 			{ AttributeSemantic::TEXCOORD0, "texcoord0" }
 		};
-		recipe.vertexShader = "version 440;\n void main(){}";
-		recipe.fragmentShader = "version 440:\n void main(){}";
+		recipe.vertexShader = "version 440;\n void main() {}";
+		recipe.fragmentShader = "version 440:\n void main() {}";
 
 		renderer = ShaderChef::CookShaderProgram(recipe);
 
@@ -169,17 +167,21 @@ public:
 		if (png == NULL)
 			return;
 		// create texture
-		tex = s_ptr<Texture>(new Texture(Texture::TEX_2D, png, Texture::InternalFormat::FOUR));
+		tex = new Texture(Texture::TEX_2D, png, Texture::InternalFormat::FOUR);
 
 		// create sampler
-		samp = s_ptr<Sampler>(new Sampler());
-		samp->SetState(Sampler::WRAP_S, Sampler::WrapMode::CLAMP_TO_EDGE);
-		samp->SetState(Sampler::WRAP_T, Sampler::WrapMode::CLAMP_TO_EDGE);
-		samp->SetState(Sampler::MIN_FILTER, Sampler::Filter::LINEAR);
-		samp->SetState(Sampler::MAG_FILTER, Sampler::Filter::LINEAR);
+		tex->GetSampler().SetState(Sampler::WRAP_S, Sampler::WrapMode::CLAMP_TO_EDGE);
+		tex->GetSampler().SetState(Sampler::WRAP_T, Sampler::WrapMode::CLAMP_TO_EDGE);
+		tex->GetSampler().SetState(Sampler::MIN_FILTER, Sampler::Filter::LINEAR);
+		tex->GetSampler().SetState(Sampler::MAG_FILTER, Sampler::Filter::LINEAR);
 	}
 
-	~PhysicsSimulationScene() {}
+	~PhysicsSimulationScene() {
+		if (renderer)
+			delete renderer;
+		if (tex)
+			delete tex;
+	}
 
 	void OnEnter() override {
 		// mouse handlers
@@ -188,7 +190,7 @@ public:
 
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_DRAG,
-			[&](const Position2& pos, real ext)->void{
+			[&](const Position2& pos, real ext)->void {
 			Vector2 mv = pos - prvPos;
 			if (graspComponent != NULL) {
 				graspComponent->GetTransform().RotateMore(mMainCam->GetBasisV(), mv.x / 180.f);
@@ -202,7 +204,7 @@ public:
 		});
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_DOWN,
-			[&](const Position2& pos, real ext)->void{
+			[&](const Position2& pos, real ext)->void {
 			prvPos = pos;
 
 			Ray ray = mMainCam->ScreenToWorldRay(pos);
@@ -210,7 +212,7 @@ public:
 			mLayers[LAYER_PICKABLE].Sort(mMainCam->GetEye());
 			Layer::ReplicaArrayIterator itr = mLayers[LAYER_PICKABLE].Begin();
 			Layer::ReplicaArrayIterator end = mLayers[LAYER_PICKABLE].End();
-			for (; itr != end; itr++){
+			for (; itr != end; itr++) {
 				auto bs = (*itr)->GetCollider();
 				if (bs == NULL)
 					continue;
@@ -221,67 +223,67 @@ public:
 		});
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_UP,
-			[&](const Position2& pos, real ext)->void{
-			if (!graspComponent){
+			[&](const Position2& pos, real ext)->void {
+			if (!graspComponent) {
 				graspComponent = NULL;
 			}
 		});
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_RBUTTON_CLICK,
-			[&](const Position2& pos, real ext)->void{
+			[&](const Position2& pos, real ext)->void {
 			Ray ray = mMainCam->ScreenToWorldRay(pos);
 
 			mLayers[LAYER_PICKABLE].Sort(mMainCam->GetEye());
 			Layer::ReplicaArrayIterator itr = mLayers[LAYER_PICKABLE].Begin();
 			Layer::ReplicaArrayIterator end = mLayers[LAYER_PICKABLE].End();
-			for (; itr != end; itr++){
+			for (; itr != end; itr++) {
 				auto bs = (*itr)->GetCollider();
 
 				if (bs == NULL)
 					continue;
 				Vector3 hitP;
-				if (ray.IntersectWith(bs, &hitP)){
+				if (ray.IntersectWith(bs, &hitP)) {
 					(*itr)->GetRigidBody()->AddForceOn(hitP, ray.dir*100.f);
 				}
 			}
 		});
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_WHEEL,
-			[&](const Position2& pos, real ext)->void{
+			[&](const Position2& pos, real ext)->void {
 			mMainCam->MoveForward(ext);
 		});
 
 
 		// scene key handlers
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->MoveSideward(-1);
 		}, Input::Keyboard::CODE_A);
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->MoveSideward(1);
 		}, Input::Keyboard::CODE_D);
 
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->MoveUpward(1);
 		}, Input::Keyboard::CODE_W);
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->MoveUpward(-1);
 		}, Input::Keyboard::CODE_S);
 
 		// rotate key
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->Roll(math::deg2rad(1));
 		}, Input::Keyboard::CODE_Q);
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->Roll(math::deg2rad(-1));
 		}, Input::Keyboard::CODE_E);
 	}
 
-	void OnLeave() override{}
+	void OnLeave() override {}
 
-	void Update(){
+	void Update() {
 		AScene::Layer::ReplicaArrayIterator itr = mLayers[LAYER_PHYSICS].Begin();
 		AScene::Layer::ReplicaArrayIterator end = mLayers[LAYER_PHYSICS].End();
-		for (; itr != end; itr++){
+		for (; itr != end; itr++) {
 			(*itr)->Update();
 		}
 
@@ -289,15 +291,11 @@ public:
 		Collision::ProcessConvexCollision(mLayers[LAYER_PHYSICS]);
 	}
 
-	void Render(){
-		//----------------
-		glMultTransposeMatrixf(mMainCam->GetViewMatrix().GetRawMatrix());
-		//----------------
-
+	void Render() {
 		renderer->Use();
 		renderer->SetUniform("matView", mMainCam->GetViewMatrix());
 		renderer->SetUniform("matProjection", mMainCam->GetProjMatrix());
-		renderer->SetSampler("texSamp", samp, tex);
+		renderer->SetTexture("texSamp", tex);
 
 		renderer->SetUniform("eyePos", mMainCam->GetEye());
 		renderer->SetUniform("light.amb", mLight->GetAmbient());
@@ -307,7 +305,7 @@ public:
 
 		ComponentMap::iterator itr = mComponents.begin();
 		ComponentMap::iterator end = mComponents.end();
-		for (; itr != end; itr++){
+		for (; itr != end; itr++) {
 			renderer->SetUniform("matWorld",
 				itr->second->GetTransform().GetMatrix());
 
@@ -317,20 +315,18 @@ public:
 	}
 };
 
-class TestScene : public AScene{
+class TestScene : public AScene {
 public:
-	s_ptr<ShaderProgram> renderer;
-
 	// dynamic light list
 	DirectionalLight* mLight;
 
 	RigidCube* mObj;
 	RigidSphere* mSphere;
 
-	s_ptr<Sampler> samp;
-	s_ptr<Texture> tex;
+	ShaderProgram* renderer;
+	Texture* tex;
 
-	TestScene(){
+	TestScene() {
 		ShaderProgram::Recipe recipe;
 		recipe.attributes = {
 			{ AttributeSemantic::POSITION, "position" },
@@ -348,7 +344,7 @@ public:
 			"out vec4 wpos;						\n"
 			"out vec3 norm;						\n"
 			"out vec2 texcoord;					\n"
-			"void main(){													\n"
+			"void main() {													\n"
 			"	wpos = matWorld * vec4(position, 1);						\n"
 			"	norm = (transpose(inverse(matWorld))*vec4(normal, 0)).xyz;	\n"
 			"	texcoord = texcoord0;										\n"
@@ -356,13 +352,13 @@ public:
 			"}";
 		recipe.fragmentShader =
 			"#version 440										\n"
-			"struct DirLight{									\n"
+			"struct DirLight {									\n"
 			"	vec4 amb;										\n"
 			"	vec4 dif;										\n"
 			"	vec4 spec;										\n"
 			"	vec3 dir;										\n"
 			"};													\n"
-			"struct Material{									\n"
+			"struct Material {									\n"
 			"	vec4 amb;										\n"
 			"	vec4 dif;										\n"
 			"	vec4 spec;										\n"
@@ -387,7 +383,7 @@ public:
 			"					vec4(1, 1, 1, 1),				\n"
 			"					vec4(0.9, 0.9, 0.9, 1), 16.0);	\n"
 			"													\n"
-			"void main(){										\n"
+			"void main() {										\n"
 			"	vec3 n = normalize(norm);						\n"
 			"	vec3 v = normalize(weye - wpos.xyz);			\n"
 			"	vec3 l = -light.dir;							\n"
@@ -395,7 +391,7 @@ public:
 			"	float cosNL = max(dot(n,l), 0.05);				\n"
 			"	vec4 texDif;									\n"
 			"													\n"
-			"	if(cosNL > 0.05 ){								\n"
+			"	if(cosNL > 0.05 ) {								\n"
 			"		vec3 r = 2*cosNL*n - l;						\n"
 			"		sc = pow(max(dot(r,v),0), mtrl.shi);		\n"
 			"	}												\n"
@@ -451,26 +447,29 @@ public:
 			LogError("Failed to load texture");
 		}
 		// create texture
-		tex = s_ptr<Texture>(new Texture(Texture::TEX_2D, png, Texture::InternalFormat::FOUR));
-
-		// create sampler
-		samp = s_ptr<Sampler>(new Sampler());
-		samp->SetState(Sampler::WRAP_S, Sampler::WrapMode::CLAMP_TO_EDGE);
-		samp->SetState(Sampler::WRAP_T, Sampler::WrapMode::CLAMP_TO_EDGE);
-		samp->SetState(Sampler::MIN_FILTER, Sampler::Filter::LINEAR);
-		samp->SetState(Sampler::MAG_FILTER, Sampler::Filter::LINEAR);
+		tex = new Texture(Texture::TEX_2D, png, Texture::InternalFormat::FOUR);
+		Sampler& samp = tex->GetSampler();
+		samp.SetState(Sampler::WRAP_S, Sampler::WrapMode::CLAMP_TO_EDGE);
+		samp.SetState(Sampler::WRAP_T, Sampler::WrapMode::CLAMP_TO_EDGE);
+		samp.SetState(Sampler::MIN_FILTER, Sampler::Filter::LINEAR);
+		samp.SetState(Sampler::MAG_FILTER, Sampler::Filter::LINEAR);
 	}
 
-	~TestScene(){}
+	~TestScene() {
+		if (renderer)
+			delete renderer;
+		if (tex)
+			delete tex;
+	}
 
-	void OnEnter() override{
+	void OnEnter() override {
 		// mouse handlers
 		static Position2 prvPos;
 		static ASceneComponent* graspComponent;
 
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_DRAG,
-			[&](const Position2& pos, real ext)->void{
+			[&](const Position2& pos, real ext)->void {
 			Vector2 mv = pos - prvPos;
 			if (graspComponent != NULL) {
 				graspComponent->GetTransform().RotateMore(mMainCam->GetBasisV(), mv.x / 180.f);
@@ -484,7 +483,7 @@ public:
 		});
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_DOWN,
-			[&](const Position2& pos, real ext)->void{
+			[&](const Position2& pos, real ext)->void {
 			prvPos = pos;
 
 			Ray ray = mMainCam->ScreenToWorldRay(pos);
@@ -492,7 +491,7 @@ public:
 			mLayers[0].Sort(mMainCam->GetEye());
 			Layer::ReplicaArrayIterator itr = mLayers[0].Begin();
 			Layer::ReplicaArrayIterator end = mLayers[0].End();
-			for (; itr != end; itr++){
+			for (; itr != end; itr++) {
 				auto bs = (*itr)->GetCollider();
 				if (bs == NULL)
 					continue;
@@ -503,45 +502,45 @@ public:
 		});
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_UP,
-			[&](const Position2& pos, real ext)->void{
-			if (!graspComponent){
+			[&](const Position2& pos, real ext)->void {
+			if (!graspComponent) {
 				graspComponent = NULL;
 			}
 		});
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_WHEEL,
-			[&](const Position2& pos, real ext)->void{
+			[&](const Position2& pos, real ext)->void {
 			mMainCam->MoveForward(ext);
 		});
 
 
 		// scene key handlers
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->MoveSideward(-1);
 		}, Input::Keyboard::CODE_A);
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->MoveSideward(1);
 		}, Input::Keyboard::CODE_D);
 
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->MoveUpward(1);
 		}, Input::Keyboard::CODE_W);
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->MoveUpward(-1);
 		}, Input::Keyboard::CODE_S);
 
 		// rotate key
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->Roll(math::deg2rad(1));
 		}, Input::Keyboard::CODE_Q);
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->Roll(math::deg2rad(-1));
 		}, Input::Keyboard::CODE_E);
 	}
 
-	void OnLeave() override{}
+	void OnLeave() override {}
 
-	void Update(){
+	void Update() {
 		//mObj->GetTransform().Translate(gpEngine->GetTimer().GetElapsedTime(), 0, 0);
 		//mSphere->GetTransform().Rotate(0, gpEngine->GetTimer().GetElapsedTime(), 0);
 		//mLight->GetTransform().Rotate(Vector3::Up, gpEngine->GetTimer().GetElapsedTime() / 2.f);
@@ -550,15 +549,11 @@ public:
 		mSphere->Update();
 	}
 
-	void Render(){
-		//----------------
-		glMultTransposeMatrixf(mMainCam->GetViewMatrix().GetRawMatrix());
-		//----------------
-
+	void Render() {
 		renderer->Use();
 		renderer->SetUniform("matView", mMainCam->GetViewMatrix());
 		renderer->SetUniform("matProjection", mMainCam->GetProjMatrix());
-		renderer->SetSampler("texSamp", samp, tex);
+		renderer->SetTexture("texSamp", tex);
 
 		renderer->SetUniform("eyePos", mMainCam->GetEye());
 		renderer->SetUniform("light.amb", mLight->GetAmbient());
@@ -568,7 +563,7 @@ public:
 
 		ComponentMap::iterator itr = mComponents.begin();
 		ComponentMap::iterator end = mComponents.end();
-		for (; itr != end; itr++){
+		for (; itr != end; itr++) {
 			renderer->SetUniform("matWorld",
 				itr->second->GetTransform().GetMatrix());
 
@@ -578,25 +573,22 @@ public:
 	}
 };
 
-class ShadowmapTestScene : public AScene{
+class ShadowmapTestScene : public AScene {
 public:
-	s_ptr<ShaderProgram> renderer;
-
 	RigidCube* mObj;
 	RigidSphere* mSphere;
 
-	s_ptr<Sampler> samp;
-	s_ptr<Texture> tex;
+	ShaderProgram* renderer;
+	Texture* tex;
 
 	// dynamic light list
 	DirectionalLight* mLight;
 
 	// shadow map
-	s_ptr<FrameBuffer> mShadowMap;
-	s_ptr<Sampler> mShSamp;
-	s_ptr<ShaderProgram> mShadowRenderer;
+	FrameBuffer* mShadowMap;
+	ShaderProgram* mShadowRenderer;
 
-	ShadowmapTestScene(){
+	ShadowmapTestScene() {
 		ShaderProgram::Recipe recipe;
 		recipe.attributes = {
 			{ AttributeSemantic::POSITION, "position" },
@@ -614,7 +606,7 @@ public:
 			"out vec4 wpos;						\n"
 			"out vec3 norm;						\n"
 			"out vec2 texcoord;					\n"
-			"void main(){													\n"
+			"void main() {													\n"
 			"	wpos = matWorld * vec4(position, 1);						\n"
 			"	norm = (transpose(inverse(matWorld))*vec4(normal, 0)).xyz;	\n"
 			"	texcoord = texcoord0;										\n"
@@ -622,13 +614,13 @@ public:
 			"}";
 		recipe.fragmentShader =
 			"#version 440										\n"
-			"struct DirLight{									\n"
+			"struct DirLight {									\n"
 			"	vec4 amb;										\n"
 			"	vec4 dif;										\n"
 			"	vec4 spec;										\n"
 			"	vec3 dir;										\n"
 			"};													\n"
-			"struct Material{									\n"
+			"struct Material {									\n"
 			"	vec4 amb;										\n"
 			"	vec4 dif;										\n"
 			"	vec4 spec;										\n"
@@ -655,7 +647,7 @@ public:
 			"					vec4(0.7,0.7,0.7,1),			\n"
 			"					vec4(0.9, 0.9, 0.9, 1), 16.0);	\n"
 			"													\n"
-			"void main(){										\n"
+			"void main() {										\n"
 			"	vec3 n = normalize(norm);						\n"
 			"	vec3 v = normalize(weye - wpos.xyz);			\n"
 			"	vec3 l = -light.dir;							\n"
@@ -672,11 +664,11 @@ public:
 			"	shCoord.z = (shCoord.z + 1.0) / 2.0;			\n"
 			"	shDepth = texture(shadowTexSamp, shCoord.xy).x;	\n"
 			"													\n"
-			"	if(shDepth+0.005 < shCoord.z){					\n"
+			"	if(shDepth+0.005 < shCoord.z) {					\n"
 			"		shd = 0.3;									\n"
 			"	}												\n"
 			"													\n"
-			"	if(cosNL > 0.05 ){								\n"
+			"	if(cosNL > 0.05 ) {								\n"
 			"		vec3 r = 2*cosNL*n - l;						\n"
 			"		sc = pow(max(dot(r,v),0), mtrl.shi);		\n"
 			"	}												\n"
@@ -725,14 +717,12 @@ public:
 			return;
 
 		// create texture
-		tex = s_ptr<Texture>(new Texture(Texture::TEX_2D, png, Texture::InternalFormat::THREE));
+		tex = new Texture(Texture::TEX_2D, png, Texture::InternalFormat::THREE);
 
-		// create sampler
-		samp = s_ptr<Sampler>(new Sampler());
-		samp->SetState(Sampler::WRAP_S, Sampler::WrapMode::CLAMP_TO_EDGE);
-		samp->SetState(Sampler::WRAP_T, Sampler::WrapMode::CLAMP_TO_EDGE);
-		samp->SetState(Sampler::MIN_FILTER, Sampler::Filter::LINEAR);
-		samp->SetState(Sampler::MAG_FILTER, Sampler::Filter::LINEAR);
+		tex->GetSampler().SetState(Sampler::WRAP_S, Sampler::WrapMode::CLAMP_TO_EDGE);
+		tex->GetSampler().SetState(Sampler::WRAP_T, Sampler::WrapMode::CLAMP_TO_EDGE);
+		tex->GetSampler().SetState(Sampler::MIN_FILTER, Sampler::Filter::LINEAR);
+		tex->GetSampler().SetState(Sampler::MAG_FILTER, Sampler::Filter::LINEAR);
 
 
 		//-------------------------------------
@@ -742,40 +732,40 @@ public:
 			"in vec3 position;											\n"
 			"uniform mat4 matWorld;										\n"
 			"uniform mat4 matLightVP;									\n"
-			"void main(){												\n"
+			"void main() {												\n"
 			"	gl_Position = matLightVP * matWorld * vec4(position, 1);\n"
 			"}";
 		recipe.fragmentShader =
 			"#version 440					\n"
 			"out float fragDepth;			\n"
-			"void main(){					\n"
+			"void main() {					\n"
 			"	fragDepth = gl_FragCoord.z;	\n"
 			"}";
 
 		mShadowRenderer = ShaderChef::CookShaderProgram(recipe);
 
 		// shadow map frame buffer
-		mShadowMap = s_ptr<FrameBuffer>(new FrameBuffer());
+		mShadowMap = new FrameBuffer();
 		mShadowMap->Bind();
 		mShadowMap->AttachTexture(
-			s_ptr<Texture>(new Texture(Texture::TEX_2D, 0,
+			new Texture(Texture::TEX_2D, 0,
 			Texture::InternalFormat::DEPTH_COMPONENT, 1024, 1024, 0, false,
-			Texture::Format::DEPTH_COMPONENT, Texture::PixelType::UNSIGNED_BYTE, NULL)),
+			Texture::Format::DEPTH_COMPONENT, Texture::PixelType::UNSIGNED_BYTE, NULL),
 			FrameBuffer::AttachmentPoint::DEPTH_ATTACHMENT);
 		glDrawBuffer(GL_NONE);//we won't bind a color texture with the currently bound FBO
 		glReadBuffer(GL_NONE);
 
-		if (!mShadowMap->CheckStatus()){
+		if (!mShadowMap->CheckStatus()) {
 			LogError("shadow map state error");
 			gpEngine->Pause();
 		}
 		mShadowMap->Unbind();
 
-		mShSamp = s_ptr<Sampler>(new Sampler());
-		mShSamp->SetState(Sampler::WRAP_S, Sampler::WrapMode::CLAMP);
-		mShSamp->SetState(Sampler::WRAP_T, Sampler::WrapMode::CLAMP);
-		mShSamp->SetState(Sampler::MIN_FILTER, Sampler::Filter::NEAREST);
-		mShSamp->SetState(Sampler::MAG_FILTER, Sampler::Filter::NEAREST);
+		auto samp = mShadowMap->GetTextureAt(0)->GetSampler();
+		samp.SetState(Sampler::WRAP_S, Sampler::WrapMode::CLAMP);
+		samp.SetState(Sampler::WRAP_T, Sampler::WrapMode::CLAMP);
+		samp.SetState(Sampler::MIN_FILTER, Sampler::Filter::NEAREST);
+		samp.SetState(Sampler::MAG_FILTER, Sampler::Filter::NEAREST);
 		
 		mCameras.push_back(new Camera(Position3(0,0,0), mLight->GetTransform().GetDirection()));
 		mCameras[1]->Orthographic(-200, 200, -200, 200, -500, 500);
@@ -784,16 +774,21 @@ public:
 		mMainCam = mCameras[0];
 	}
 
-	~ShadowmapTestScene() {}
+	~ShadowmapTestScene() {
+		if (renderer) delete renderer;
+		if (tex) delete tex;
+		if (mShadowRenderer) delete mShadowRenderer;
+		if (mShadowMap) delete mShadowMap;
+	}
 
-	void OnEnter() override{
+	void OnEnter() override {
 		// mouse handlers
 		static Position2 prvPos;
 		static ASceneComponent* graspComponent;
 
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_DRAG,
-			[&](const Position2& pos, real ext)->void{
+			[&](const Position2& pos, real ext)->void {
 			Vector2 mv = pos - prvPos;
 			if (graspComponent != NULL) {
 				graspComponent->GetTransform().RotateMore(mMainCam->GetBasisV(), mv.x / 180.f);
@@ -807,7 +802,7 @@ public:
 		});
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_DOWN,
-			[&](const Position2& pos, real ext)->void{
+			[&](const Position2& pos, real ext)->void {
 			prvPos = pos;
 
 			Ray ray = mMainCam->ScreenToWorldRay(pos);
@@ -815,7 +810,7 @@ public:
 			mLayers[0].Sort(mMainCam->GetEye());
 			Layer::ReplicaArrayIterator itr = mLayers[0].Begin();
 			Layer::ReplicaArrayIterator end = mLayers[0].End();
-			for (; itr != end; itr++){
+			for (; itr != end; itr++) {
 				auto bs = (*itr)->GetCollider();
 				if (bs == NULL)
 					continue;
@@ -826,50 +821,50 @@ public:
 		});
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_UP,
-			[&](const Position2& pos, real ext)->void{
-			if (!graspComponent){
+			[&](const Position2& pos, real ext)->void {
+			if (!graspComponent) {
 				graspComponent = NULL;
 			}
 		});
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_WHEEL,
-			[&](const Position2& pos, real ext)->void{
+			[&](const Position2& pos, real ext)->void {
 			mMainCam->MoveForward(ext);
 		});
 
 
 		// scene key handlers
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->MoveSideward(-1);
 		}, Input::Keyboard::CODE_A);
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->MoveSideward(1);
 		}, Input::Keyboard::CODE_D);
 
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->MoveUpward(1);
 		}, Input::Keyboard::CODE_W);
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->MoveUpward(-1);
 		}, Input::Keyboard::CODE_S);
 
 		// rotate key
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->Roll(math::deg2rad(1));
 		}, Input::Keyboard::CODE_Q);
-		Input::keyboard.RegisterKeyCombHandler([&]()->void{
+		Input::keyboard.RegisterKeyCombHandler([&]()->void {
 			mMainCam->Roll(math::deg2rad(-1));
 		}, Input::Keyboard::CODE_E);
 	}
 
-	void OnLeave() override{}
+	void OnLeave() override {}
 
-	void Update(){
+	void Update() {
 		mObj->Update();
 		mSphere->Update();
 	}
 
-	void Render(){
+	void Render() {
 		Matrix4 lightVP = mCameras[1]->GetProjMatrix() * mCameras[1]->GetViewMatrix();
 		ComponentMap::iterator itr;
 		ComponentMap::iterator end;
@@ -886,7 +881,7 @@ public:
 
 		itr = mComponents.begin();
 		end = mComponents.end();
-		for (; itr != end; itr++){
+		for (; itr != end; itr++) {
 			mShadowRenderer->SetUniform("matWorld",
 				itr->second->GetTransform().GetMatrix());
 			itr->second->Render();
@@ -910,12 +905,12 @@ public:
 		renderer->SetUniform("light.spec", mLight->GetSpecular());
 		renderer->SetUniform("light.dir", mLight->GetTransform().GetDirection());
 
-		renderer->SetSampler("texSamp", samp, tex);
-		renderer->SetSampler("shadowTexSamp", mShSamp, mShadowMap->GetTextureAt(0), 1);
+		renderer->SetTexture("texSamp", tex);
+		renderer->SetTexture("shadowTexSamp",mShadowMap->GetTextureAt(0), 1);
 
 		itr = mComponents.begin();
 		end = mComponents.end();
-		for (; itr != end; itr++){
+		for (; itr != end; itr++) {
 			renderer->SetUniform("matWorld",
 				itr->second->GetTransform().GetMatrix());
 
@@ -936,9 +931,9 @@ public:
 // animated model.
 // hierarchical joint and mesh attribute of
 // relative joint and blending weight.
-class AnimatedModel : public AModel{
+class AnimatedModel : public AModel {
 public:
-	class Joint{
+	class Joint {
 	private:
 		friend AnimatedModel;
 
@@ -958,21 +953,21 @@ public:
 			const Joint* parentJoint=NULL)
 			: id(ID), Mp(M_p)
 		{
-			if (parentJoint == NULL){
+			if (parentJoint == NULL) {
 				pid = -1;
 				invMd = Mp.Inverse();
 			}
-			else{
+			else {
 				pid = parentJoint->id;
 				invMd = Mp.Inverse() * parentJoint->invMd;
 			}
 		}
 	};
 
-	class Animator{
+	class Animator {
 	public:
-		struct Animation{
-			struct TransformData{
+		struct Animation {
+			struct TransformData {
 				real time;
 				Vector3 translation;
 				Quaternion rotation;
@@ -981,15 +976,15 @@ public:
 
 			std::vector<TransformData> datas;
 
-			const Matrix4 Interpolate(real time){
+			const Matrix4 Interpolate(real time) {
 				uinteger sz = datas.size();
 				uinteger i = 1;
-				for (; i < sz; i++){
+				for (; i < sz; i++) {
 					if (time <= datas[i].time)
 						break;
 				}
 
-				if (time == datas[i].time){
+				if (time == datas[i].time) {
 					Matrix4 mat = datas[i].rotation.ToMatrix4(true);
 					mat.m[0][3] = datas[i].translation.x;
 					mat.m[1][3] = datas[i].translation.y;
@@ -1013,15 +1008,15 @@ public:
 			}
 		};
 
-		struct _PlayMode_wrapper{
-			enum PlayMode{
+		struct _PlayMode_wrapper {
+			enum PlayMode {
 				ONCE = 0, REPEAT
 			};
 		};
 		typedef _PlayMode_wrapper::PlayMode PlayMode;
 
-		struct _PlayState_wrapper{
-			enum PlayState{
+		struct _PlayState_wrapper {
+			enum PlayState {
 				STOP = 0, PAUSE, RUN
 			};
 		};
@@ -1058,41 +1053,41 @@ public:
 			: playTime(play_time), passingTime(0.f),
 			mode(play_mode), state(play_state)
 		{}
-		~Animator(){}
+		~Animator() {}
 
-		void SetAnimations(const std::vector<Animation>& animations){
+		void SetAnimations(const std::vector<Animation>& animations) {
 			anims = animations;
 		}
 
-		void Run(){
+		void Run() {
 			state = PlayState::RUN;
 		}
 
-		void Pause(){
+		void Pause() {
 			state = PlayState::PAUSE;
 		}
 
-		void Stop(){
+		void Stop() {
 			state = PlayState::STOP;
 			passingTime = 0.f;
 		}
 
-		void SetPlayMode(PlayMode play_mode){
+		void SetPlayMode(PlayMode play_mode) {
 			mode = play_mode;
 		}
 
 	private:
-		void Update(real deltaTime){
+		void Update(real deltaTime) {
 			if (state != PlayState::RUN)
 				return;
 
 			passingTime += deltaTime;
-			if (passingTime > playTime){
-				if (mode == PlayMode::ONCE){
+			if (passingTime > playTime) {
+				if (mode == PlayMode::ONCE) {
 					state = PlayState::STOP;
 					passingTime = 0.f;
 				}
-				else{
+				else {
 					passingTime = playTime - passingTime;
 				}
 			}
@@ -1108,28 +1103,28 @@ private:
 
 public:
 	AnimatedModel(const std::string& name, ASceneComponent* parent, bool activate)
-		: AModel(name, parent, activate){}
+		: AModel(name, parent, activate) {}
 	
-	virtual ~AnimatedModel(){}
+	virtual ~AnimatedModel() {}
 
-	void SetJointTable(const std::vector<Joint>& joints){
+	void SetJointTable(const std::vector<Joint>& joints) {
 		mJoints = joints;
 		mPalette.resize(joints.size());
 	}
 
-	void SetAnimator(const Animator& animator){
+	void SetAnimator(const Animator& animator) {
 		mAnimator = animator;
 	}
 
-	Animator& GetAnimator(){
+	Animator& GetAnimator() {
 		return mAnimator;
 	}
 
-	const MatrixPalette& GetMatrixPalette() const{
+	const MatrixPalette& GetMatrixPalette() const {
 		return mPalette;
 	}
 
-	void Update() override{
+	void Update() override {
 		if (mCollider != NULL)
 			mCollider->Update();
 		if (mRigidBody != NULL)
@@ -1143,14 +1138,14 @@ public:
 
 		Matrix4* matWs = new Matrix4[mPalette.size()];
 		uinteger count = mJoints.size();
-		for (uinteger i = 0; i < count; i++){
+		for (uinteger i = 0; i < count; i++) {
 			Matrix4 Mc = mAnimator.anims[i].Interpolate(mAnimator.passingTime);
-			if (mJoints[i].pid == -1){
+			if (mJoints[i].pid == -1) {
 				// Mi_0 = Mc_0
 				matWs[i] = Mc;
 				mPalette[i] = Mc;
 			}
-			else{
+			else {
 				// Mw_i = Mw_{i-1} * Mp_i * Mc_i
 				matWs[i] = matWs[mJoints[i].pid] * mJoints[i].Mp * Mc;
 				// Mi = Mw_i * invMd_i
@@ -1161,18 +1156,18 @@ public:
 	}
 
 	// uniform matrix palette should to be passed before.
-	void Render() override{
+	void Render() override {
 		mMesh->Draw();
 	}
 };
 
-class TmpScene : public AScene{
+class TmpScene : public AScene {
 public:
-	s_ptr<ShaderProgram> renderer;
+	ShaderProgram* renderer;
 
 	AnimatedModel* animModel;
 
-	TmpScene(){
+	TmpScene() {
 		ShaderProgram::Recipe recipe;
 		recipe.attributes = {
 			{ AttributeSemantic::POSITION, "position" },
@@ -1193,12 +1188,12 @@ public:
 			"uniform mat4 matProjection;\n"
 			"uniform mat4 palette[20];	\n"
 			"out vec3 norm;				\n"
-			"void main(){				\n"
+			"void main() {				\n"
 			"	vec3 blendedPos = vec3(0,0,0);\n"
 			"	vec3 p;					\n"
 			"	vec3 n;					\n"
 			"	norm = vec3(0,0,0);		\n"
-			"	for(int i=0; i<4; i++){											\n"
+			"	for(int i=0; i<4; i++) {											\n"
 			"		if(matIndex[i] == -1)										\n"
 			"			break;													\n"
 			"		p = (palette[int(matIndex[i])] * vec4(position,1.0)).xyz;	\n"
@@ -1212,7 +1207,7 @@ public:
 			"#version 440				\n"
 			"out vec4 fragColor;		\n"
 			"in vec3 norm;				\n"
-			"void main(){				\n"
+			"void main() {				\n"
 			"	fragColor = vec4(1,1,1, 1);	\n"
 			"}";
 
@@ -1291,19 +1286,21 @@ public:
 		AddSceneComponent(animModel);
 	}
 
-	~TmpScene(){
+	~TmpScene() {
+		if (renderer)
+			delete renderer;
 	}
 
-	void OnEnter() override{
+	void OnEnter() override {
 	}
 
-	void OnLeave() override{}
+	void OnLeave() override {}
 
-	void Update(){
+	void Update() {
 		animModel->Update();
 	}
 
-	void Render(){
+	void Render() {
 		renderer->Use();
 		renderer->SetUniform("matView", mMainCam->GetViewMatrix());
 		renderer->SetUniform("matProjection", mMainCam->GetProjMatrix());
@@ -1321,14 +1318,14 @@ public:
 
 
 
-class TestScene2 : public AScene{
+class TestScene2 : public AScene {
 public:
-	s_ptr<ShaderProgram> renderer;
+	ShaderProgram* renderer;
 
 	// dynamic light list
 	DirectionalLight* mLight;
 
-	TestScene2(){
+	TestScene2() {
 		ShaderProgram::Recipe recipe;
 		recipe.attributes = {
 				{ AttributeSemantic::POSITION, "position" },
@@ -1343,20 +1340,20 @@ public:
 			"uniform mat4 matProjection;		\n"
 			"out vec4 wpos;						\n"
 			"out vec3 norm;						\n"
-			"void main(){													\n"
+			"void main() {													\n"
 			"	wpos = matWorld * vec4(position, 1);						\n"
 			"	norm = (transpose(inverse(matWorld))*vec4(normal, 0)).xyz;	\n"
 			"	gl_Position = matProjection * matView * wpos;				\n"
 			"}";
 		recipe.fragmentShader =
 			"#version 440										\n"
-			"struct DirLight{									\n"
+			"struct DirLight {									\n"
 			"	vec4 amb;										\n"
 			"	vec4 dif;										\n"
 			"	vec4 spec;										\n"
 			"	vec3 dir;										\n"
 			"};													\n"
-			"struct Material{									\n"
+			"struct Material {									\n"
 			"	vec4 amb;										\n"
 			"	vec4 dif;										\n"
 			"	vec4 spec;										\n"
@@ -1378,14 +1375,14 @@ public:
 			"					vec4(0.7,0.7,0.7,1),			\n"
 			"					vec4(0.9, 0.9, 0.9, 1), 16.0);	\n"
 			"													\n"
-			"void main(){										\n"
+			"void main() {										\n"
 			"	vec3 n = normalize(norm);						\n"
 			"	vec3 v = normalize(weye - wpos.xyz);			\n"
 			"	vec3 l = -light.dir;							\n"
 			"	float sc=0;										\n"
 			"	float cosNL = max(dot(n,l), 0.05);				\n"
 			"													\n"
-			"	if(cosNL > 0.05 ){								\n"
+			"	if(cosNL > 0.05 ) {								\n"
 			"		vec3 r = 2*cosNL*n - l;						\n"
 			"		sc = pow(max(dot(r,v),0), mtrl.shi);		\n"
 			"	}												\n"
@@ -1430,16 +1427,19 @@ public:
 		AddSceneComponent(mLight);
 	}
 
-	~TestScene2(){}
+	~TestScene2() {
+		if (renderer)
+			delete renderer;
+	}
 
-	void OnEnter() override{
+	void OnEnter() override {
 		// mouse handlers
 		static Position2 prvPos;
 		static ASceneComponent* graspComponent;
 
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_DRAG,
-			[&](const Position2& pos, real ext)->void{
+			[&](const Position2& pos, real ext)->void {
 			Vector2 mv = pos - prvPos;
 			if (graspComponent != NULL) {
 				graspComponent->GetTransform().RotateMore(mMainCam->GetBasisV(), mv.x / 180.f);
@@ -1453,7 +1453,7 @@ public:
 		});
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_DOWN,
-			[&](const Position2& pos, real ext)->void{
+			[&](const Position2& pos, real ext)->void {
 			prvPos = pos;
 
 			Ray ray = mMainCam->ScreenToWorldRay(pos);
@@ -1461,7 +1461,7 @@ public:
 			mLayers[0].Sort(mMainCam->GetEye());
 			Layer::ReplicaArrayIterator itr = mLayers[0].Begin();
 			Layer::ReplicaArrayIterator end = mLayers[0].End();
-			for (; itr != end; itr++){
+			for (; itr != end; itr++) {
 				auto bs = (*itr)->GetCollider();
 				if (bs == NULL)
 					continue;
@@ -1472,24 +1472,24 @@ public:
 		});
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_LBUTTON_UP,
-			[&](const Position2& pos, real ext)->void{
-			if (!graspComponent){
+			[&](const Position2& pos, real ext)->void {
+			if (!graspComponent) {
 				graspComponent = NULL;
 			}
 		});
 		Input::mouse.RegisterMouseHandler(
 			Input::Mouse::EVENT_WHEEL,
-			[&](const Position2& pos, real ext)->void{
+			[&](const Position2& pos, real ext)->void {
 			mMainCam->MoveForward(ext);
 		});
 	}
 
-	void OnLeave() override{}
+	void OnLeave() override {}
 
-	void Update(){
+	void Update() {
 	}
 
-	void Render(){
+	void Render() {
 		renderer->Use();
 		renderer->SetUniform("matView", mMainCam->GetViewMatrix());
 		renderer->SetUniform("matProjection", mMainCam->GetProjMatrix());
@@ -1502,7 +1502,7 @@ public:
 
 		ComponentMap::iterator itr = mComponents.begin();
 		ComponentMap::iterator end = mComponents.end();
-		for (; itr != end; itr++){
+		for (; itr != end; itr++) {
 			renderer->SetUniform("matWorld",
 				itr->second->GetTransform().GetMatrix());
 
@@ -1514,7 +1514,7 @@ public:
 
 
 //---------------------------------------------------------------------
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdShow){
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdShow) {
 	// ============ initialization ===============
 	gpEngine->InitializeApp(hInstance, nCmdShow, L"test", L"test");
 
@@ -1522,7 +1522,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 	// engine settings (after initialization)
 	
 	// user input handler setting
-	Input::keyboard.RegisterKeyCombHandler([]()->void{
+	Input::keyboard.RegisterKeyCombHandler([]()->void {
 		gpEngine->Halt();
 	}, Input::Keyboard::CODE_ESC);
 

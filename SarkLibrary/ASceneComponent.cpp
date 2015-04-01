@@ -1,9 +1,9 @@
 #include "ASceneComponent.h"
 
-namespace sark{
+namespace sark {
 
 	ASceneComponent::ComponentID ASceneComponent::_nextComponentID = 0;
-	ASceneComponent::ComponentID ASceneComponent::_getUniqueComponentID(){
+	ASceneComponent::ComponentID ASceneComponent::_getUniqueComponentID() {
 		return _nextComponentID++;
 	}
 
@@ -53,7 +53,7 @@ namespace sark{
 		}
 
 		mParent = newParent;
-		if (newParent != NULL){
+		if (newParent != NULL) {
 			newParent->AddChild(this);
 		}
 	}
@@ -144,7 +144,7 @@ namespace sark{
 
 
 	// get the children container
-	ASceneComponent::ChildContainer& ASceneComponent::GetChildren(){
+	ASceneComponent::ChildContainer& ASceneComponent::GetChildren() {
 		return mChildren;
 	}
 
@@ -164,16 +164,16 @@ namespace sark{
 
 
 	// get transform object of this component. it is local transform object.
-	Transform& ASceneComponent::GetTransform(){
+	Transform& ASceneComponent::GetTransform() {
 		return mTransform;
 	}
 
 	// is this component activated?
-	bool ASceneComponent::IsActive() const{
+	bool ASceneComponent::IsActive() const {
 		return mActivated;
 	}
 	// set component activation property
-	void ASceneComponent::Activate(bool act){
+	void ASceneComponent::Activate(bool act) {
 		mActivated = act;
 	}
 

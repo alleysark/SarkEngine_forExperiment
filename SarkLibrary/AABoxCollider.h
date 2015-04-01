@@ -4,13 +4,13 @@
 #include "core.h"
 #include "ACollider.h"
 
-namespace sark{
+namespace sark {
 
 	// axis aligned box.
 	// box that its faces are aligned with
 	// standard coordinates axis orientation.
 	// it is represented as min, max position.
-	class AABoxCollider : public ACollider{
+	class AABoxCollider : public ACollider {
 	public:
 		// minimum position
 		Vector3 min;

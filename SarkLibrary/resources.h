@@ -7,7 +7,7 @@
 #include "core.h"
 #include "Texture.h"
 
-namespace sark{
+namespace sark {
 
 	class IResource;
 	template<class ImpResourceType> class IResourceLoader;
@@ -18,7 +18,7 @@ namespace sark{
 	// resource management class.
 	// for resource loading, caching, releasing, etc..
 	// resources can be cached by its name when it is already loaded before using
-	class ResourceManager{
+	class ResourceManager {
 	public:
 		typedef std::map<std::string, s_ptr<IResource>> ResourceMap;
 
@@ -40,14 +40,14 @@ namespace sark{
 		void SetBasePath(const std::string& pathName);
 
 		template<class ResourceType>
-		s_ptr<ResourceType> Load(const std::string& name){
+		s_ptr<ResourceType> Load(const std::string& name) {
 			ResourceMap::iterator itr = mResources.find(name);
-			if (itr != mResources.end()){
+			if (itr != mResources.end()) {
 				return std::dynamic_pointer_cast<ResourceType>(itr->second);
 			}
 
 			s_ptr<ResourceType> resc = ResourceType::Load(mBasePath + name);
-			if (resc == NULL){
+			if (resc == NULL) {
 				return NULL;
 			}
 
@@ -61,10 +61,10 @@ namespace sark{
 	// user defined resource should have inherit it(or sub interfaces)
 	// and IResourceLoader.
 	// resource is uncopiable object
-	class IResource{
+	class IResource {
 	public:
-		IResource(){}
-		virtual ~IResource(){}
+		IResource() {}
+		virtual ~IResource() {}
 		
 	private:
 		IResource(const IResource&);
@@ -75,9 +75,9 @@ namespace sark{
 	// resource loader static-interface as <crtp pattern>.
 	// user defined resource should have inherit this and IResource.
 	template<class ImpResourceType>
-	class IResourceLoader{
+	class IResourceLoader {
 	public:
-		static s_ptr<ImpResourceType> Load(const std::string& path){
+		static s_ptr<ImpResourceType> Load(const std::string& path) {
 			return ImpResourceType::LoadImp(path);
 		}
 
@@ -87,10 +87,10 @@ namespace sark{
 	};
 
 	// texture resource interface
-	class ITextureResource : public IResource{
+	class ITextureResource : public IResource {
 	public:
-		ITextureResource(){}
-		virtual ~ITextureResource(){}
+		ITextureResource() {}
+		virtual ~ITextureResource() {}
 
 		// get image width
 		virtual const integer GetWidth() const = 0;
@@ -114,8 +114,8 @@ namespace sark{
 	// 3d model resource interface
 	class IModelResource : public IResource {
 	public:
-		IModelResource(){}
-		virtual ~IModelResource(){}
+		IModelResource() {}
+		virtual ~IModelResource() {}
 
 		// make this model resource to be center
 		virtual void MakeItCenter() = 0;

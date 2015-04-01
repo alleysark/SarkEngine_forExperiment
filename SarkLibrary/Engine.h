@@ -16,13 +16,13 @@
 #include "Timer.h"
 #include "Input.h"
 
-namespace sark{
+namespace sark {
 
 	// engine is the core single-tone class to make application.
 	// it creates window and initializes graphics library(especially OpenGL).
 	// almost of all application components like scene, physics system, 
 	// devices are handled by this class
-	class Engine{
+	class Engine {
 	private:
 		// singleton instance
 		static Engine* instance;

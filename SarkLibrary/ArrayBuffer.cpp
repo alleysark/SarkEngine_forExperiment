@@ -1,6 +1,6 @@
 #include "ArrayBuffer.h"
 
-namespace sark{
+namespace sark {
 
 	ArrayBuffer::AttributeFeature::AttributeFeature()
 		: attribTarget(AttributeSemantic::POSITION), elementCount(0),
@@ -10,8 +10,8 @@ namespace sark{
 
 
 
-	ArrayBuffer::ArrayBuffer(const ArrayBuffer&){}
-	ArrayBuffer& ArrayBuffer::operator=(const ArrayBuffer&){ return *this; }
+	ArrayBuffer::ArrayBuffer(const ArrayBuffer&) {}
+	ArrayBuffer& ArrayBuffer::operator=(const ArrayBuffer&) { return *this; }
 
 	ArrayBuffer::ArrayBuffer()
 		: mDrawMode(DrawMode::NONE)
@@ -20,11 +20,11 @@ namespace sark{
 	}
 
 	// delete all generated buffers.
-	ArrayBuffer::~ArrayBuffer(){
+	ArrayBuffer::~ArrayBuffer() {
 		// delete all attribute buffers.
-		for (integer i = 0; i < AttributeSemantic::COUNT; i++){
-			if (mAttribFeats[i] != NULL){
-				if (mAttribFeats[i]->bufId != 0){
+		for (integer i = 0; i < AttributeSemantic::COUNT; i++) {
+			if (mAttribFeats[i] != NULL) {
+				if (mAttribFeats[i]->bufId != 0) {
 					glDeleteBuffers(1, &mAttribFeats[i]->bufId);
 				}
 			}
@@ -33,18 +33,18 @@ namespace sark{
 	}
 
 	// get draw mode.
-	const ArrayBuffer::DrawMode& ArrayBuffer::GetDrawMode() const{
+	const ArrayBuffer::DrawMode& ArrayBuffer::GetDrawMode() const {
 		return mDrawMode;
 	}
 
 	// set draw mode.
-	void ArrayBuffer::SetDrawMode(DrawMode drawMode){
+	void ArrayBuffer::SetDrawMode(DrawMode drawMode) {
 		mDrawMode = drawMode;
 	}
 
 	// get data count of specific attribute.
 	// it'll return 0 if given attribute buffer is not exists.
-	const uinteger ArrayBuffer::GetDataCount(AttributeSemantic attribSemantic) const{
+	const uinteger ArrayBuffer::GetDataCount(AttributeSemantic attribSemantic) const {
 		if (mAttribFeats[attribSemantic] == NULL)
 			return 0;
 		return mAttribFeats[attribSemantic]->dataCount;
@@ -52,8 +52,8 @@ namespace sark{
 
 	
 	// bind this vertex buffer object.
-	void ArrayBuffer::BindAttribBuffers() const{
-		for (integer i = 0; i < AttributeSemantic::COUNT; i++){
+	void ArrayBuffer::BindAttribBuffers() const {
+		for (integer i = 0; i < AttributeSemantic::COUNT; i++) {
 			if (mAttribFeats[i] == NULL)
 				continue;
 			
@@ -69,11 +69,11 @@ namespace sark{
 
 	// unbind currently bound vertex buffer object 
 	// and disable the enabled vertex attribute arrays.
-	void ArrayBuffer::UnbindAttribBuffers() const{
+	void ArrayBuffer::UnbindAttribBuffers() const {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		for (integer i = 0; i < AttributeSemantic::COUNT; i++){
+		for (integer i = 0; i < AttributeSemantic::COUNT; i++) {
 			if (mAttribFeats[i] == NULL)
 				continue;
 
@@ -82,7 +82,7 @@ namespace sark{
 	}
 
 	// bind specific attribute buffer object.
-	bool ArrayBuffer::BindAttribBuffer(AttributeSemantic attribSemantic) const{
+	bool ArrayBuffer::BindAttribBuffer(AttributeSemantic attribSemantic) const {
 		if (mAttribFeats[attribSemantic] == NULL)
 			return false;
 
@@ -98,7 +98,7 @@ namespace sark{
 
 	// unbind currently bound vertex buffer object 
 	// and disable specific vertex attribute array.
-	bool ArrayBuffer::UnbindAttribBuffer(AttributeSemantic attribSemantic) const{
+	bool ArrayBuffer::UnbindAttribBuffer(AttributeSemantic attribSemantic) const {
 		if (mAttribFeats[attribSemantic] == NULL)
 			return false;
 
@@ -113,13 +113,13 @@ namespace sark{
 
 	// draw vertex array directly.
 	// you should have to bind this buffer.
-	void ArrayBuffer::DrawArrays() const{
+	void ArrayBuffer::DrawArrays() const {
 		ONLYDBG_CODEBLOCK(
-		if (mAttribFeats[AttributeSemantic::POSITION] == NULL){
+		if (mAttribFeats[AttributeSemantic::POSITION] == NULL) {
 			LogWarn("positions are the essential attribute to draw");
 			return;
 		}
-		if (mDrawMode == DrawMode::NONE){
+		if (mDrawMode == DrawMode::NONE) {
 			LogWarn("you should have set the draw mode to draw");
 			return;
 		});
@@ -129,16 +129,16 @@ namespace sark{
 
 	// draw elements. you should have to bind relative
 	// vertex buffer and this index buffer.
-	void ArrayBuffer::DrawPrimitives() const{
+	void ArrayBuffer::DrawPrimitives() const {
 		ONLYDBG_CODEBLOCK(
-		if (mAttribFeats[AttributeSemantic::POSITION] == NULL){
+		if (mAttribFeats[AttributeSemantic::POSITION] == NULL) {
 			LogWarn("positions are the essential attribute to draw");
 			return;
 		}
-		if (mAttribFeats[AttributeSemantic::INDICES] == NULL){
+		if (mAttribFeats[AttributeSemantic::INDICES] == NULL) {
 			LogWarn("indices are required to draw arrays as 'element'");
 		}
-		if (mDrawMode == DrawMode::NONE){
+		if (mDrawMode == DrawMode::NONE) {
 			LogWarn("you should have set the draw mode to draw");
 			return;
 		});

@@ -5,14 +5,14 @@
 #include "ArrayBuffer.h"
 #include "AScene.h"
 
-namespace sark{
+namespace sark {
 
 	class ConvexHull;
 
 	// collision detector and resolver in here.
 	// at present, it supports only for the indexed triangle mesh
 	// and it does not resolve the 'resting state'.
-	class Collision{
+	class Collision {
 	public:
 		// coefficient of restitution.
 		// it'll be deprecated soon.

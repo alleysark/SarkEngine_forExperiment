@@ -3,7 +3,7 @@
 
 #include "core.h"
 
-namespace sark{
+namespace sark {
 
 	class ASceneComponent;
 
@@ -11,7 +11,7 @@ namespace sark{
 	// "In physics, a rigid body is an idealization of
 	// a solid body in which deformation is neglected."
 	// -wikipedia
-	class RigidBody{
+	class RigidBody {
 	private:
 		// it consider the scene component position
 		// as center of mass by default.

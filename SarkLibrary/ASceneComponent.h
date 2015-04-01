@@ -8,7 +8,7 @@
 #include "core.h"
 #include "Transform.h"
 
-namespace sark{
+namespace sark {
 
 	class ACollider;
 	class Mesh;

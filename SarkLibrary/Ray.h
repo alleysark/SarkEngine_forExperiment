@@ -3,12 +3,12 @@
 
 #include "core.h"
 
-namespace sark{
+namespace sark {
 
 	class ACollider;
 
 	// the ray toward direction vector.
-	class Ray{
+	class Ray {
 	public:
 		// start position. the origin of ray.
 		Vector3 pos;

@@ -4,9 +4,9 @@
 #include "ACollider.h"
 #include "primitives.hpp"
 
-namespace sark{
+namespace sark {
 
-	void RigidSphere::CreateSphere(){
+	void RigidSphere::CreateSphere() {
 		// idea by 'datenwolf'
 		// (http://stackoverflow.com/questions/5988686/creating-a-3d-sphere-in-opengl-using-visual-c)
 		
@@ -20,7 +20,7 @@ namespace sark{
 		real PI_2 = math::PI / 2.f;
 		uinteger r, s;
 
-		for (r = 0; r < mSlice; r++){
+		for (r = 0; r < mSlice; r++) {
 			for (s = 0; s < mStack; s++) {
 				real y = math::sin(-PI_2 + math::PI * r * R);
 				real x = math::cos(2 * math::PI * s * S) * sin(math::PI * r * R);
@@ -34,8 +34,8 @@ namespace sark{
 			}
 		}
 
-		for (r = 0; r < mSlice - 1; r++){
-			for (s = 0; s < mStack - 1; s++){
+		for (r = 0; r < mSlice - 1; r++) {
+			for (s = 0; s < mStack - 1; s++) {
 				uint16 v0 = (uint16)(r * mStack + s);
 				uint16 v1 = (uint16)(r * mStack + (s + 1));
 				uint16 v2 = (uint16)((r + 1) * mStack + (s + 1));
@@ -99,21 +99,21 @@ namespace sark{
 		CreateSphere();
 	}
 
-	RigidSphere::~RigidSphere(){
+	RigidSphere::~RigidSphere() {
 	}
 
 	// get radius of sphere.
-	const real& RigidSphere::GetRadius() const{
+	const real& RigidSphere::GetRadius() const {
 		return mRadius;
 	}
 
 	// get slice count.
-	const uinteger& RigidSphere::GetSliceCount() const{
+	const uinteger& RigidSphere::GetSliceCount() const {
 		return mSlice;
 	}
 
 	// get stack count.
-	const uinteger& RigidSphere::GetStackCount() const{
+	const uinteger& RigidSphere::GetStackCount() const {
 		return mStack;
 	}
 

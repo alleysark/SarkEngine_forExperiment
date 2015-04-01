@@ -1,11 +1,11 @@
 #include "ACollider.h"
 
-namespace sark{
+namespace sark {
 
 	ACollider::ACollider(ASceneComponent* reference)
 		: mReference(reference)
 	{}
 
-	ACollider::~ACollider(){}
+	ACollider::~ACollider() {}
 
 }

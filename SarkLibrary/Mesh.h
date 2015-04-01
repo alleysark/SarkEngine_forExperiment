@@ -4,10 +4,10 @@
 #include "core.h"
 #include "ArrayBuffer.h"
 
-namespace sark{
+namespace sark {
 
 	// mesh the data set of 3d model.
-	class Mesh{
+	class Mesh {
 	protected:
 		// array buffer of mesh.
 		ArrayBuffer mArrayBuf;

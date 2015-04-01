@@ -4,7 +4,7 @@
 #include "RigidBody.h"
 #include "ACollider.h"
 
-namespace sark{
+namespace sark {
 
 	AModel::AModel(const std::string& name, ASceneComponent* parent, bool activate)
 		: ASceneComponent(name, parent, activate),
@@ -13,7 +13,7 @@ namespace sark{
 		mMesh = new Mesh();
 	}
 
-	AModel::~AModel(){
+	AModel::~AModel() {
 		if (mMesh != NULL)
 			delete mMesh;
 		if (mRigidBody != NULL)
@@ -28,12 +28,12 @@ namespace sark{
 	}
 
 	// set new collider or empty by null pointer
-	void AModel::SetCollider(ACollider* newColl){
+	void AModel::SetCollider(ACollider* newColl) {
 		mCollider = newColl;
 	}
 
 	// get mesh object of scene component.
-	Mesh* AModel::GetMesh(){
+	Mesh* AModel::GetMesh() {
 		return mMesh;
 	}
 
@@ -47,12 +47,12 @@ namespace sark{
 	}
 
 	// get rigid body. it can be NULL for the non-rigid body.
-	RigidBody* AModel::GetRigidBody(){
+	RigidBody* AModel::GetRigidBody() {
 		return mRigidBody;
 	}
 
 	// set new rigid body or empty unique_ptr.
-	void AModel::SetRigidBody(RigidBody* newBody){
+	void AModel::SetRigidBody(RigidBody* newBody) {
 		mRigidBody = newBody;
 	}
 

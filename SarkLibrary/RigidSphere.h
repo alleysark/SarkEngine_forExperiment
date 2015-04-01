@@ -3,14 +3,14 @@
 
 #include "StaticModel.h"
 
-namespace sark{
+namespace sark {
 
 	class Mesh;
 	class RigidBody;
 	class ACollider;
 
 	// simple rigid sphere scene component.
-	class RigidSphere : public StaticModel{
+	class RigidSphere : public StaticModel {
 	private:
 		// radius
 		real mRadius;

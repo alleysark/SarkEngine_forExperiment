@@ -3,14 +3,14 @@
 
 #include "core.h"
 
-namespace sark{
+namespace sark {
 
 	class ASceneComponent;
 
 	// interface of collider.
-	class ACollider{
+	class ACollider {
 	public:
-		enum Type{ SPHERE, AABOX, OBOX, CONVEXHULL };
+		enum Type { SPHERE, AABOX, OBOX, CONVEXHULL };
 
 	protected:
 		// refernece pointer.

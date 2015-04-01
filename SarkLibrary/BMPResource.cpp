@@ -3,7 +3,7 @@
 #include "BMPResource.h"
 #include "Debug.h"
 
-namespace sark{
+namespace sark {
 
 	BMPResource::BMPResource()
 		: mWidth(0), mHeight(0), mPixels(NULL)
@@ -16,37 +16,37 @@ namespace sark{
 		memcpy(mPixels, bmp.mPixels, size);
 	}
 
-	BMPResource::~BMPResource(){
-		if (mPixels != NULL){
+	BMPResource::~BMPResource() {
+		if (mPixels != NULL) {
 			delete[] mPixels;
 		}
 	}
 
-	const integer BMPResource::GetWidth() const{
+	const integer BMPResource::GetWidth() const {
 		return mWidth;
 	}
 
-	const integer BMPResource::GetHeight() const{
+	const integer BMPResource::GetHeight() const {
 		return mHeight;
 	}
 
-	const integer BMPResource::GetDepth() const{
+	const integer BMPResource::GetDepth() const {
 		return 0;
 	}
 
-	Texture::Format BMPResource::GetPixelFormat() const{
+	Texture::Format BMPResource::GetPixelFormat() const {
 		return Texture::Format::RGB;
 	}
 
-	Texture::PixelType BMPResource::GetPixelType() const{
+	Texture::PixelType BMPResource::GetPixelType() const {
 		return Texture::PixelType::UNSIGNED_BYTE;
 	}
 
-	const void* BMPResource::GetPixels() const{
+	const void* BMPResource::GetPixels() const {
 		return mPixels;
 	}
 
-	s_ptr<BMPResource> BMPResource::LoadImp(const std::string& name){
+	s_ptr<BMPResource> BMPResource::LoadImp(const std::string& name) {
 		BITMAPFILEHEADER bmpFileHead;
 		BITMAPINFOHEADER bmpInfoHead;
 		memset(&bmpFileHead, 0, sizeof(BITMAPFILEHEADER));
@@ -54,24 +54,24 @@ namespace sark{
 
 		std::ifstream stream;
 		stream.open(name, std::ios::binary | std::ios::beg);
-		if (!stream.is_open()){
+		if (!stream.is_open()) {
 			LogWarn(name + " would not open");
 			return NULL;
 		}
 
 		stream.read((char*)&bmpFileHead, sizeof(BITMAPFILEHEADER));
-		if (((char*)&bmpFileHead)[0] != 'B' || ((char*)&bmpFileHead)[1] != 'M'){
+		if (((char*)&bmpFileHead)[0] != 'B' || ((char*)&bmpFileHead)[1] != 'M') {
 			LogWarn(name + " has invalid bitmap magic-code");
 			return NULL;
 		}
 
 		stream.read((char*)&bmpInfoHead, sizeof(BITMAPINFOHEADER));
-		if (bmpInfoHead.biSize != 40){
+		if (bmpInfoHead.biSize != 40) {
 			LogWarn("it only support BITMAPINFOHEADER format bitmap");
 			return NULL;
 		}
 
-		if (bmpInfoHead.biBitCount != 24 && bmpInfoHead.biBitCount != 32){
+		if (bmpInfoHead.biBitCount != 24 && bmpInfoHead.biBitCount != 32) {
 			LogWarn(name + " has unsupported bit-count");
 				return NULL;
 		}
@@ -82,14 +82,14 @@ namespace sark{
 		bmp->mPixels = new uint8[bmp->mWidth * bmp->mHeight * 3];
 
 		stream.seekg(bmpFileHead.bfOffBits, std::ios::beg);
-		if (bmpInfoHead.biBitCount == 24){
+		if (bmpInfoHead.biBitCount == 24) {
 			// 24bit bmp has dummy pixels in each rows
 			integer dumbyte = ((bmp->mWidth) % 4);
 			dumbyte = (dumbyte == 0 ? 0 : (4 - dumbyte) * 3);
 
 			int64 i, k;
-			for (i = 0; i < bmp->mHeight; i++){
-				for (k = 0; k < bmp->mWidth; k++){
+			for (i = 0; i < bmp->mHeight; i++) {
+				for (k = 0; k < bmp->mWidth; k++) {
 					// read bgr order
 					int64 pix_idx = (bmp->mHeight - i - 1)*bmp->mWidth * 3 + k * 3;
 					stream.read((char*)&bmp->mPixels[pix_idx], 3);
@@ -101,11 +101,11 @@ namespace sark{
 				stream.seekg(dumbyte, std::ios::cur);
 			}
 		}
-		else if (bmpInfoHead.biBitCount == 32){
+		else if (bmpInfoHead.biBitCount == 32) {
 			uint8 rgba[4];
 			int64 i, k;
-			for (i = 0; i < bmp->mHeight; i++){
-				for (k = 0; k < bmp->mWidth; k++){
+			for (i = 0; i < bmp->mHeight; i++) {
+				for (k = 0; k < bmp->mWidth; k++) {
 					// read rgba order
 					stream.read((char*)rgba, 4);
 

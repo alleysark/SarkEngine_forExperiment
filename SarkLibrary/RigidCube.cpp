@@ -4,9 +4,9 @@
 #include "ACollider.h"
 #include "primitives.hpp"
 
-namespace sark{
+namespace sark {
 
-	void RigidCube::CreateCube(){
+	void RigidCube::CreateCube() {
 		real width = mWidth / 2.f;
 		real height = mHeight / 2.f;
 		real depth = mDepth / 2.f;
@@ -115,19 +115,19 @@ namespace sark{
 		CreateCube();
 	}
 
-	RigidCube::~RigidCube(){
+	RigidCube::~RigidCube() {
 	}
 
 	// get width of cube.
-	const real& RigidCube::GetWidth() const{
+	const real& RigidCube::GetWidth() const {
 		return mWidth;
 	}
 	// get height of cube.
-	const real& RigidCube::GetHeight() const{
+	const real& RigidCube::GetHeight() const {
 		return mHeight;
 	}
 	// get depth of cube.
-	const real& RigidCube::GetDepth() const{
+	const real& RigidCube::GetDepth() const {
 		return mDepth;
 	}
 

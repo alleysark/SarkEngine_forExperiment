@@ -9,7 +9,7 @@
 #include "ASceneComponent.h"
 #include "Camera.h"
 
-namespace sark{
+namespace sark {
 
 	// pure abstract scene class.
 	// 'scene' is one of a major element of the engine.
@@ -25,7 +25,7 @@ namespace sark{
 		// but to deal them efficiently(sortable, selectable, etc..),
 		// they are replicated into the 'layer' as its memory address(pointer).
 		// and it also be replicated other layers for the other purpose.
-		class Layer{
+		class Layer {
 		public:
 			typedef std::list<ASceneComponent*> ReplicaArray;
 			typedef ReplicaArray::iterator ReplicaArrayIterator;

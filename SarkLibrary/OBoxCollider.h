@@ -4,13 +4,13 @@
 #include "core.h"
 #include "ACollider.h"
 
-namespace sark{
+namespace sark {
 
 	// oriented box.
 	// box which has the own orientation.
 	// it is represented as center position
 	// of box and its own basis with extensions.
-	class OBoxCollider : public ACollider{
+	class OBoxCollider : public ACollider {
 	public:
 		// center position of box.
 		Vector3 pos;

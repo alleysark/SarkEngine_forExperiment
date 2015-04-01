@@ -3,10 +3,10 @@
 
 #include "AModel.h"
 
-namespace sark{
+namespace sark {
 
 	// static mesh model.
-	class StaticModel : public AModel{
+	class StaticModel : public AModel {
 	public:
 		StaticModel(const std::string& name, ASceneComponent* parent, bool activate);
 

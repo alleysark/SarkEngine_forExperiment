@@ -4,15 +4,15 @@
 #include <GL/glew.h>
 #include "core.h"
 
-namespace sark{
+namespace sark {
 
 	// sampler is a kind of wrapper class.
 	// it wraps the sampler id generated through the graphics API.
 	// *note: sampler is only available on glsl version 3.3 or higher.
-	class Sampler{
+	class Sampler {
 	public:
 		// available sampler parameter state.
-		enum State{
+		enum State {
 			// wrapping mode
 			WRAP_S = GL_TEXTURE_WRAP_S,
 			WRAP_T = GL_TEXTURE_WRAP_T,
@@ -31,7 +31,7 @@ namespace sark{
 		};
 		
 		// allowed wrapping mode
-		enum WrapMode{
+		enum WrapMode {
 			CLAMP = GL_CLAMP,
 			CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
 			CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER,
@@ -40,7 +40,7 @@ namespace sark{
 		};
 
 		// minification and magnification filter algorithms
-		enum Filter{
+		enum Filter {
 			// nearest neighbour
 			NEAREST = GL_NEAREST,
 

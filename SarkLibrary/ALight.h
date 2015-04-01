@@ -4,13 +4,13 @@
 #include "core.h"
 #include "ASceneComponent.h"
 
-namespace sark{
+namespace sark {
 
 	// pure abstract light class
-	class ALight : public ASceneComponent{
+	class ALight : public ASceneComponent {
 	public:
 		// light type definition
-		enum LightType{
+		enum LightType {
 			POINT_LIGHT, SPOT_LIGHT, DIRECTIONAL_LIGHT
 		};
 

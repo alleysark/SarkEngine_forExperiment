@@ -3,23 +3,23 @@
 #include "ACollider.h"
 #include "RigidBody.h"
 
-namespace sark{
+namespace sark {
 
 	StaticModel::StaticModel(const std::string& name, 
 		ASceneComponent* parent, bool activate)
 		: AModel(name, parent, activate)
 	{}
 
-	StaticModel::~StaticModel(){}
+	StaticModel::~StaticModel() {}
 
-	void StaticModel::Update(){
+	void StaticModel::Update() {
 		if (mCollider != NULL)
 			mCollider->Update();
 		if (mRigidBody != NULL)
 			mRigidBody->Update();
 	}
 
-	void StaticModel::Render(){
+	void StaticModel::Render() {
 		mMesh->Draw();
 	}
 

@@ -1,12 +1,12 @@
 #include "Engine.h"
 #include "Input.h"
 
-namespace sark{
+namespace sark {
 
 	// singleton instance
 	Engine* Engine::instance = NULL;
 	// get instance of this engine
-	Engine* Engine::GetInstance(){
+	Engine* Engine::GetInstance() {
 		if (instance == NULL)
 			instance = new Engine();
 		return instance;
@@ -19,12 +19,12 @@ namespace sark{
 		mCurrentScene(NULL)
 	{ }
 
-	Engine::Engine(const Engine&){}
-	const Engine& Engine::operator=(const Engine&){ return *this; }
+	Engine::Engine(const Engine&) {}
+	const Engine& Engine::operator=(const Engine&) { return *this; }
 
 
 	// initialize application
-	bool Engine::InitializeApp(HINSTANCE hInstance, integer nCmdShow, std::wstring strClassName, std::wstring strAppName){
+	bool Engine::InitializeApp(HINSTANCE hInstance, integer nCmdShow, std::wstring strClassName, std::wstring strAppName) {
 		mhInst = hInstance;
 
 		WNDCLASSEX wc;
@@ -55,19 +55,19 @@ namespace sark{
 	}
 
 	// run engine loop
-	void Engine::Run(){
+	void Engine::Run() {
 		mbRunning = true;
 		MSG msg;
 
 		mTimer.Resume();
-		while (mbRunning){
-			if (PeekMessage(&msg, mhWnd, 0, 0, PM_REMOVE)){
+		while (mbRunning) {
+			if (PeekMessage(&msg, mhWnd, 0, 0, PM_REMOVE)) {
 				// translate and dispatch messages
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
-			else{
-				if (mTimer.Update()){
+			else {
+				if (mTimer.Update()) {
 					// update current scene
 					mCurrentScene->Update();
 
@@ -84,33 +84,33 @@ namespace sark{
 	}
 
 	// get resource manager
-	ResourceManager& Engine::GetResourceManager(){
+	ResourceManager& Engine::GetResourceManager() {
 		return mResourceMgr;
 	}
 
 	// get engine timer
-	Timer& Engine::GetTimer(){
+	Timer& Engine::GetTimer() {
 		return mTimer;
 	}
 
 	// pause engine loop. message loop is not paused
-	bool Engine::Pause(){
+	bool Engine::Pause() {
 		return mTimer.Pause();
 	}
 
 	// resume engine loop
-	bool Engine::Resume(){
+	bool Engine::Resume() {
 		return mTimer.Resume();
 	}
 
 	// call a halt to running engine
-	void Engine::Halt(){
+	void Engine::Halt() {
 		mTimer.Pause();
 		mbRunning = false;
 	}
 
 	// release application
-	void Engine::ReleaseApp(){
+	void Engine::ReleaseApp() {
 		for (auto sc = mScenes.begin(); sc != mScenes.end(); sc++) {
 			delete sc->second;
 		}
@@ -119,7 +119,7 @@ namespace sark{
 	}
 
 	// enable opengl device and rendering context
-	bool Engine::EnableGLContext(){
+	bool Engine::EnableGLContext() {
 		PIXELFORMATDESCRIPTOR pfd;
 		int nPixelFormat;
 
@@ -141,14 +141,14 @@ namespace sark{
 	}
 
 	// disable opengl device and rendering context
-	void Engine::DisableGLContext(){
+	void Engine::DisableGLContext() {
 		wglMakeCurrent(NULL, NULL);
 		wglDeleteContext(mhRC);
 		ReleaseDC(mhWnd, mhDC);
 	}
 
 	// setup opengl state
-	void Engine::SetupGL(){
+	void Engine::SetupGL() {
 		glClearColor(mClearColor.r, mClearColor.g, mClearColor.b, mClearColor.a);
 		glEnable(GL_DEPTH_TEST);
 
@@ -169,13 +169,13 @@ namespace sark{
 
 	// ---------- configuration methods ------------
 
-	bool Engine::AddScene(const std::string& sceneName, AScene* scene, bool asCurrent){
+	bool Engine::AddScene(const std::string& sceneName, AScene* scene, bool asCurrent) {
 		SceneContainer::const_iterator find = mScenes.find(sceneName);
 		if (find != mScenes.cend())
 			return false;
 		mScenes[sceneName] = scene;
-		if (asCurrent){
-			if (mCurrentScene != NULL){
+		if (asCurrent) {
+			if (mCurrentScene != NULL) {
 				mCurrentScene->OnLeave();
 			}
 			mCurrentScene = scene;
@@ -184,11 +184,11 @@ namespace sark{
 		return true;
 	}
 
-	bool Engine::SetCurrentScene(const std::string& sceneName){
+	bool Engine::SetCurrentScene(const std::string& sceneName) {
 		SceneContainer::const_iterator find = mScenes.find(sceneName);
 		if (find == mScenes.cend())
 			return false;
-		if (mCurrentScene != NULL){
+		if (mCurrentScene != NULL) {
 			mCurrentScene->OnLeave();
 		}
 		mCurrentScene = find->second;
@@ -200,18 +200,18 @@ namespace sark{
 		return mCurrentScene;
 	}
 
-	void Engine::SetClearColor(const ColorRGBA& color){
+	void Engine::SetClearColor(const ColorRGBA& color) {
 		mClearColor = color;
 		glClearColor(mClearColor.r, mClearColor.g, mClearColor.b, mClearColor.a);
 	}
 
-	void Engine::ResizeWindow(uinteger width, uinteger height){
+	void Engine::ResizeWindow(uinteger width, uinteger height) {
 		SetWindowPos(mhWnd, NULL, 0, 0, width, height, SWP_NOMOVE | SWP_NOZORDER);
 	}
 
 
-	LRESULT CALLBACK Engine::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam){
-		switch (iMessage){
+	LRESULT CALLBACK Engine::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam) {
+		switch (iMessage) {
 		case WM_DESTROY:
 			Engine::instance->mbRunning = false;
 			return 0;

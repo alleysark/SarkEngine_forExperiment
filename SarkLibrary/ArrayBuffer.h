@@ -8,18 +8,18 @@
 #include "primitives.hpp"
 #include "Debug.h"
 
-namespace sark{
+namespace sark {
 
 	// array buffer object for mesh data.
 	// it offers you the function to generate vertex attribute
 	// array buffer with user-defined attribute type.
 	// it also offers you the accessor of mapped attribute array
 	// buffer which is the random-accessible memory.
-	class ArrayBuffer{
+	class ArrayBuffer {
 	public:
 		// buffer storage hint
-		struct _BufferHint_wrapper{
-			enum BufferHint{
+		struct _BufferHint_wrapper {
+			enum BufferHint {
 				STATIC = GL_STATIC_DRAW,
 				DYNAMIC = GL_DYNAMIC_DRAW,
 				STREAM = GL_STREAM_DRAW
@@ -28,8 +28,8 @@ namespace sark{
 		typedef _BufferHint_wrapper::BufferHint BufferHint;
 
 		// buffer accessing hint
-		struct _AccessHint_wrapper{
-			enum AccessHint{
+		struct _AccessHint_wrapper {
+			enum AccessHint {
 				READ_ONLY = GL_READ_ONLY,
 				WRITE_ONLY = GL_WRITE_ONLY,
 				READ_WRITE = GL_READ_WRITE
@@ -38,8 +38,8 @@ namespace sark{
 		typedef _AccessHint_wrapper::AccessHint AccessHint;
 
 		// attribute element type
-		struct _ElementType_wrapper{
-			enum ElementType{
+		struct _ElementType_wrapper {
+			enum ElementType {
 				// type real. usual type
 			#ifdef SARKLIB_USING_DOUBLE
 				REAL = GL_DOUBLE,
@@ -62,8 +62,8 @@ namespace sark{
 		typedef _ElementType_wrapper::ElementType ElementType;
 
 		// draw mode definition.
-		struct _DrawMode_wrapper{
-			enum DrawMode{
+		struct _DrawMode_wrapper {
+			enum DrawMode {
 				POINTS = GL_POINTS,
 				LINES = GL_LINES,
 				LINE_LOOP = GL_LINE_LOOP,
@@ -80,7 +80,7 @@ namespace sark{
 
 
 		// feature of each attribute
-		class AttributeFeature{
+		class AttributeFeature {
 		public:
 			// attribute target, e.g. ShaderProgram::ATTR_POSITION.
 			AttributeSemantic attribTarget;
@@ -118,7 +118,7 @@ namespace sark{
 		// it offers you the valid reference address.
 		// *note: this class is uncopiable.
 		template<class _AttribType>
-		class AttributeAccessor{
+		class AttributeAccessor {
 		private:
 			// start pointer of mapped buffer.
 			void* mPtr;
@@ -257,27 +257,27 @@ namespace sark{
 
 	// accessor unmap the mapped pointer when it is destructed.
 	template<class _AttribType>
-	ArrayBuffer::AttributeAccessor<_AttribType>::~AttributeAccessor(){
+	ArrayBuffer::AttributeAccessor<_AttribType>::~AttributeAccessor() {
 		if (mPtr != NULL)
 			Destroy();
 	}
 
 	// is this accessor empty?
 	template<class _AttribType>
-	bool ArrayBuffer::AttributeAccessor<_AttribType>::Empty() const{
+	bool ArrayBuffer::AttributeAccessor<_AttribType>::Empty() const {
 		return (mPtr == NULL);
 	}
 
 	// get the number of attribute elements
 	template<class _AttribType>
-	uinteger ArrayBuffer::AttributeAccessor<_AttribType>::Count() const{
+	uinteger ArrayBuffer::AttributeAccessor<_AttribType>::Count() const {
 		return mFeatPtr->bufSize / sizeof(_AttribType);
 	}
 
 	// destroy this attribute accessor explicitly.
 	template<class _AttribType>
-	void ArrayBuffer::AttributeAccessor<_AttribType>::Destroy(){
-		if (mPtr != NULL){
+	void ArrayBuffer::AttributeAccessor<_AttribType>::Destroy() {
+		if (mPtr != NULL) {
 			glBindBuffer(mFeatPtr->bufTarget, mFeatPtr->bufId);
 			glUnmapBuffer(mFeatPtr->bufTarget);
 			glBindBuffer(mFeatPtr->bufTarget, 0);
@@ -288,9 +288,9 @@ namespace sark{
 	// get the reference of attribute value at 'index'.
 	template<class _AttribType>
 	_AttribType& 
-		ArrayBuffer::AttributeAccessor<_AttribType>::operator[](uinteger index){
+		ArrayBuffer::AttributeAccessor<_AttribType>::operator[](uinteger index) {
 		ONLYDBG_CODEBLOCK(
-		if (index*sizeof(_AttribType) >= mFeatPtr->bufSize){
+		if (index*sizeof(_AttribType) >= mFeatPtr->bufSize) {
 			LogFatal("attribute index exceeds valid range");
 		});
 		return *reinterpret_cast<_AttribType*>(
@@ -299,9 +299,9 @@ namespace sark{
 	// get the read-only const reference of attribute value at 'index'.
 	template<class _AttribType>
 	const _AttribType& 
-		ArrayBuffer::AttributeAccessor<_AttribType>::operator[](uinteger index) const{
+		ArrayBuffer::AttributeAccessor<_AttribType>::operator[](uinteger index) const {
 		ONLYDBG_CODEBLOCK(
-		if (index*sizeof(_AttribType) >= mFeatPtr->bufSize){
+		if (index*sizeof(_AttribType) >= mFeatPtr->bufSize) {
 			LogFatal("attribute index exceeds valid range");
 		});
 		return *reinterpret_cast<const _AttribType*>(
@@ -317,7 +317,7 @@ namespace sark{
 		const std::vector<_AttribType>& data, BufferHint storageHint)
 	{
 		// check uniqueness of attribute type.
-		if (mAttribFeats[attribSemantic] != NULL){
+		if (mAttribFeats[attribSemantic] != NULL) {
 			LogWarn("there is the buffer generation request of "
 				"existent attribute type");
 			return false;
@@ -327,10 +327,10 @@ namespace sark{
 		AttributeFeature feat;
 
 		// check and fill element type and element count.
-		if (_ElemType == ElementType::NONE){
+		if (_ElemType == ElementType::NONE) {
 			const std::type_info& attr_type = typeid(_AttribType);
 
-			if (attribSemantic != AttributeSemantic::INDICES){
+			if (attribSemantic != AttributeSemantic::INDICES) {
 				feat.elementType = ElementType::REAL;
 				if (attr_type == typeid(real))
 					feat.elementCount = 1;
@@ -340,30 +340,30 @@ namespace sark{
 					feat.elementCount = 3;
 				else if (attr_type == typeid(Vector4))
 					feat.elementCount = 4;
-				else{
+				else {
 					LogWarn("auto-detection of element properties only supports for "
 						"_AttribType of [real | Vector2 | Vector3 | Vector4]");
 					return false;
 				}
 			}
-			else{
-				if (attr_type == typeid(TriangleFace16)){
+			else {
+				if (attr_type == typeid(TriangleFace16)) {
 					feat.elementType = ElementType::UNSIGNED_SHORT;
 					feat.elementCount = 3;
 				}
-				else if (attr_type == typeid(TriangleFace32)){
+				else if (attr_type == typeid(TriangleFace32)) {
 					feat.elementType = ElementType::UNSIGNED_INT;
 					feat.elementCount = 3;
 				}
-				else if (attr_type == typeid(QuadFace16)){
+				else if (attr_type == typeid(QuadFace16)) {
 					feat.elementType = ElementType::UNSIGNED_SHORT;
 					feat.elementCount = 4;
 				}
-				else if (attr_type == typeid(QuadFace32)){
+				else if (attr_type == typeid(QuadFace32)) {
 					feat.elementType = ElementType::UNSIGNED_INT;
 					feat.elementCount = 4;
 				}
-				else{
+				else {
 					LogWarn("auto-detection of element properties "
 						"only supports for _PrimitiveType of "
 						"[TriangleFace16 | TriangleFace32 | QuadFace16 | QuadFace32]");
@@ -371,10 +371,10 @@ namespace sark{
 				}
 			}
 		}
-		else{
+		else {
 			feat.elementType = _ElemType;
 
-			switch (_ElemType){
+			switch (_ElemType) {
 			case ElementType::REAL:
 				feat.elementCount = sizeof(_AttribType) / sizeof(real);
 				break;
@@ -406,7 +406,7 @@ namespace sark{
 
 		// generate buffer
 		glGenBuffers(1, &feat.bufId);
-		if (feat.bufId == 0){
+		if (feat.bufId == 0) {
 			LogError("failed to generate buffer");
 			return false;
 		}
@@ -418,7 +418,7 @@ namespace sark{
 
 		// create attribute feature and copy data
 		mAttribFeats[attribSemantic] = new AttributeFeature(feat);
-		if (mAttribFeats[attribSemantic] == NULL){
+		if (mAttribFeats[attribSemantic] == NULL) {
 			LogError("failed to allocate attribute feature");
 			return false;
 		}
@@ -431,7 +431,7 @@ namespace sark{
 		AttributeSemantic attribSemantic, AccessHint hint)
 	{
 		// existence check
-		if (mAttribFeats[attribSemantic] == NULL){
+		if (mAttribFeats[attribSemantic] == NULL) {
 			LogWarn("there is no buffer for the specified attribute");
 			return AttributeAccessor<_AttribType>();
 		}
@@ -440,13 +440,13 @@ namespace sark{
 		void* ptr = NULL;
 
 		// access hint validation check and warn.
-		if (feat->bufHint == BufferHint::STATIC){
-			if (hint != AccessHint::READ_ONLY){
+		if (feat->bufHint == BufferHint::STATIC) {
+			if (hint != AccessHint::READ_ONLY) {
 				LogWarn("you may have created the buffer as STATIC for READ_ONLY access");
 			}
 		}
-		else if (feat->bufHint == BufferHint::STREAM){
-			if (hint != AccessHint::WRITE_ONLY){
+		else if (feat->bufHint == BufferHint::STREAM) {
+			if (hint != AccessHint::WRITE_ONLY) {
 				LogWarn("you may have created the buffer as STREAM for WRITE_ONLY access");
 			}
 		}
@@ -461,7 +461,7 @@ namespace sark{
 		glBindBuffer(feat->bufTarget, 0);
 
 		// mapping correction check
-		if (ptr == NULL){
+		if (ptr == NULL) {
 			GLenum errcode = glGetError();
 			std::string err_str = "failed to map buffer\n";
 			err_str += reinterpret_cast<const char*>(gluErrorString(errcode));

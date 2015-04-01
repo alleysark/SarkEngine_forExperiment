@@ -3,10 +3,10 @@
 
 #include "StaticModel.h"
 
-namespace sark{
+namespace sark {
 
 	// simple rigid cube scene component.
-	class RigidCube : public StaticModel{
+	class RigidCube : public StaticModel {
 	private:
 		// basic properties of cube
 		real mWidth, mHeight, mDepth;

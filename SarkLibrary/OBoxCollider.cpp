@@ -4,7 +4,7 @@
 #include "SphereCollider.h"
 #include "AABoxCollider.h"
 
-namespace sark{
+namespace sark {
 
 	OBoxCollider::OBoxCollider(ASceneComponent* reference)
 		: ACollider(reference), pos(0), ext(0.5f)
@@ -27,12 +27,12 @@ namespace sark{
 		axis[0] = _axis[0]; axis[1] = _axis[1]; axis[2] = _axis[2];
 	}
 
-	const ACollider::Type OBoxCollider::GetType() const{
+	const ACollider::Type OBoxCollider::GetType() const {
 		return ACollider::OBOX;
 	}
 
-	bool OBoxCollider::IntersectWith(const ACollider* coll) const{
-		switch (coll->GetType()){
+	bool OBoxCollider::IntersectWith(const ACollider* coll) const {
+		switch (coll->GetType()) {
 		case ACollider::SPHERE:{
 				const SphereCollider& sphere = reinterpret_cast<const SphereCollider&>(*coll);
 				return tool::Sphere_OBoxIntersection(sphere.pos, sphere.r, pos, ext, axis);
@@ -54,7 +54,7 @@ namespace sark{
 		return false;
 	}
 
-	void OBoxCollider::Update(){
+	void OBoxCollider::Update() {
 		// to orient the object, it needs the rotation matrix R.
 		// therefore, transposition of R can transform the object
 		// in the world-space into the origin of the object-space.

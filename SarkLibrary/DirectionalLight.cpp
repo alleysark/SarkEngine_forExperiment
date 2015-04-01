@@ -1,7 +1,7 @@
 #include "DirectionalLight.h"
 #include "Debug.h"
 
-namespace sark{
+namespace sark {
 
 	DirectionalLight::DirectionalLight(const ColorRGBA& ambient, const ColorRGBA& diffuse, const ColorRGBA& specular)
 		: ALight("", NULL, true, LightType::DIRECTIONAL_LIGHT,
@@ -14,11 +14,11 @@ namespace sark{
 		ambient, diffuse, specular, 1.f, 0.f, 0.f)
 	{}
 
-	DirectionalLight:: ~DirectionalLight(){}
+	DirectionalLight:: ~DirectionalLight() {}
 
-	void DirectionalLight::Update(){ }
+	void DirectionalLight::Update() { }
 
-	void DirectionalLight::Render(){ }
+	void DirectionalLight::Render() { }
 
 	// directional light doesn't have collider.
 	// so it simply returns NULL.
@@ -26,11 +26,11 @@ namespace sark{
 		return NULL;
 	}
 
-	Mesh* DirectionalLight::GetMesh(){
+	Mesh* DirectionalLight::GetMesh() {
 		return NULL;
 	}
 
-	RigidBody* DirectionalLight::GetRigidBody(){
+	RigidBody* DirectionalLight::GetRigidBody() {
 		return NULL;
 	}
 

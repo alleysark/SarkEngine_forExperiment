@@ -4,7 +4,7 @@
 #include "AABoxCollider.h"
 #include "OBoxCollider.h"
 
-namespace sark{
+namespace sark {
 
 	SphereCollider::SphereCollider(ASceneComponent* reference)
 		: ACollider(reference), pos(0), r(1.f)
@@ -14,16 +14,16 @@ namespace sark{
 		: ACollider(reference), pos(position), r(radius)
 	{}
 
-	SphereCollider::~SphereCollider(){}
+	SphereCollider::~SphereCollider() {}
 
 	// get type of collider
-	const ACollider::Type SphereCollider::GetType() const{
+	const ACollider::Type SphereCollider::GetType() const {
 		return ACollider::SPHERE;
 	}
 
 	// intersection test.
-	bool SphereCollider::IntersectWith(const ACollider* coll) const{
-		switch (coll->GetType()){
+	bool SphereCollider::IntersectWith(const ACollider* coll) const {
+		switch (coll->GetType()) {
 		case ACollider::SPHERE:{
 				const SphereCollider& sphereB = reinterpret_cast<const SphereCollider&>(*coll);
 				return tool::Sphere_SphereIntersection(pos, r, sphereB.pos, sphereB.r);
@@ -46,7 +46,7 @@ namespace sark{
 	}
 
 	// update sphere
-	void SphereCollider::Update(){
+	void SphereCollider::Update() {
 		pos = mReference->GetTransform().GetPosition();
 	}
 

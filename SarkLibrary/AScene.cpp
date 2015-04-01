@@ -1,26 +1,26 @@
 #include "AScene.h"
 #include <algorithm>
 
-namespace sark{
+namespace sark {
 
 	//=============================================
 	//		AScene::Layer class implementation
 	//=============================================
 
-	AScene::Layer::Layer(){
+	AScene::Layer::Layer() {
 	}
 
-	AScene::Layer::~Layer(){
+	AScene::Layer::~Layer() {
 		mReplicas.clear();
 	}
 
 	// push component into this layer
-	void AScene::Layer::Push(ASceneComponent* component){
+	void AScene::Layer::Push(ASceneComponent* component) {
 		mReplicas.push_back(component);
 	}
 
 	// pop component from this layer
-	void AScene::Layer::Pop(const ASceneComponent::ComponentID& componentId){
+	void AScene::Layer::Pop(const ASceneComponent::ComponentID& componentId) {
 		ReplicaArray::iterator itr = mReplicas.begin();
 		ReplicaArray::iterator end = mReplicas.end();
 		for (; itr != end; itr++) {
@@ -31,38 +31,38 @@ namespace sark{
 		}
 	}
 	// pop component from this layer
-	void AScene::Layer::Pop(ReplicaArrayIterator itrator){
+	void AScene::Layer::Pop(ReplicaArrayIterator itrator) {
 		mReplicas.erase(itrator);
 	}
 
 	// sort all scene components in this layer by relative distance of input position
-	void AScene::Layer::Sort(const Position3& position){
+	void AScene::Layer::Sort(const Position3& position) {
 		// update relative distance
 		ReplicaArray::iterator itr = mReplicas.begin();
 		ReplicaArray::iterator end = mReplicas.end();
-		for (; itr != end; itr++){
+		for (; itr != end; itr++) {
 			(*itr)->rel_distance
 				= ((*itr)->GetTransform().GetPosition() - position).MagnitudeSq();
 		}
 
 
-		mReplicas.sort([](ASceneComponent* lhs, ASceneComponent* rhs)->bool{
+		mReplicas.sort([](ASceneComponent* lhs, ASceneComponent* rhs)->bool {
 			return (lhs->rel_distance < rhs->rel_distance);
 		});
 	}
 
 	// get array iterator of begin
-	AScene::Layer::ReplicaArrayIterator AScene::Layer::Begin(){
+	AScene::Layer::ReplicaArrayIterator AScene::Layer::Begin() {
 		return mReplicas.begin();
 	}
 
 	// get array iterator of end
-	AScene::Layer::ReplicaArrayIterator AScene::Layer::End(){
+	AScene::Layer::ReplicaArrayIterator AScene::Layer::End() {
 		return mReplicas.end();
 	}
 
 	// clear layer
-	void AScene::Layer::Clear(){
+	void AScene::Layer::Clear() {
 		mReplicas.clear();
 	}
 
@@ -72,9 +72,9 @@ namespace sark{
 	//			AScene class implementation
 	//=============================================
 
-	AScene::AScene(){}
+	AScene::AScene() {}
 
-	AScene::~AScene(){
+	AScene::~AScene() {
 		ClearSceneComponents();
 	}
 
@@ -115,7 +115,7 @@ namespace sark{
 	}
 
 	// delete scene component by component id
-	bool AScene::DeleteSceneComponent(const ASceneComponent::ComponentID& componentId){
+	bool AScene::DeleteSceneComponent(const ASceneComponent::ComponentID& componentId) {
 		// erase input thing from component map
 		ComponentMap::const_iterator find = mComponents.find(componentId);
 		if (find == mComponents.cend())
@@ -126,16 +126,16 @@ namespace sark{
 	}
 
 	// delete all scene components by component name
-	uinteger AScene::DeleteSceneComponents(const std::string& componentName){
+	uinteger AScene::DeleteSceneComponents(const std::string& componentName) {
 		uinteger count = 0;
 		ComponentMap::iterator itr = mComponents.begin();
 		ComponentMap::iterator end = mComponents.end();
-		for (; itr != end;){
-			if (itr->second->GetComponentName() == componentName){
+		for (; itr != end;) {
+			if (itr->second->GetComponentName() == componentName) {
 				mComponents.erase(itr++);
 				count++;
 			}
-			else{
+			else {
 				itr++;
 			}
 		}
@@ -143,7 +143,7 @@ namespace sark{
 	}
 
 	// find the scene component from given component id
-	ASceneComponent* AScene::FindSceneComponent(const ASceneComponent::ComponentID& componentId){
+	ASceneComponent* AScene::FindSceneComponent(const ASceneComponent::ComponentID& componentId) {
 		ComponentMap::const_iterator find = mComponents.find(componentId);
 		if (find == mComponents.cend())
 			return NULL;
@@ -151,13 +151,13 @@ namespace sark{
 	}
 
 	// find whole scene components matched with given component name
-	std::list<ASceneComponent*> AScene::FindSceneComponents(const std::string& componentName){
+	std::list<ASceneComponent*> AScene::FindSceneComponents(const std::string& componentName) {
 		std::list<ASceneComponent*> out;
 
 		ComponentMap::iterator itr = mComponents.begin();
 		ComponentMap::iterator end = mComponents.end();
-		for (; itr != end;itr++){
-			if (itr->second->GetComponentName() == componentName){
+		for (; itr != end;itr++) {
+			if (itr->second->GetComponentName() == componentName) {
 				out.push_back(itr->second);
 			}
 		}

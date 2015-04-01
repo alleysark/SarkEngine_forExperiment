@@ -4,7 +4,7 @@
 #include "Engine.h"
 #include "Debug.h"
 
-namespace sark{
+namespace sark {
 
 	RigidBody::RigidBody(ASceneComponent* reference,
 		const real invMass, const Matrix3& invI0,
@@ -15,40 +15,40 @@ namespace sark{
 		mGravityOn(gravityOn),
 		mForce(0.f), mTorque(0.f)
 	{
-		if (mReference == NULL){
+		if (mReference == NULL) {
 			LogError("component reference can't be NULL for rigid body");
 		}
 	}
 
-	RigidBody::~RigidBody(){}
+	RigidBody::~RigidBody() {}
 
 	// get center of mass.
-	const Position3 RigidBody::GetCM(){
+	const Position3 RigidBody::GetCM() {
 		return mReference->GetTransform().GetPosition();
 	}
 
 	// get mass.
-	const real& RigidBody::GetInvMass() const{
+	const real& RigidBody::GetInvMass() const {
 		return mInvMass;
 	}
 
 	// set mass. if zero, then body is fixed.
-	void RigidBody::SetInvMass(real invMass){
+	void RigidBody::SetInvMass(real invMass) {
 		mInvMass = invMass;
 	}
 
 	// get inverse of initial inertia tensor.
-	const Matrix3& RigidBody::GetInvInertiaTensor0() const{
+	const Matrix3& RigidBody::GetInvInertiaTensor0() const {
 		return mInvI0;
 	}
 
 	// set inverse initial inertia tensor
-	void RigidBody::SetInvInertiaTensor0(const Matrix3& invI0){
+	void RigidBody::SetInvInertiaTensor0(const Matrix3& invI0) {
 		mInvI0 = invI0;
 	}
 
 	// get inverse inertia tensor of time t. inv(I(t))
-	const Matrix3 RigidBody::GetInvInertiaTensor() const{
+	const Matrix3 RigidBody::GetInvInertiaTensor() const {
 		const Matrix4& matRef = mReference->GetTransform().GetMatrix();
 		Matrix3 rotMat(
 			matRef.row[0].xyz,
@@ -59,26 +59,26 @@ namespace sark{
 	}
 
 	// get current linear velocity.
-	const Vector3& RigidBody::GetVelocity() const{
+	const Vector3& RigidBody::GetVelocity() const {
 		return mVelocity;
 	}
 
 	// set current linear velocity.
-	void RigidBody::SetVelocity(const Vector3& velocity){
+	void RigidBody::SetVelocity(const Vector3& velocity) {
 		mVelocity = velocity;
 	}
 
 	// get current angular velocity.
-	const Vector3& RigidBody::GetAngularVelocity() const{
+	const Vector3& RigidBody::GetAngularVelocity() const {
 		return mAngularVelocity;
 	}
 	// set current angular velocity.
-	void RigidBody::SetAngularVelocity(const Vector3& angularVelocity){
+	void RigidBody::SetAngularVelocity(const Vector3& angularVelocity) {
 		mAngularVelocity = angularVelocity;
 	}
 
 	// add linear force to this rigid body.
-	void RigidBody::AddForce(const Vector3& force){
+	void RigidBody::AddForce(const Vector3& force) {
 		mForce += force;
 	}
 
@@ -100,23 +100,23 @@ namespace sark{
 	}
 
 	// is this body affected by gravity.
-	bool RigidBody::IsGravityOn() const{
+	bool RigidBody::IsGravityOn() const {
 		return mGravityOn;
 	}
 
 	// set this body to be affected by gravity or not.
-	void RigidBody::GravityOn(bool on){
+	void RigidBody::GravityOn(bool on) {
 		mGravityOn = on;
 	}
 
 	// is this body fixed.
-	bool RigidBody::IsFixed() const{
+	bool RigidBody::IsFixed() const {
 		return (mInvMass == 0);
 	}
 
 	// update translational terms and rotational terms.
-	void RigidBody::Update(){
-		if (mInvMass == 0){
+	void RigidBody::Update() {
+		if (mInvMass == 0) {
 			mVelocity = 0.f;
 			mAngularVelocity = 0.f;
 			return;
@@ -147,7 +147,7 @@ namespace sark{
 		// R(t+¥Ät) <= q(t+¥Ät) = q_w(t)q(t)
 		Quaternion q = transRef.GetRotation();
 		real magw = mAngularVelocity.Magnitude();
-		if (math::real_notequal(magw, 0.f)){
+		if (math::real_notequal(magw, 0.f)) {
 			// ¥è = |¥ø|*¥Ät
 			real half_theta = magw*dt / 2.f;
 			Vector3 unitw = mAngularVelocity / magw;

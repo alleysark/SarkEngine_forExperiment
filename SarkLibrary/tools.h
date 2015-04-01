@@ -4,8 +4,8 @@
 #include <vector>
 #include "core.h"
 
-namespace sark{
-	namespace tool{
+namespace sark {
+	namespace tool {
 
 		// point location about plane.
 		// *param:
@@ -13,7 +13,7 @@ namespace sark{
 		//     plane_n - plane normal vector.
 		//     plane_p - a point on the plane.
 		// *return: position is above(1), on(0) or below(-1) the plane.
-		inline int8 PointLocationByPlane(const Vector3& P, const Vector3& plane_n, const Vector3& plane_p){
+		inline int8 PointLocationByPlane(const Vector3& P, const Vector3& plane_n, const Vector3& plane_p) {
 			return math::sign((P - plane_p).Dot(plane_n));
 		}
 
@@ -22,7 +22,7 @@ namespace sark{
 		//     P       - point.
 		//     plane_n - plane normal vector.
 		//     plane_p - a point on the plane.
-		inline real DistancePointFromPlane(const Vector3& P, const Vector3& plane_n, const Vector3& plane_p){
+		inline real DistancePointFromPlane(const Vector3& P, const Vector3& plane_n, const Vector3& plane_p) {
 			// D = -dot(plane_p, plane_n)
 			return (P.Dot(plane_n) - plane_p.Dot(plane_n)) / plane_n.Magnitude();
 		}
